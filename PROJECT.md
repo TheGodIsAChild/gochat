@@ -51,17 +51,18 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：用户已恢复工作（19:40 说「继续 gochat」），M0 接近收尾，但有一个 API 误用待修。
+- **项目状态**：用户已恢复工作，M0「读配置」核心功能**已跑通并验证**，剩最后收尾。
   - `internal/config/`：5 个结构体各自文件，`Config` 聚合（仅数据定义；读取逻辑归 `core`）。
-  - `core/init_config.go`（624B）：`LoadConfigFile`（flag）+ `LoadConfig`（**有 bug**）+ `InitBaseServices`（编排）。
+  - `core/init_config.go`（682B）：`LoadConfigFile`（flag）+ `LoadConfig`（`&global.Config` 已修对）+ `InitBaseServices`（编排）。
   - `global/global.go`（110B）：`var ConfigPath *string` + `var Config config.Config`。
-  - `main.go`（127B）：仅 `global.ConfigPath = core.LoadConfigFile()`，**未调 LoadConfig / InitBaseServices**。
-  - 依赖：用户选了 `github.com/goccy/go-yaml v1.19.2`（不是 yaml.v3），已写入 go.mod/go.sum。经临时目录实测可正确读取全部配置。
-  - **当前 build 红**：`core\init_config.go:27:22: cannot convert bytes to yaml.BytesMarshaler`（`BytesMarshaler` 是接口不是函数）。
-  - `internal/httpapi/`：未创建。
-- **待修的 3 处**：`LoadConfig()` 加 `error` 返回；`fmt.Errorf(...)` 丢弃 → `return err`；`yaml.BytesMarshaler(data)` → `yaml.Unmarshal(data, &global.Config)`；并删掉未用的 `"fmt"` import。改完还需在 main 接线并打印 `global.Config.Mysql.Port` 验证 3307。
+  - `main.go`（147B）：仅调 `LoadConfigFile` + `LoadConfig`，**无打印、无 InitBaseServices**。
+  - 依赖：`github.com/goccy/go-yaml v1.19.2`（用户自选，已入 go.mod/go.sum）。
+  - **✅ 实测已验证**：`LoadConfig` 能正确读入 config.yaml（MySQL=127.0.0.1:3307、Redis=127.0.0.1:6379、JWT.expire=72）。
+  - `go build ./...` 绿；**`go vet` 仍红**：`core\init_config.go:25:62: fmt.Errorf call has arguments but no formatting directives`（缺 `%w`）。
+  - `internal/httpapi/`：未创建（M0 最后一块 `/health`）。
+- **待修**：`fmt.Errorf("...：", err)` → 加 `%w`；`yaml.Unmarshal` 的 error 未接；main 加打印验证 + 调 `InitBaseServices`；然后写 `router.go` + `/health`。
 - **数据库状态**：MySQL `gochat` 库存在但**已清空无表**（users/friend_requests/friendships 已 DROP），等你 AutoMigrate 亲手建
-- **下一步**：修 LoadConfig → main 接线 → `go run .` 打印 3307 → `router.go` + `/health`
+- **下一步**：修 vet 错误 → main 打印 3307 → `router.go` + `/health` → M0 完成
 - **最近 commit**：`docs: record M0 skeleton done, blocked on config.Load`
 
 ## 六、关键决策记录（追加式）
