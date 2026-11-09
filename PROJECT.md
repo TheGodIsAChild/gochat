@@ -39,8 +39,8 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 | 里程碑 | 内容 | 状态 | commit | 验收 |
 |---|---|---|---|---|
-| M0 | 环境 + 骨架 + 配置 | 🔄 参考实现已验证，待你重写 | b14e596 | build/vet/curl 全通过 |
-| M1 | 用户 + 好友（GORM 关联） | ⬜ | — | — |
+| M0 | 环境 + 骨架 + 配置 | ⬜ 待你从0手写 | — | — |
+| M1 | 用户 + 好友（GORM 关联） | ⬜ 待你从0手写 | — | — |
 | M2 | 单聊文本 + WebSocket + 在线状态 | ⬜ | — | — |
 | M3 | 群聊 + 广播 + Redis pub/sub | ⬜ | — | — |
 | M4 | 并发专题：连接管理 / 优雅退出 / 压测 | ⬜ | — | — |
@@ -51,10 +51,9 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **当前里程碑**：M0（环境 + 骨架），环境就绪 + **参考实现已跑通**（build / vet / curl 全通过），已提交 `b14e596`
-- **下一步**：**你自己重写 M0 三个文件**（`internal/config/config.go`、`internal/httpapi/router.go`、`main.go`），对照参考版学习；重跑验收后我逐行 review
-- **预备材料（已备好）**：`gochat-study/m0-walkthrough.md`（重写前先看）、`gochat-study/m1-task.md`（下一里程碑任务卡）
-- **最近 commit**：`b14e596` M0: scaffold + reference skeleton
+- **项目状态**：实现代码已全部清空（`main.go`、`internal/**`、`go.sum` 已删），等你从 0 手写。当前只剩环境脚手架：`docker-compose.yml`、`config.yaml`、`.gitignore`、空 `go.mod`、`PROJECT.md`
+- **下一步**：**你从 0 写 M0**：`main.go` + `internal/config/config.go` + `internal/httpapi/router.go`
+- **最近 commit**：`reset: 清空实现代码，改为从0手写`
 
 ## 六、关键决策记录（追加式）
 
@@ -62,6 +61,7 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
   1. **前端范围**：最小 Web 页面（原生 HTML/JS）+ 浏览器真实通话（M5 能可视化演示）。
   2. **消息队列**：RabbitMQ（amqp091-go）。
 - 架构节奏：先单体（M0–M5）跑通，再拆微服务（M6）+ 接 MQ（M7）。
+- 2026-11-09 **辅导模式确认（重要）**：用户要求**从 0 手写代码，不接受现成实现**。我的角色固定为：设计讲解 + 项目结构 + 接口草图 + 代码审查 + 答疑；**不提供可直接复制的完整实现**。
 
 ## 七、环境速查（重要，别踩坑）
 
