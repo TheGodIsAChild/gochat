@@ -3,6 +3,8 @@ package db
 import (
 	"fmt"
 	"gochat/global"
+	"gochat/internal/model/friend"
+	"gochat/internal/model/user"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -11,7 +13,9 @@ import (
 
 func LoadMysql() (*gorm.DB, error) {
 	dsn := global.Config.Mysql.DB_DSN()
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true, //不生成实体外键
+	})
 	if err != nil {
 		return db, fmt.Errorf("数据库连接Open失败，请检查数据库状态：%w", err)
 	}
@@ -25,4 +29,20 @@ func LoadMysql() (*gorm.DB, error) {
 	global.DB = db
 	fmt.Printf("数据库连接成功")
 	return db, nil
+}
+
+func InitMysqlTables() (bool, error) {
+	err := global.DB.AutoMigrate(
+		&friend.Blacklist{},
+		&friend.FriendGroup{},
+		&friend.FriendRequest{},
+		&friend.Friendship{},
+		&user.User{},
+		&user.UserSettings{},
+	)
+	if err != nil {
+		fmt.Print("初始化数据库表失败")
+		return false, err
+	}
+	return true, nil
 }

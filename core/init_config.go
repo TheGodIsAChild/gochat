@@ -13,10 +13,18 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-func LoadConfigFile() *string {
-	configPath := flag.String("config", "config.yaml", "./config.yaml")
+type FlagConfig struct {
+	ConfigPath string
+	InitDB     bool
+}
+
+var flagConfig = new(FlagConfig)
+
+func LoadConfigFile() {
+	flag.StringVar(&flagConfig.ConfigPath, "config", "./config.yaml", "默认使用config.yaml")
+	flag.BoolVar(&flagConfig.InitDB, "db", false, "是否初始化数据库")
 	flag.Parse()
-	return configPath
+	global.ConfigPath = &flagConfig.ConfigPath
 }
 
 func LoadConfig() (bool, error) {
@@ -32,7 +40,16 @@ func LoadConfig() (bool, error) {
 }
 
 func InitBaseServices() {
-	db.LoadMysql()
+	if _, err := db.LoadMysql(); err != nil {
+		fmt.Print(fmt.Errorf("数据库连接失败：%w", err))
+		os.Exit(0)
+	}
+	if flagConfig.InitDB {
+		if _, err := db.InitMysqlTables(); err != nil {
+			fmt.Print(fmt.Errorf("数据库建表初始化错误：%w", err))
+			os.Exit(0)
+		}
+	}
 	db.LoadRedis()
 	mq.LoadMq()
 	jwt.LoadJWT()

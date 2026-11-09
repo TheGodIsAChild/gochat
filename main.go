@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	global.ConfigPath = core.LoadConfigFile()
+	core.LoadConfigFile()
 	core.LoadConfig()
 	core.InitBaseServices()
 	fmt.Println("Config：", global.Config)
