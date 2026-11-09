@@ -52,6 +52,7 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 ## 五、当前状态
 
 - **项目状态**：实现代码已全部清空（`main.go`、`internal/**`、`go.sum` 已删），等你从 0 手写。当前只剩环境脚手架：`docker-compose.yml`、`config.yaml`、`.gitignore`、空 `go.mod`、`PROJECT.md`
+- **数据库状态**：MySQL `gochat` 库存在但**已清空无表**（users/friend_requests/friendships 已 DROP），等你 AutoMigrate 亲手建
 - **下一步**：**你从 0 写 M0**：`main.go` + `internal/config/config.go` + `internal/httpapi/router.go`
 - **最近 commit**：`reset: 清空实现代码，改为从0手写`
 
