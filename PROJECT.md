@@ -30,10 +30,19 @@
 ```
 C:\Users\Mr.Du\Desktop\deepseekHarness\
   gochat\            # 项目代码（独立 git 仓库，从零写）
-  gochat-study\      # 规划文档（plan.md / rebuild-log.md）
+  gochat-study\      # 规划文档（见下）
   study\             # 旧项目 cortex 的文档，与本项目无关，别混
   reference\         # 旧项目 cortex 只读引用，与本项目无关
 ```
+
+**gochat 内部结构（权威版见 `gochat-study/structure.md`）**：采用「`core/` 启动装配 + `global/` 全局状态 + `internal/` 业务」风格；`internal/model|service|router` 按域拆子包，`internal/config` 保持扁平。
+
+**gochat-study 文档索引**：
+- `structure.md` —— 项目结构 + 命名/拆分规则（权威）
+- `plan.md` —— 9 个里程碑总计划
+- `db-schema.md` —— 完整数据库设计（9 域约 25 表，标注里程碑）
+- `m0-task.md` / `m0-checklist.md` —— M0 任务卡/自检
+- `m1-design.md` / `m1-models.md` / `m1-auth.md` / `m1-task.md` —— M1 设计/模型/bcrypt+JWT/任务卡
 
 ## 四、里程碑进度
 
