@@ -51,14 +51,16 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：用户正在从 0 手写 M0，进展中。
-  - `internal/config/`：已拆成「一结构体一文件」（config.go 只留 Config 聚合；mysql/server/redis/jwt/rabbitmq 各自文件）。`ExpireHours` 已加 `yaml:"expire_hours"`。**build 绿（该包）**。
-  - **待办**：`Load`/`Get` 尚未写；`core/load_config.go` 是 0 字节空文件，导致 `go build ./...` 红（应删除，Load 归入 internal/config）。
-  - `main.go`（14B）：仅 `package main`，待写（flag -config → config.Load）。
+- **项目状态**：用户从 0 手写 M0 中，骨架已完成，卡在 `config.Load`。
+  - `internal/config/`：5 个结构体各自文件，`Config` 聚合。**缺 `Load`/`Get`（关键卡点）**。
+  - `core/`：`init_config.go`（`LoadConfigFile` 解析 flag + `LoadBaseServices` 编排）、`db/`、`jwt/`、`mq/`、`server/` 子包（包名已修正，函数均为空壳）。
+  - `global/global.go`：`var ConfigPath *string`。
+  - `main.go`（168B）：`global.ConfigPath = core.LoadConfigFile()` + `fmt.Print(global.ConfigPath)`——**指针未解引用（打印地址）**，且未调 `LoadBaseServices`。
   - `internal/httpapi/`：未创建。
+  - `go build ./...` 当前绿；但项目无实际功能（未读配置、未起服务）。
 - **数据库状态**：MySQL `gochat` 库存在但**已清空无表**（users/friend_requests/friendships 已 DROP），等你 AutoMigrate 亲手建
-- **下一步**：删 `core/` → 写 `config.Load`/`Get` → `go get gopkg.in/yaml.v3` → `router.go` → `main.go`
-- **最近 commit**：`docs: update M0 progress (config.go structs done, Load/Get pending)`
+- **下一步**：写 `config.Load`/`Get`（微步法：空壳→os.ReadFile→yaml.Unmarshal）→ main 解引用 + 调 `LoadBaseServices` → `router.go` + `/health`
+- **最近 commit**：`docs: update M0 progress (config split done, Load/Get + core cleanup pending)`
 
 ## 六、关键决策记录（追加式）
 
