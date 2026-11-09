@@ -1,0 +1,24 @@
+# gochat 配置文件（开发环境）
+server:
+  addr: ":8080"
+  mode: "debug" # gin 运行模式：debug / release / test
+
+mysql:
+  host: "127.0.0.1"
+  port: 3307
+  user: "gochat"
+  password: "gochat123"
+  database: "gochat"
+  charset: "utf8mb4"
+
+redis:
+  addr: "127.0.0.1:6379"
+  password: ""
+  db: 0
+
+rabbitmq:
+  url: "amqp://gochat:gochat123@127.0.0.1:5672/"
+
+jwt:
+  secret: "gochat-dev-secret-change-me"
+  expire_hours: 72
