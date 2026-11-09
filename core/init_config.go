@@ -50,7 +50,9 @@ func InitBaseServices() {
 			os.Exit(0)
 		}
 	}
-	db.LoadRedis()
+	if _, err := db.LoadRedis(); err != nil {
+		fmt.Print(fmt.Errorf("初始化Redis失败：%w", err))
+	}
 	mq.LoadMq()
 	jwt.LoadJWT()
 	server.LoadServer()

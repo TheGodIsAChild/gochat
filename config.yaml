@@ -21,4 +21,5 @@ rabbitmq:
 
 jwt:
   secret: "gochat-dev-secret-change-me"
-  expire_hours: 72
+  access_expire_minutes: 120
+  refresh_expire_hours: 720
