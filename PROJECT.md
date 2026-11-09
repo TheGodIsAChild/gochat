@@ -60,8 +60,10 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
   - 依赖：`github.com/goccy/go-yaml` + `github.com/gin-gonic/gin v1.12.0`。
   - `go build ./...` 绿、`go vet ./...` 绿。
 - **下一步**：**M1（用户 + 好友）**——设计见 `gochat-study/m1-design.md`、任务卡见 `m1-task.md`。要点：GORM 连 MySQL(3307) + AutoMigrate + JWT + bcrypt + 好友事务。
+  - M1 第 1 步进行中：`gorm.io/gorm v1.31.2` + `gorm.io/driver/mysql v1.6.0` 已装进 go.mod（用户已 `go get`）。待用户填 `core/db/init_mysql.go` 的 `LoadMysql()`（当前 39B 空壳）。
+  - **✅ 已实测验证**：GORM 从本机连 Docker MySQL 成功（`gochat:gochat123@tcp(127.0.0.1:3307)/gochat?charset=utf8mb4&parseTime=True&loc=Local`，MySQL 版本 8.0.46）。连接层无坑。
 - **数据库状态**：MySQL `gochat` 库存在但**仍为空表**（M1 由用户 AutoMigrate 亲手建）
-- **最近 commit**：`docs: M0 config verified (build/vet/run green), next /health`
+- **最近 commit**：`69c6a7e` M0 complete: config loading + gin /health
 
 ## 六、关键决策记录（追加式）
 
