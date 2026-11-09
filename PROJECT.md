@@ -51,17 +51,17 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：M0 的「读配置」**已完全通过验收**（build / vet / run 全绿），只剩 `/health`。
+- **项目状态**：M0 的「读配置」**已完全通过验收**（build / vet / run 全绿）；`/health` 正在做，当前被一个空文件卡住 build。
   - `internal/config/`：5 个结构体各自文件，`Config` 聚合（仅数据定义；读取逻辑归 `core`）。
-  - `core/init_config.go`（777B）：`LoadConfigFile`（flag）+ `LoadConfig`（`&global.Config`、`%w` 均已修对）+ `InitBaseServices`（编排，子包函数仍为空壳）。
-  - `global/global.go`（110B）：`var ConfigPath *string` + `var Config config.Config`。
-  - `main.go`（197B）：`LoadConfigFile` → `LoadConfig` → `fmt.Println("Config：", global.Config)`。**实测 `go run .` 打印完整配置**（MySQL 3307 / Redis 6379 / RabbitMQ URL / JWT 72 / Server :8080）。
-  - 依赖：`github.com/goccy/go-yaml v1.19.2`。
-  - **`go build ./...` 绿、`go vet ./...` 绿**。
-  - `internal/httpapi/`：未创建（M0 最后一块 `/health`）。
-- **下一步**：`go get github.com/gin-gonic/gin` → 写 `internal/httpapi/router.go`（`NewRouter()` + `GET /health`）→ main 里 `r.Run(global.Config.Server.Addr)` → `curl /health` 验证 200
+  - `core/init_config.go`（777B）：`LoadConfigFile` + `LoadConfig`（`&global.Config`、`%w` 已修对）+ `InitBaseServices`（子包仍空壳）。
+  - `global/global.go`：`var ConfigPath *string` + `var Config config.Config`。
+  - `main.go`（197B）：`LoadConfigFile` → `LoadConfig` → `fmt.Println("Config：", global.Config)`。实测打印完整配置（3307/6379/RabbitMQ/JWT 72/:8080）。
+  - 依赖：`github.com/goccy/go-yaml` + `github.com/gin-gonic/gin v1.12.0`（已 go get）。
+  - 用户选择了新路由结构：`internal/router/health/health_api.go`（= `package health`，`Register(r *gin.Engine)`）+ 计划 `internal/router/router.go`（`NewRouter()` 汇总）。
+  - **当前 build 红**：`internal/router/health/health_api.go` 是 **0 字节空文件** → `expected 'package', found 'EOF'`。
+- **下一步**：填 `health_api.go`（`package health` + `Register`）→ 建 `internal/router/router.go`（`NewRouter` 调 `health.Register`）→ main 里 `r := router.NewRouter(); r.Run(global.Config.Server.Addr)` → `curl /health`
 - **数据库状态**：MySQL `gochat` 库存在但**已清空无表**（users/friend_requests/friendships 已 DROP），等你 AutoMigrate 亲手建
-- **最近 commit**：`docs: config loading verified (MySQL 3307), remaining vet fix + /health`
+- **最近 commit**：`docs: M0 config verified (build/vet/run green), next /health`
 
 ## 六、关键决策记录（追加式）
 
