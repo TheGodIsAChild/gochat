@@ -51,18 +51,13 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：✅ **M0 已完成！** 服务可运行，`curl http://127.0.0.1:8080/health` 返回 `200 + {"status":"ok"}`（实测进程 `gochat` PID 32924 监听 :8080）。
-  - `internal/config/`：5 个结构体各自文件，`Config` 聚合（仅数据定义；读取逻辑归 `core`）。
-  - `core/init_config.go`（777B）：`LoadConfigFile` + `LoadConfig`（`&global.Config`、`%w` 已修对）+ `InitBaseServices`（子包仍空壳）。
-  - `global/global.go`：`var ConfigPath *string` + `var Config config.Config`。
-  - `internal/router/`：`router.go`（`NewRouter()` = `gin.Default()` + `health.HealthRouter(r)`）+ `health/health_api.go`（`HealthRouter(r *gin.Engine)` 注册 `GET /health`）。
-  - `main.go`（285B）：`LoadConfigFile` → `LoadConfig` → 打印 Config → `r := router.NewRouter()` → `r.Run(global.Config.Server.Addr)`。
-  - 依赖：`github.com/goccy/go-yaml` + `github.com/gin-gonic/gin v1.12.0`。
-  - `go build ./...` 绿、`go vet ./...` 绿。
-- **下一步**：**M1（用户 + 好友）**——设计见 `gochat-study/m1-design.md`、任务卡见 `m1-task.md`。要点：GORM 连 MySQL(3307) + AutoMigrate + JWT + bcrypt + 好友事务。
-  - M1 第 1 步进行中：`gorm.io/gorm v1.31.2` + `gorm.io/driver/mysql v1.6.0` 已装进 go.mod（用户已 `go get`）。待用户填 `core/db/init_mysql.go` 的 `LoadMysql()`（当前 39B 空壳）。
-  - **✅ 已实测验证**：GORM 从本机连 Docker MySQL 成功（`gochat:gochat123@tcp(127.0.0.1:3307)/gochat?charset=utf8mb4&parseTime=True&loc=Local`，MySQL 版本 8.0.46）。连接层无坑。
-- **数据库状态**：MySQL `gochat` 库存在但**仍为空表**（M1 由用户 AutoMigrate 亲手建）
+- **项目状态**：✅ M0 完成；**M1 第 1 步（GORM 连 MySQL）已完成并验证**。
+  - M0：`internal/config`（5 结构体）、`core.LoadConfig`、`global`、`internal/router`（NewRouter + HealthRouter）、`main.go`。`curl /health` → 200。
+  - M1 第 1 步：`internal/config/mysql_config.go` 加了 `DB_DSN()` 方法；`core/db/init_mysql.go` 的 `LoadMysql() (*gorm.DB, error)` 已实现（DSN → `gorm.Open(mysql.Open(dsn))` → 连接池 → `global.DB`）；`global` 加了 `var DB *gorm.DB`；`main.go` 已调 `core.InitBaseServices()`。
+  - **✅ 实测**：`go run .` 打印「数据库连接成功」、正常监听 :8080，GORM 连 MySQL 8.0.46 成功。
+  - ⚠️ 待改：`InitBaseServices()` 目前忽略了 `LoadMysql()` 返回的 error（连接失败不会报）。
+- **下一步**：M1 第 2 步——**模型 + AutoMigrate**（users / friend_requests / friendships）。指导文档见 `gochat-study/m1-models.md`（含复合索引 tag 的坑）。之后再 bcrypt + JWT（`m1-auth.md`）。
+- **数据库状态**：MySQL `gochat` 库存在但**仍为空表**（下一步 AutoMigrate 建）
 - **最近 commit**：`69c6a7e` M0 complete: config loading + gin /health
 
 ## 六、关键决策记录（追加式）
