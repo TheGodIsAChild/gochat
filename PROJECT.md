@@ -51,16 +51,17 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：用户从 0 手写 M0 中，骨架已完成，卡在 `config.Load`。
-  - `internal/config/`：5 个结构体各自文件，`Config` 聚合。**缺 `Load`/`Get`（关键卡点）**。
+- **项目状态**：用户从 0 手写 M0 中，骨架已完成，卡在「读 yaml」这一步。
+  - `internal/config/`：5 个结构体各自文件，`Config` 聚合。只做数据定义（用户决定：读取逻辑归 `core`）。
   - `core/`：`init_config.go`（`LoadConfigFile` 解析 flag + `LoadBaseServices` 编排）、`db/`、`jwt/`、`mq/`、`server/` 子包（包名已修正，函数均为空壳）。
   - `global/global.go`：`var ConfigPath *string`。
-  - `main.go`（168B）：`global.ConfigPath = core.LoadConfigFile()` + `fmt.Print(global.ConfigPath)`——**指针未解引用（打印地址）**，且未调 `LoadBaseServices`。
+  - `main.go`（127B）：仅 `global.ConfigPath = core.LoadConfigFile()`，无其他逻辑。
   - `internal/httpapi/`：未创建。
-  - `go build ./...` 当前绿；但项目无实际功能（未读配置、未起服务）。
+  - `go build ./...` 绿，但项目无实际功能（未读配置、未起服务）。
+- **⚠️ 已提供参考实现**：第 51 轮给出了 `core.LoadConfig`（os.ReadFile + yaml.Unmarshal）的完整参考 + main 接线方式，条件是用户需理解后重写。用户尚未落地。
 - **数据库状态**：MySQL `gochat` 库存在但**已清空无表**（users/friend_requests/friendships 已 DROP），等你 AutoMigrate 亲手建
-- **下一步**：写 `config.Load`/`Get`（微步法：空壳→os.ReadFile→yaml.Unmarshal）→ main 解引用 + 调 `LoadBaseServices` → `router.go` + `/health`
-- **最近 commit**：`docs: update M0 progress (config split done, Load/Get + core cleanup pending)`
+- **下一步**：用户实现 `core.LoadConfig`（读 yaml）→ main 接线 → `go run .` 打印 3307 → 然后 `router.go` + `/health`
+- **最近 commit**：`docs: record M0 skeleton done, blocked on config.Load`
 
 ## 六、关键决策记录（追加式）
 
