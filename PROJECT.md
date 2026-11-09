@@ -53,6 +53,7 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 - **当前里程碑**：M0（环境 + 骨架），环境就绪 + **参考实现已跑通**（build / vet / curl 全通过），已提交 `b14e596`
 - **下一步**：**你自己重写 M0 三个文件**（`internal/config/config.go`、`internal/httpapi/router.go`、`main.go`），对照参考版学习；重跑验收后我逐行 review
+- **预备材料（已备好）**：`gochat-study/m0-walkthrough.md`（重写前先看）、`gochat-study/m1-task.md`（下一里程碑任务卡）
 - **最近 commit**：`b14e596` M0: scaffold + reference skeleton
 
 ## 六、关键决策记录（追加式）
