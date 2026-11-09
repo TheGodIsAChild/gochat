@@ -39,7 +39,7 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 | 里程碑 | 内容 | 状态 | commit | 验收 |
 |---|---|---|---|---|
-| M0 | 环境 + 骨架 + 配置 | 🔄 进行中 | — | — |
+| M0 | 环境 + 骨架 + 配置 | 🔄 参考实现已验证，待你重写 | b14e596 | build/vet/curl 全通过 |
 | M1 | 用户 + 好友（GORM 关联） | ⬜ | — | — |
 | M2 | 单聊文本 + WebSocket + 在线状态 | ⬜ | — | — |
 | M3 | 群聊 + 广播 + Redis pub/sub | ⬜ | — | — |
@@ -51,9 +51,9 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **当前里程碑**：M0（环境 + 骨架），**环境已就绪**（MySQL/Redis/RabbitMQ 三容器 healthy），脚手架 + 依赖就位
-- **下一步**：你写 main.go + internal/config + /health（任务卡见 `gochat-study/m0-task.md`）
-- **最近 commit**：—
+- **当前里程碑**：M0（环境 + 骨架），环境就绪 + **参考实现已跑通**（build / vet / curl 全通过），已提交 `b14e596`
+- **下一步**：**你自己重写 M0 三个文件**（`internal/config/config.go`、`internal/httpapi/router.go`、`main.go`），对照参考版学习；重跑验收后我逐行 review
+- **最近 commit**：`b14e596` M0: scaffold + reference skeleton
 
 ## 六、关键决策记录（追加式）
 
