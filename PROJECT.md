@@ -51,9 +51,12 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：用户已开始从 0 手写 M0。当前进度：`main.go` 只有 `package main`（14B）、`internal/config/config.go` 是空文件（0B）、`internal/httpapi/` 未创建。环境脚手架齐全。
+- **项目状态**：用户正在从 0 手写 M0，进展中。
+  - `internal/config/config.go`（498B）：5 个子结构体 + `Config` 已写好，`Port int` / `Database` / `Charset` 已修正。**待补**：`ExpireHours` 加 `yaml:"expire_hours"` tag、`Load`/`Get` 两个函数。
+  - `main.go`（14B）：仅 `package main`，待写。
+  - `internal/httpapi/`：未创建。
 - **数据库状态**：MySQL `gochat` 库存在但**已清空无表**（users/friend_requests/friendships 已 DROP），等你 AutoMigrate 亲手建
-- **下一步**：用户填 `internal/config/config.go`（结构体 + Load + Get）→ `internal/httpapi/router.go` → `main.go` 接起来
+- **下一步**：完成 config.go（tag + Load/Get）→ `go get gopkg.in/yaml.v3` → `router.go` → `main.go`
 - **最近 commit**：`reset: 清空实现代码，改为从0手写`
 
 ## 六、关键决策记录（追加式）
