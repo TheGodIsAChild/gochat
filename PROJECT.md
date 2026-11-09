@@ -56,9 +56,9 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
   - M1 第 1 步：`internal/config/mysql_config.go` 加了 `DB_DSN()` 方法；`core/db/init_mysql.go` 的 `LoadMysql() (*gorm.DB, error)` 已实现（DSN → `gorm.Open(mysql.Open(dsn))` → 连接池 → `global.DB`）；`global` 加了 `var DB *gorm.DB`；`main.go` 已调 `core.InitBaseServices()`。
   - **✅ 实测**：`go run .` 打印「数据库连接成功」、正常监听 :8080，GORM 连 MySQL 8.0.46 成功。
   - ⚠️ 待改：`InitBaseServices()` 目前忽略了 `LoadMysql()` 返回的 error（连接失败不会报）。
-- **下一步**：M1 第 2 步——**模型 + AutoMigrate**（users / friend_requests / friendships）。指导文档见 `gochat-study/m1-models.md`（含复合索引 tag 的坑）。之后再 bcrypt + JWT（`m1-auth.md`）。
-- **数据库状态**：MySQL `gochat` 库存在但**仍为空表**（下一步 AutoMigrate 建）
-- **最近 commit**：`69c6a7e` M0 complete: config loading + gin /health
+- **下一步**：M1 第 2 步——**模型 + AutoMigrate（6 张表）**：`users`、`user_settings`、`friend_requests`、`friendships`、`friend_groups`、`blacklist`。文档：[`db-schema.md`](gochat-study/db-schema.md)（完整表设计）、[`m1-models.md`](gochat-study/m1-models.md)（GORM 写法+复合索引坑）、[`m1-design.md`](gochat-study/m1-design.md)（设计+API）、[`m1-auth.md`](gochat-study/m1-auth.md)（bcrypt/JWT）。之后再 bcrypt + JWT + service + handler。
+- **数据库状态**：MySQL `gochat` 库存在但**仍为空表**（下一步 AutoMigrate 建 6 张）
+- **最近 commit**：`9e3a8c5` M1 step1: GORM MySQL connection working
 
 ## 六、关键决策记录（追加式）
 
