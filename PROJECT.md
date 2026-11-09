@@ -52,12 +52,13 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 ## 五、当前状态
 
 - **项目状态**：用户正在从 0 手写 M0，进展中。
-  - `internal/config/config.go`（498B）：5 个子结构体 + `Config` 已写好，`Port int` / `Database` / `Charset` 已修正。**待补**：`ExpireHours` 加 `yaml:"expire_hours"` tag、`Load`/`Get` 两个函数。
-  - `main.go`（14B）：仅 `package main`，待写。
+  - `internal/config/`：已拆成「一结构体一文件」（config.go 只留 Config 聚合；mysql/server/redis/jwt/rabbitmq 各自文件）。`ExpireHours` 已加 `yaml:"expire_hours"`。**build 绿（该包）**。
+  - **待办**：`Load`/`Get` 尚未写；`core/load_config.go` 是 0 字节空文件，导致 `go build ./...` 红（应删除，Load 归入 internal/config）。
+  - `main.go`（14B）：仅 `package main`，待写（flag -config → config.Load）。
   - `internal/httpapi/`：未创建。
 - **数据库状态**：MySQL `gochat` 库存在但**已清空无表**（users/friend_requests/friendships 已 DROP），等你 AutoMigrate 亲手建
-- **下一步**：完成 config.go（tag + Load/Get）→ `go get gopkg.in/yaml.v3` → `router.go` → `main.go`
-- **最近 commit**：`reset: 清空实现代码，改为从0手写`
+- **下一步**：删 `core/` → 写 `config.Load`/`Get` → `go get gopkg.in/yaml.v3` → `router.go` → `main.go`
+- **最近 commit**：`docs: update M0 progress (config.go structs done, Load/Get pending)`
 
 ## 六、关键决策记录（追加式）
 
