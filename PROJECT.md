@@ -51,19 +51,17 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：用户已恢复工作，M0「读配置」核心功能**已跑通并验证**，剩最后收尾。
+- **项目状态**：M0 的「读配置」**已完全通过验收**（build / vet / run 全绿），只剩 `/health`。
   - `internal/config/`：5 个结构体各自文件，`Config` 聚合（仅数据定义；读取逻辑归 `core`）。
-  - `core/init_config.go`（682B）：`LoadConfigFile`（flag）+ `LoadConfig`（`&global.Config` 已修对）+ `InitBaseServices`（编排）。
+  - `core/init_config.go`（777B）：`LoadConfigFile`（flag）+ `LoadConfig`（`&global.Config`、`%w` 均已修对）+ `InitBaseServices`（编排，子包函数仍为空壳）。
   - `global/global.go`（110B）：`var ConfigPath *string` + `var Config config.Config`。
-  - `main.go`（147B）：仅调 `LoadConfigFile` + `LoadConfig`，**无打印、无 InitBaseServices**。
-  - 依赖：`github.com/goccy/go-yaml v1.19.2`（用户自选，已入 go.mod/go.sum）。
-  - **✅ 实测已验证**：`LoadConfig` 能正确读入 config.yaml（MySQL=127.0.0.1:3307、Redis=127.0.0.1:6379、JWT.expire=72）。
-  - `go build ./...` 绿；**`go vet` 仍红**：`core\init_config.go:25:62: fmt.Errorf call has arguments but no formatting directives`（缺 `%w`）。
+  - `main.go`（197B）：`LoadConfigFile` → `LoadConfig` → `fmt.Println("Config：", global.Config)`。**实测 `go run .` 打印完整配置**（MySQL 3307 / Redis 6379 / RabbitMQ URL / JWT 72 / Server :8080）。
+  - 依赖：`github.com/goccy/go-yaml v1.19.2`。
+  - **`go build ./...` 绿、`go vet ./...` 绿**。
   - `internal/httpapi/`：未创建（M0 最后一块 `/health`）。
-- **待修**：`fmt.Errorf("...：", err)` → 加 `%w`；`yaml.Unmarshal` 的 error 未接；main 加打印验证 + 调 `InitBaseServices`；然后写 `router.go` + `/health`。
+- **下一步**：`go get github.com/gin-gonic/gin` → 写 `internal/httpapi/router.go`（`NewRouter()` + `GET /health`）→ main 里 `r.Run(global.Config.Server.Addr)` → `curl /health` 验证 200
 - **数据库状态**：MySQL `gochat` 库存在但**已清空无表**（users/friend_requests/friendships 已 DROP），等你 AutoMigrate 亲手建
-- **下一步**：修 vet 错误 → main 打印 3307 → `router.go` + `/health` → M0 完成
-- **最近 commit**：`docs: record M0 skeleton done, blocked on config.Load`
+- **最近 commit**：`docs: config loading verified (MySQL 3307), remaining vet fix + /health`
 
 ## 六、关键决策记录（追加式）
 
