@@ -171,6 +171,7 @@ const App = (() => {
   // ==================== 启动 ====================
   async function init() {
     bindLoginView();
+    bindNav();
     bindWsEvents();
 
     if (API.hasLogin()) {
@@ -227,16 +228,21 @@ const App = (() => {
   }
 
   // ==================== 面板切换 ====================
+  // 左侧导航按钮绑定：点击切换 聊天/通讯录/通话/设置
+  function bindNav() {
+    $$('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchPanel(btn.dataset.panel));
+    });
+  }
+
   function switchPanel(panel) {
     S.panel = panel;
     $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.panel === panel));
     if (panel === 'calls') loadCalls();
     if (panel === 'settings') loadSettings();
+    if (panel !== 'chats') S.currentConv = null;
     renderList();
-    if (panel !== 'chats') {
-      S.currentConv = null;
-      renderMain();
-    }
+    renderMain();
   }
 
   // ==================== 中间列表渲染 ====================
