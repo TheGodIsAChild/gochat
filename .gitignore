@@ -1,16 +1,30 @@
-﻿# 缂栬瘧浜х墿
+# 编译产物
 /bin/
 *.exe
 *.test
 *.out
 
-# 鏈湴閰嶇疆锛堝惈瀵嗛挜锛屼笉鍏ュ簱锛?config.local.yaml
+# 本地配置（含密钥，不入库）
+config.local.yaml
 .env
 
 # IDE
 .idea/
 .vscode/
 .DS_Store
+
 # 运行时日志与临时编译产物
 *.log
 gochat*.exe
+
+# ---- 博客 ----
+# 构建产物（由 npm run build 生成）
+blog/public/
+# 第三方主题（npm postinstall 会自动复制到 themes/fluid）
+blog/themes/
+blog/node_modules/
+blog/db.json
+blog/.deploy_git/
+
+# Go 覆盖率报告
+coverage.out

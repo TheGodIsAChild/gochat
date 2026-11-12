@@ -20,7 +20,8 @@ rabbitmq:
   url: "amqp://gochat:gochat123@127.0.0.1:5672/"
 
 jwt:
-  secret: "gochat-dev-secret-change-me"
+  # ⚠️ 开源默认值，仅用于本地开发。生产环境请用环境变量注入，切勿使用此值
+  secret: "change-me-in-production"
   access_expire_minutes: 120
   refresh_expire_hours: 720
 

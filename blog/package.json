@@ -2,9 +2,10 @@
   "name": "gochat-blog",
   "version": "1.0.0",
   "private": true,
-  "description": "gochat 项目学习博客（Hexo）",
+  "description": "gochat learning blog (Hexo + Fluid)",
   "scripts": {
-    "build": "hexo generate",
+    "postinstall": "node tools/copy-theme.js",
+    "build": "node tools/copy-theme.js && hexo generate",
     "clean": "hexo clean",
     "server": "hexo server"
   },
@@ -21,7 +22,6 @@
     "hexo-renderer-ejs": "^2.0.0",
     "hexo-renderer-marked": "^7.0.1",
     "hexo-renderer-stylus": "^3.0.1",
-    "hexo-theme-fluid": "^1.9.9",
-    "hexo-theme-landscape": "^1.1.0"
+    "hexo-theme-fluid": "^1.9.9"
   }
 }

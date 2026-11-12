@@ -4,6 +4,8 @@
 并完整走过了 **单体 → gRPC 微服务 → RabbitMQ 最终一致性** 的演进过程。
 仓库内附带一个**仿微信的三栏演示前端**和一个 **Hexo 学习博客**。
 
+![系统架构](blog/source/images/architecture.svg)
+
 ---
 
 ## 一、快速开始
@@ -129,14 +131,14 @@ gochat/
 
 ## 六、学习博客（Hexo）
 
-- 源码：`blog/`（`_config.yml` + `source/_posts/`）
-- 生成产物：`blog/public/`（已提交，Go 服务托管在 `/blog/`）
-- 重新生成：
+- 源码：`blog/`（`_config.yml` + `_config.fluid.yml` + `source/_posts/`）
+- 生成产物：`blog/public/`（**不入库**，需本地构建；Go 服务托管在 `/blog/`）
+- 首次使用需构建：
 
 ```bash
 cd blog
-npm install        # 首次
-npm run build      # hexo generate
+npm install        # 会自动把 hexo-theme-fluid 复制到 themes/（postinstall）
+npm run build      # hexo generate → 生成 blog/public/
 ```
 
 博客文章：**共 58 篇**，文件名统一为 `类目-序号-名称.md`，首页从上到下就是学习顺序。
@@ -210,3 +212,12 @@ go test ./...     # 单元测试（ws hub 并发测试）
 - 多实例部署时：在线状态/限流/WS 广播需要 Redis
 - 未做消息已读回执、撤回、群通话（SFU）
 - 前端为演示级，未做移动端适配
+
+---
+
+## 十、License
+
+[MIT](LICENSE) © 2026 TheGodIsAChild
+
+> `config.yaml` 中的数据库密码、JWT secret 均为**本地开发默认值**（仅用于本机 Docker），
+> 生产部署前请务必替换为环境变量注入的方式。
