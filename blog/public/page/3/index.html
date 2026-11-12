@@ -324,6 +324,394 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/blog/2026/11/13/99-%E5%9C%BA%E6%99%AF%E9%9B%86-30%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF/" target="_self">
+          场景集：30 个业务场景怎么实现
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/99-%E5%9C%BA%E6%99%AF%E9%9B%86-30%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF/" target="_self">
+        <div>
+          从项目里提炼的关键业务场景：问题 → 处理方案 → 代码位置 → 关键点。用途：面试讲项目时按场景展开，或排查&#x2F;扩展功能时对照。   M1 · 认证与好友场景 1：用户注册问题：注册要保证「用户名唯一」，并同时创建默认设置。 方案：  先查用户名是否已存在（友好提示） bcrypt 加密密码 事务：插入 users + user_settings  代码：internal/servic
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 09:30" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" class="category-chain-item">面试准备</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/">#场景题</a>
+            
+              <a href="/blog/tags/%E8%AE%BE%E8%AE%A1/">#设计</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/98-%E9%9D%A2%E8%AF%95%E9%9B%86-72%E9%A2%98/" target="_self">
+          面试集：72 道高频题（含简答与代码位置）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/98-%E9%9D%A2%E8%AF%95%E9%9B%86-72%E9%A2%98/" target="_self">
+        <div>
+          从项目代码提炼的面试题。每题包含：问题 → 简答 → 本项目代码位置。建议练法：先自己答，再看简答，最后对照代码。标记：⭐ 高频 &#x2F; ⭐⭐ 必会   一、Go 语言基础⭐ 1. context.Context 是干什么的？简答：用来在调用链上传递「取消信号、超时、请求范围的值」。本项目里所有可能慢的操作（Redis、DB、下游调用）第一个参数都是 ctx，客户端断开时 c.Reques
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 09:20" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" class="category-chain-item">面试准备</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
+            
+              <a href="/blog/tags/%E5%85%AB%E8%82%A1/">#八股</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/97-M7-RabbitMQ%E4%B8%8E%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+          M7 详细设计：RabbitMQ 与 Outbox 最终一致性
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/97-M7-RabbitMQ%E4%B8%8E%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+        <div>
+          上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M7: RabbitMQ + transactional outbox pattern — async message delivery   一、里程碑目标用消息队列把「发消息」和「推送消息」解耦：  RabbitMQ 连接 + 持久化队列 本地消息表（Transactional Outbox）：业务写入和事件写入同一事务 后
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 09:10" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/RabbitMQ/">#RabbitMQ</a>
+            
+              <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/">#最终一致性</a>
+            
+              <a href="/blog/tags/Outbox/">#Outbox</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/96-M6-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8C%96-gRPC-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+          M6 详细设计：微服务化与 gRPC
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/96-M6-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8C%96-gRPC-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+        <div>
+          上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M6: microservices via gRPC (JSON codec since no protoc) — user service :9001, chat service :9002, HTTP gateway routes   一、里程碑目标把单体按职责拆成两个内部服务，用 gRPC 通信，再加一个 HTTP ga
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 09:00" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/gRPC/">#gRPC</a>
+            
+              <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">#微服务</a>
+            
+              <a href="/blog/tags/protobuf/">#protobuf</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/95-M5-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+          M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/95-M5-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+        <div>
+          上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M5: call model + signaling state machine + WebSocket SDP/ICE relay + call history API   一、里程碑目标在聊天基础上加「语音通话」：  通话记录模型（call_records） 通话状态机（呼叫中&#x2F;已接通&#x2F;已拒绝&#x2F
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 08:50" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/WebRTC/">#WebRTC</a>
+            
+              <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/">#信令</a>
+            
+              <a href="/blog/tags/P2P/">#P2P</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/94-M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+          M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/94-M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+        <div>
+          对应提交：M4: graceful shutdown + CloseBaseServices + sliding-window rate limit + WS CloseAll + bounded fan-out + hub concurrency tests   一、里程碑目标前面 M1–M3 功能跑通了，但还有几个「生产环境才会暴露」的问题：    问题 后果 本里程碑方案    进程被 k
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 08:40" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
+            
+              <a href="/blog/tags/%E9%99%90%E6%B5%81/">#限流</a>
+            
+              <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">#优雅退出</a>
+            
+              <a href="/blog/tags/goroutine/">#goroutine</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/blog/2026/11/13/93-M3-%E7%BE%A4%E8%81%8A-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
           M3 详细设计：群聊（建群事务 / 权限 / 人数统计）
         </a>
@@ -582,379 +970,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S00-%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB%E6%80%BB%E7%B4%A2%E5%BC%95/" target="_self">
-          源码走读总索引：核心文件全览
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S00-%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB%E6%80%BB%E7%B4%A2%E5%BC%95/" target="_self">
-        <div>
-          本页汇总了项目的全部核心源码（每个文件都是完整未删减的版本）。  项目源码里保留了 【思路】【注意点】【面试点】 三类中文注释。建议阅读顺序：先看 一次 HTTP 请求的完整链路，再按下面的顺序读源码。    序号 文件 规模 职责    S01 main.go 103 行 程序入口：加载配置 → 初始化服务 → 启动 HTTP&#x2F;gRPC&#x2F;MQ → 优雅退出   S02 co
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 19:00" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-              <a href="/blog/tags/%E7%B4%A2%E5%BC%95/">#索引</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S01-%E6%BA%90%E7%A0%81-main/" target="_self">
-          源码走读 S01：main.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S01-%E6%BA%90%E7%A0%81-main/" target="_self">
-        <div>
-          文件路径：main.go　行数：103 行职责：程序入口：加载配置 → 初始化服务 → 启动 HTTP&#x2F;gRPC&#x2F;MQ → 优雅退出  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  12345678910111213141516171819202122232425
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 18:00" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S02-%E6%BA%90%E7%A0%81-init-config/" target="_self">
-          源码走读 S02：init_config.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S02-%E6%BA%90%E7%A0%81-init-config/" target="_self">
-        <div>
-          文件路径：core/init_config.go　行数：84 行职责：配置加载：命令行参数、读 YAML、初始化&#x2F;关闭所有基础服务  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  12345678910111213141516171819202122232425262728
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:59" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S03-%E6%BA%90%E7%A0%81-init-mysql/" target="_self">
-          源码走读 S03：init_mysql.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S03-%E6%BA%90%E7%A0%81-init-mysql/" target="_self">
-        <div>
-          文件路径：core/db/init_mysql.go　行数：69 行职责：GORM 连接 MySQL：DSN、连接池、AutoMigrate 建表  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  12345678910111213141516171819202122232425262
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:58" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S04-%E6%BA%90%E7%A0%81-global/" target="_self">
-          源码走读 S04：global.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S04-%E6%BA%90%E7%A0%81-global/" target="_self">
-        <div>
-          文件路径：global/global.go　行数：29 行职责：全局状态：Config &#x2F; DB &#x2F; Redis &#x2F; MQ 的位置  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  1234567891011121314151617181920212223
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:57" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S05-%E6%BA%90%E7%A0%81-auth/" target="_self">
-          源码走读 S05：auth.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S05-%E6%BA%90%E7%A0%81-auth/" target="_self">
-        <div>
-          文件路径：internal/middleware/auth.go　行数：73 行职责：JWT 鉴权中间件：解析 Bearer、校验 type、写 context  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  1234567891011121314151617181920212223
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:56" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/blog/page/2/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/blog/">1</a><a class="page-number" href="/blog/page/2/#board">2</a><span class="page-number current">3</span><a class="page-number" href="/blog/page/4/#board">4</a><a class="page-number" href="/blog/page/5/#board">5</a><a class="extend next" rel="next" href="/blog/page/4/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/blog/page/2/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/blog/">1</a><a class="page-number" href="/blog/page/2/#board">2</a><span class="page-number current">3</span><a class="page-number" href="/blog/page/4/#board">4</a><a class="page-number" href="/blog/page/5/#board">5</a><a class="page-number" href="/blog/page/6/#board">6</a><a class="extend next" rel="next" href="/blog/page/4/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

@@ -647,15 +647,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" target="_self">
-          项目介绍：从零实现一个仿微信 IM 后端
+        <a href="/blog/2026/11/13/20-%E6%9E%B6%E6%9E%84%E6%80%BB%E8%A7%88-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1/" target="_self">
+          架构总览：从单体到微服务，为什么这么设计
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/20-%E6%9E%B6%E6%9E%84%E6%80%BB%E8%A7%88-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1/" target="_self">
         <div>
-          为什么做这个项目我想系统练习三件事：并发编程、微服务拆分、消息队列。普通的 CRUD 项目练不到这些，于是决定做一个「仿微信」的即时通讯后端：  有长连接（WebSocket）→ 练并发 有多个业务域（用户&#x2F;好友&#x2F;聊天&#x2F;群&#x2F;通话）→ 练拆分 有异步推送需求 → 练消息队列  技术栈   层 技术    Web 框架 Gin   ORM GORM + MySQ
+          本文回答一个问题：这个项目为什么长成这样。角色：需求 → 拆模块 → 定分层 → 定通信方式 → 定部署形态。   一、需求决定了架构先看需求，不要先看代码：    需求 对架构的要求    用户能登录、长期在线 认证 + 会话（JWT&#x2F;Redis）   加好友、建群 关系数据模型（好友&#x2F;群）   实时收到消息 长连接（WebSocket）   消息不能丢、不重复 持久化 +
         </div>
       </a>
 
@@ -663,7 +663,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 13:10" pubdate>
+            <time datetime="2026-11-13 13:19" pubdate>
               2026-11-13
             </time>
           </div>
@@ -679,7 +679,7 @@
     
       <span class="category-chain">
         
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  <a href="/blog/categories/%E6%B7%B1%E5%BA%A6%E4%B8%93%E9%A2%98/" class="category-chain-item">深度专题</a>
   
   
 
@@ -693,12 +693,12 @@
         
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/Go/">#Go</a>
             
               <a href="/blog/tags/%E6%9E%B6%E6%9E%84/">#架构</a>
             
-              <a href="/blog/tags/IM/">#IM</a>
+              <a href="/blog/tags/%E5%88%86%E5%B1%82/">#分层</a>
+            
+              <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">#微服务</a>
             
           </div>
         
@@ -712,15 +712,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" target="_self">
-          认证与好友：双 token 与事务
+        <a href="/blog/2026/11/13/21-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8%E8%AE%BE%E8%AE%A1-12%E5%BC%A0%E8%A1%A8%E9%80%90%E5%BC%A0%E8%AE%B2/" target="_self">
+          数据库表设计：12 张表逐张讲清楚
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/21-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8%E8%AE%BE%E8%AE%A1-12%E5%BC%A0%E8%A1%A8%E9%80%90%E5%BC%A0%E8%AE%B2/" target="_self">
         <div>
-          一、为什么用双 token单 token 的矛盾：  有效期长 → 体验好，但泄露风险大、无法撤销 有效期短 → 安全，但频繁掉登录  双 token：  access token：2 小时，每个请求携带，泄露窗口小 refresh token：30 天，只用来换新 access，存服务端可撤销  用户只要 30 天内用过，refresh 自动续期 → 无感不掉登录。 二、无感刷新的完整流程123
+          表设计不是「把字段列出来」，而是用约束表达业务规则。本文逐张表讲：为什么有这张表、每个字段干什么、索引为什么这么建。   一、5 条设计原则   原则 说明 例子    按领域分表 一张表只服务一个业务概念 friend_requests 与 friendships 分开   软删除 保留历史，IM 需要审计&#x2F;回溯 friendships.status=2   双向两行 好友关系（A,
         </div>
       </a>
 
@@ -728,7 +728,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 13:00" pubdate>
+            <time datetime="2026-11-13 13:18" pubdate>
               2026-11-13
             </time>
           </div>
@@ -744,7 +744,7 @@
     
       <span class="category-chain">
         
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  <a href="/blog/categories/%E6%B7%B1%E5%BA%A6%E4%B8%93%E9%A2%98/" class="category-chain-item">深度专题</a>
   
   
 
@@ -759,13 +759,13 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/GORM/">#GORM</a>
-            
-              <a href="/blog/tags/JWT/">#JWT</a>
-            
-              <a href="/blog/tags/Redis/">#Redis</a>
-            
               <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+            
+              <a href="/blog/tags/MySQL/">#MySQL</a>
+            
+              <a href="/blog/tags/%E8%A1%A8%E8%AE%BE%E8%AE%A1/">#表设计</a>
+            
+              <a href="/blog/tags/%E7%B4%A2%E5%BC%95/">#索引</a>
             
           </div>
         
@@ -779,15 +779,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" target="_self">
-          实时消息与 WebSocket
+        <a href="/blog/2026/11/13/22-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98-7%E4%B8%AA%E5%B9%B6%E5%8F%91%E5%9C%BA%E6%99%AF/" target="_self">
+          并发编程实战：项目里的 7 个并发场景
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/22-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98-7%E4%B8%AA%E5%B9%B6%E5%8F%91%E5%9C%BA%E6%99%AF/" target="_self">
         <div>
-          一、会话 + 消息两层抽象单聊和群聊共用一套表： 123conversations         会话（type: 1单聊 / 2群聊）conversation_members  成员（谁在会话、读到哪）messages              消息（conversation_id + sender_id + content）  好处：消息表不用区分单聊&#x2F;群聊，统一按 convers
+          这个项目的并发点都在哪？每个点用了什么手段、为什么、怎么验证。读完你应该能回答：「什么时候该加锁，什么时候不该加」。  一、先复习 Go 并发的 4 个工具   工具 用途 本项目用在哪    goroutine 并发执行 HTTP 请求（gin 自带）、WS 读写泵、扇出推送   channel goroutine 通信 &#x2F; 队列 每个 WS 连接的发送队列   sync.Mutex
         </div>
       </a>
 
@@ -795,7 +795,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 12:50" pubdate>
+            <time datetime="2026-11-13 13:17" pubdate>
               2026-11-13
             </time>
           </div>
@@ -811,7 +811,76 @@
     
       <span class="category-chain">
         
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  <a href="/blog/categories/%E6%B7%B1%E5%BA%A6%E4%B8%93%E9%A2%98/" class="category-chain-item">深度专题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
+            
+              <a href="/blog/tags/goroutine/">#goroutine</a>
+            
+              <a href="/blog/tags/channel/">#channel</a>
+            
+              <a href="/blog/tags/%E9%94%81/">#锁</a>
+            
+              <a href="/blog/tags/context/">#context</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/23-WebSocket%E5%85%A8%E8%A7%A3-%E6%8F%A1%E6%89%8B%E5%BF%83%E8%B7%B3%E9%87%8D%E8%BF%9E%E4%B8%8Ewss/" target="_self">
+          WebSocket 全解：握手、心跳、重连与 wss
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/23-WebSocket%E5%85%A8%E8%A7%A3-%E6%8F%A1%E6%89%8B%E5%BF%83%E8%B7%B3%E9%87%8D%E8%BF%9E%E4%B8%8Ewss/" target="_self">
+        <div>
+          从「为什么不用 HTTP 轮询」讲到「生产环境怎么用 wss + Nginx 反代」。读完你应该能独立设计一个能扛住断线、跨实例的实时消息通道。   一、为什么 IM 必须用 WebSocket   方案 实时性 开销 双向 适用    短轮询 差（间隔延迟） 每次建连接 否 低频状态查询   长轮询 较好 每条消息重建连接 半双工 兼容性要求高   SSE 好 单连接 只下行 通知推送   W
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:16" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E6%B7%B1%E5%BA%A6%E4%B8%93%E9%A2%98/" class="category-chain-item">深度专题</a>
   
   
 
@@ -828,11 +897,11 @@
             
               <a href="/blog/tags/WebSocket/">#WebSocket</a>
             
-              <a href="/blog/tags/%E5%B9%82%E7%AD%89/">#幂等</a>
+              <a href="/blog/tags/wss/">#wss</a>
             
-              <a href="/blog/tags/%E5%88%86%E9%A1%B5/">#分页</a>
+              <a href="/blog/tags/%E5%BF%83%E8%B7%B3/">#心跳</a>
             
-              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
+              <a href="/blog/tags/%E9%87%8D%E8%BF%9E/">#重连</a>
             
           </div>
         
@@ -846,15 +915,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" target="_self">
-          群聊设计与权限
+        <a href="/blog/2026/11/13/24-Redis%E5%9C%A8%E6%9C%AC%E9%A1%B9%E7%9B%AE%E7%9A%845%E7%A7%8D%E7%94%A8%E6%B3%95/" target="_self">
+          Redis 在本项目的 5 种用法
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/24-Redis%E5%9C%A8%E6%9C%AC%E9%A1%B9%E7%9B%AE%E7%9A%845%E7%A7%8D%E7%94%A8%E6%B3%95/" target="_self">
         <div>
-          一、复用会话抽象M2 已经把「会话 + 成员 + 消息」抽象好了，所以群聊几乎是免费的：  群聊 &#x3D; type=2 的会话 + groups 表（群元信息） 群消息发送&#x2F;推送完全复用 M2 的 SendMessage &#x2F; PushMessage  M3 新增的只是群的生命周期管理：建群、拉人、踢人、改资料、解散。  这就是好抽象的复利：M2 多花点心思，M3 直接受益
+          Redis 不是只能做「缓存」。在这个项目里它是认证白名单、原子操作工具、限流计数器。本文逐个讲用法、命令、为什么，以及线上要注意什么。  一、用法总览   用法 数据结构 命令 代码位置    1. refresh token 白名单 String + TTL SET / GETDEL / DEL auth/token_store.go   2. 批量删除用户 token SCAN SCAN
         </div>
       </a>
 
@@ -862,7 +931,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 12:40" pubdate>
+            <time datetime="2026-11-13 13:15" pubdate>
               2026-11-13
             </time>
           </div>
@@ -878,7 +947,7 @@
     
       <span class="category-chain">
         
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  <a href="/blog/categories/%E6%B7%B1%E5%BA%A6%E4%B8%93%E9%A2%98/" class="category-chain-item">深度专题</a>
   
   
 
@@ -893,78 +962,11 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+              <a href="/blog/tags/Redis/">#Redis</a>
             
-              <a href="/blog/tags/%E7%BE%A4%E8%81%8A/">#群聊</a>
+              <a href="/blog/tags/%E7%BC%93%E5%AD%98/">#缓存</a>
             
-              <a href="/blog/tags/%E6%9D%83%E9%99%90/">#权限</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" target="_self">
-          并发加固与优雅退出
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" target="_self">
-        <div>
-          一、优雅退出以前 r.Run() 直接阻塞，进程被 kill 时：  处理中的请求被硬切断 WebSocket 没 Close 帧，客户端要等超时 DB&#x2F;Redis 连接没释放  现在的做法： 1234567891011srv := &amp;http.Server&#123;Addr: ..., Handler: router.NewRouter()&#125;go srv.Liste
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 12:30" pubdate>
-              2026-11-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
-            
-              <a href="/blog/tags/%E9%99%90%E6%B5%81/">#限流</a>
-            
-              <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">#优雅退出</a>
-            
-              <a href="/blog/tags/goroutine/">#goroutine</a>
+              <a href="/blog/tags/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C/">#原子操作</a>
             
           </div>
         
@@ -976,7 +978,7 @@
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/#board">2</a><a class="page-number" href="/blog/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/5/#board">5</a><a class="extend next" rel="next" href="/blog/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+      <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/#board">2</a><a class="page-number" href="/blog/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/6/#board">6</a><a class="extend next" rel="next" href="/blog/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

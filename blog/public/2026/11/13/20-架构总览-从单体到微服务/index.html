@@ -1,0 +1,990 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="本文回答一个问题：这个项目为什么长成这样。角色：需求 → 拆模块 → 定分层 → 定通信方式 → 定部署形态。   一、需求决定了架构先看需求，不要先看代码：    需求 对架构的要求    用户能登录、长期在线 认证 + 会话（JWT&#x2F;Redis）   加好友、建群 关系数据模型（好友&#x2F;群）   实时收到消息 长连接（WebSocket）   消息不能丢、不重复 持久化 +">
+<meta property="og:type" content="article">
+<meta property="og:title" content="架构总览：从单体到微服务，为什么这么设计">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/13/20-%E6%9E%B6%E6%9E%84%E6%80%BB%E8%A7%88-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="本文回答一个问题：这个项目为什么长成这样。角色：需求 → 拆模块 → 定分层 → 定通信方式 → 定部署形态。   一、需求决定了架构先看需求，不要先看代码：    需求 对架构的要求    用户能登录、长期在线 认证 + 会话（JWT&#x2F;Redis）   加好友、建群 关系数据模型（好友&#x2F;群）   实时收到消息 长连接（WebSocket）   消息不能丢、不重复 持久化 +">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://127.0.0.1:8080/blog/blog/images/architecture.svg">
+<meta property="article:published_time" content="2026-11-13T05:19:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:18:32.721Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="分层">
+<meta property="article:tag" content="微服务">
+<meta property="article:tag" content="架构">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://127.0.0.1:8080/blog/blog/images/architecture.svg">
+  
+  
+  
+  <title>架构总览：从单体到微服务，为什么这么设计 - gochat 项目学习博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 50vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.55)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="架构总览：从单体到微服务，为什么这么设计"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-13 13:19" pubdate>
+          2026年11月13日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">架构总览：从单体到微服务，为什么这么设计</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文回答一个问题：<strong>这个项目为什么长成这样</strong>。<br>角色：需求 → 拆模块 → 定分层 → 定通信方式 → 定部署形态。</p>
+</blockquote>
+<p><img src="/blog/blog/images/architecture.svg" srcset="/blog/img/loading.gif" lazyload alt="gochat 系统架构"></p>
+<h2 id="一、需求决定了架构"><a href="#一、需求决定了架构" class="headerlink" title="一、需求决定了架构"></a>一、需求决定了架构</h2><p>先看需求，不要先看代码：</p>
+<table>
+<thead>
+<tr>
+<th>需求</th>
+<th>对架构的要求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户能登录、长期在线</td>
+<td>认证 + 会话（JWT&#x2F;Redis）</td>
+</tr>
+<tr>
+<td>加好友、建群</td>
+<td>关系数据模型（好友&#x2F;群）</td>
+</tr>
+<tr>
+<td>实时收到消息</td>
+<td><strong>长连接</strong>（WebSocket）</td>
+</tr>
+<tr>
+<td>消息不能丢、不重复</td>
+<td>持久化 + 幂等 + 游标分页</td>
+</tr>
+<tr>
+<td>语音通话</td>
+<td><strong>P2P 通信（WebRTC）+ 信令</strong></td>
+</tr>
+<tr>
+<td>系统能演进、能扩展</td>
+<td><strong>分层 + 可拆分的服务边界</strong></td>
+</tr>
+</tbody></table>
+<p><strong>关键结论</strong>：IM 的架构难点不在 CRUD，而在 <strong>长连接、实时性、消息一致性</strong>。</p>
+<h2 id="二、分层：为什么是这四层"><a href="#二、分层：为什么是这四层" class="headerlink" title="二、分层：为什么是这四层"></a>二、分层：为什么是这四层</h2><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nix">router<span class="hljs-symbol">/handler</span>  →  service  →  model <span class="hljs-symbol">/</span> global.DB  →  MySQL <span class="hljs-symbol">/</span> Redis<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>只做</th>
+<th>绝不做</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>handler</td>
+<td>解析请求、参数校验、写响应</td>
+<td>不写业务规则、不碰事务</td>
+</tr>
+<tr>
+<td>service</td>
+<td>业务规则、事务、调 model</td>
+<td>不 import gin（可被 gRPC 复用）</td>
+</tr>
+<tr>
+<td>model</td>
+<td>描述表结构</td>
+<td>不写业务逻辑</td>
+</tr>
+<tr>
+<td>基础设施</td>
+<td>连接、缓存、消息</td>
+<td>不感知业务</td>
+</tr>
+</tbody></table>
+<h3 id="为什么要这么分？两个真实收益"><a href="#为什么要这么分？两个真实收益" class="headerlink" title="为什么要这么分？两个真实收益"></a>为什么要这么分？两个真实收益</h3><ol>
+<li><strong>M6 拆微服务时</strong>：service 完全不用改，只是把 handler 从 Gin 换成 gRPC。因为我们从第一天就把 <code>*gin.Context</code> 挡在 handler 层。</li>
+<li><strong>可测试</strong>：service 是纯 Go 函数，单测不用起 HTTP 服务。</li>
+</ol>
+<h3 id="反面教材"><a href="#反面教材" class="headerlink" title="反面教材"></a>反面教材</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// ❌ service 里直接用 gin.Context → 和 HTTP 框架绑死</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Register</span><span class="hljs-params">(c *gin.Context)</span></span> &#123; ... c.JSON(...) &#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="三、单体-vs-微服务：为什么要走两遍"><a href="#三、单体-vs-微服务：为什么要走两遍" class="headerlink" title="三、单体 vs 微服务：为什么要走两遍"></a>三、单体 vs 微服务：为什么要走两遍</h2><p>本项目 <strong>M0–M5 是单体，M6 才拆</strong>。这不是偷懒，是刻意设计。</p>
+<h3 id="单体的三个真实痛点（只有自己写过才懂）"><a href="#单体的三个真实痛点（只有自己写过才懂）" class="headerlink" title="单体的三个真实痛点（只有自己写过才懂）"></a>单体的三个真实痛点（只有自己写过才懂）</h3><table>
+<thead>
+<tr>
+<th>痛点</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>扩缩容粒度粗</td>
+<td>聊天流量大，但用户服务也得跟着扩</td>
+</tr>
+<tr>
+<td>故障不隔离</td>
+<td>一个模块 OOM 全挂</td>
+</tr>
+<tr>
+<td>部署耦合</td>
+<td>改一行全量发布</td>
+</tr>
+</tbody></table>
+<h3 id="拆分方式：按领域，不按技术层"><a href="#拆分方式：按领域，不按技术层" class="headerlink" title="拆分方式：按领域，不按技术层"></a>拆分方式：按领域，不按技术层</h3><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs nix">❌ controller 服务 <span class="hljs-symbol">/</span> service 服务 <span class="hljs-symbol">/</span> dao 服务（按技术分层）<br>✅ 用户服务（user :<span class="hljs-number">9001</span>）<span class="hljs-symbol">/</span> 聊天服务（chat :<span class="hljs-number">9002</span>）<span class="hljs-symbol">/</span> 网关<br></code></pre></td></tr></table></figure>
+
+<p><strong>判断标准</strong>：一个服务应该能独立回答「它负责什么业务」，而不是「它负责哪一层」。</p>
+<h2 id="四、通信方式怎么选"><a href="#四、通信方式怎么选" class="headerlink" title="四、通信方式怎么选"></a>四、通信方式怎么选</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>方式</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>浏览器 → 后端</td>
+<td>HTTP + WebSocket</td>
+<td>浏览器原生支持</td>
+</tr>
+<tr>
+<td>客户端 → 内部服务</td>
+<td><strong>只经过 gateway</strong></td>
+<td>统一鉴权&#x2F;限流，不暴露内部</td>
+</tr>
+<tr>
+<td>内部服务之间</td>
+<td><strong>gRPC</strong></td>
+<td>强契约、性能高、支持流</td>
+</tr>
+<tr>
+<td>消息异步推送</td>
+<td><strong>MQ（RabbitMQ）</strong></td>
+<td>解耦、削峰、最终一致性</td>
+</tr>
+<tr>
+<td>实时上行</td>
+<td>WebSocket 帧</td>
+<td>低延迟双向</td>
+</tr>
+</tbody></table>
+<h3 id="同步-vs-异步的边界"><a href="#同步-vs-异步的边界" class="headerlink" title="同步 vs 异步的边界"></a>同步 vs 异步的边界</h3><figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs gauss">同步（用户要立即拿到结果）：<br>  登录 → 签发 <span class="hljs-built_in">token</span> → 返回<br><br>异步（用户不需要立即知道结果）：<br>  发消息 → 落库 → 写 outbox → （后台）发 MQ → 消费者推送<br></code></pre></td></tr></table></figure>
+
+<p><strong>判断标准</strong>：用户&#x2F;调用方是否必须等待结果才能继续。必须等 → 同步；可以稍后 → 异步。</p>
+<h2 id="五、数据流：一条消息的完整旅程"><a href="#五、数据流：一条消息的完整旅程" class="headerlink" title="五、数据流：一条消息的完整旅程"></a>五、数据流：一条消息的完整旅程</h2><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs dart">① A 发消息<br>   HTTP/WS → gateway → chat 服务 → 事务&#123; messages + conversations + outbox &#125;<br>② outbox worker 每 2s 轮询 → 发 <span class="hljs-title class_">RabbitMQ</span><br>③ consumer 消费 → 查会话成员 → ws.<span class="hljs-title class_">PushToConversation</span><br>④ 在线成员 <span class="hljs-title class_">WebSocket</span> 收到；离线成员消息已在 DB，上线拉历史<br></code></pre></td></tr></table></figure>
+
+<p><strong>为什么消息要绕一圈 MQ 而不是直接推？</strong></p>
+<ul>
+<li>请求快速返回（不用在请求里查成员+逐个推）</li>
+<li>推送失败有重试（outbox）</li>
+<li>消费方可以独立扩容</li>
+</ul>
+<h2 id="六、部署形态"><a href="#六、部署形态" class="headerlink" title="六、部署形态"></a>六、部署形态</h2><p>单进程演示（本项目）：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">一个 gochat 进程内同时启动：<br>  HTTP :<span class="hljs-number">8080</span>（gateway + 前端 + 博客）<br>  gRPC :<span class="hljs-number">9001</span>（<span class="hljs-keyword">user</span> <span class="hljs-title">服务）</span><br><span class="hljs-title">  gRPC</span> :<span class="hljs-number">9002</span>（chat 服务）<br>  MQ worker + consumer<br></code></pre></td></tr></table></figure>
+
+<p>真实微服务部署：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs dart"><span class="hljs-title function_">gateway</span>(容器) ──gRPC──► <span class="hljs-title function_">user</span>(容器) / <span class="hljs-title function_">chat</span>(容器)<br>     │                      │<br>     └──── <span class="hljs-title class_">RabbitMQ</span> ────────┘<br>              │<br>      <span class="hljs-title class_">MySQL</span> / <span class="hljs-title class_">Redis</span>（独立或集群）<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>本项目把两者合在一个进程，是为了<strong>演示方便</strong>；代码边界已经按微服务划好了。</p>
+</blockquote>
+<h2 id="七、微服务化带来的新问题（面试高频）"><a href="#七、微服务化带来的新问题（面试高频）" class="headerlink" title="七、微服务化带来的新问题（面试高频）"></a>七、微服务化带来的新问题（面试高频）</h2><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>本项目现状</th>
+<th>生产做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>服务发现</td>
+<td>配置写死地址</td>
+<td>Consul&#x2F;Etcd&#x2F;K8s Service</td>
+</tr>
+<tr>
+<td>超时</td>
+<td>context 超时</td>
+<td>每个调用设 deadline</td>
+</tr>
+<tr>
+<td>重试</td>
+<td>未做</td>
+<td>幂等 + 有限重试</td>
+</tr>
+<tr>
+<td>熔断</td>
+<td>未做</td>
+<td>Sentinel&#x2F;Hystrix</td>
+</tr>
+<tr>
+<td>链路追踪</td>
+<td>未做</td>
+<td>OpenTelemetry + trace_id</td>
+</tr>
+<tr>
+<td>数据一致性</td>
+<td>Outbox + 最终一致</td>
+<td>Saga&#x2F;TCC&#x2F;本地消息表</td>
+</tr>
+</tbody></table>
+<h2 id="八、架构评审会怎么问"><a href="#八、架构评审会怎么问" class="headerlink" title="八、架构评审会怎么问"></a>八、架构评审会怎么问</h2><ol>
+<li>为什么先单体后微服务？</li>
+<li>服务按什么拆？为什么不按技术层？</li>
+<li>为什么内部用 gRPC、对外用 HTTP？</li>
+<li>哪些操作用同步、哪些用异步？判断标准是什么？</li>
+<li>微服务后怎么做鉴权？→ gateway 统一校验，内部信任或 mTLS</li>
+<li>消息为什么走 MQ？不走行不行？→ 可以，但会慢且不削峰</li>
+</ol>
+<hr>
+<p>相关：<a href="/blog/2026/11/13/90-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE/">分层架构图</a>、<a href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/">一次 HTTP 请求的完整链路</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E6%B7%B1%E5%BA%A6%E4%B8%93%E9%A2%98/" class="category-chain-item">深度专题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" class="print-no-link">#架构</a>
+      
+        <a href="/blog/tags/%E5%88%86%E5%B1%82/" class="print-no-link">#分层</a>
+      
+        <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" class="print-no-link">#微服务</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>架构总览：从单体到微服务，为什么这么设计</div>
+      <div>http://127.0.0.1:8080/blog/2026/11/13/20-架构总览-从单体到微服务/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gochat</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/" title="踩坑集：24 个真实坑（含原因与解法）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">踩坑集：24 个真实坑（含原因与解法）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2026/11/13/21-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8%E8%AE%BE%E8%AE%A1-12%E5%BC%A0%E8%A1%A8%E9%80%90%E5%BC%A0%E8%AE%B2/" title="数据库表设计：12 张表逐张讲清楚">
+                        <span class="hidden-mobile">数据库表设计：12 张表逐张讲清楚</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

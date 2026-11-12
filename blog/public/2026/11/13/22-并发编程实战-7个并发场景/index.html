@@ -1,0 +1,925 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="这个项目的并发点都在哪？每个点用了什么手段、为什么、怎么验证。读完你应该能回答：「什么时候该加锁，什么时候不该加」。  一、先复习 Go 并发的 4 个工具   工具 用途 本项目用在哪    goroutine 并发执行 HTTP 请求（gin 自带）、WS 读写泵、扇出推送   channel goroutine 通信 &#x2F; 队列 每个 WS 连接的发送队列   sync.Mutex">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并发编程实战：项目里的 7 个并发场景">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/13/22-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98-7%E4%B8%AA%E5%B9%B6%E5%8F%91%E5%9C%BA%E6%99%AF/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="这个项目的并发点都在哪？每个点用了什么手段、为什么、怎么验证。读完你应该能回答：「什么时候该加锁，什么时候不该加」。  一、先复习 Go 并发的 4 个工具   工具 用途 本项目用在哪    goroutine 并发执行 HTTP 请求（gin 自带）、WS 读写泵、扇出推送   channel goroutine 通信 &#x2F; 队列 每个 WS 连接的发送队列   sync.Mutex">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-13T05:17:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:19:00.171Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="channel">
+<meta property="article:tag" content="context">
+<meta property="article:tag" content="goroutine">
+<meta property="article:tag" content="并发">
+<meta property="article:tag" content="锁">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>并发编程实战：项目里的 7 个并发场景 - gochat 项目学习博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 50vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.55)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="并发编程实战：项目里的 7 个并发场景"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-13 13:17" pubdate>
+          2026年11月13日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          32 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">并发编程实战：项目里的 7 个并发场景</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>这个项目的并发点都在哪？每个点用了什么手段、为什么、怎么验证。<br>读完你应该能回答：<strong>「什么时候该加锁，什么时候不该加」</strong>。</p>
+</blockquote>
+<h2 id="一、先复习-Go-并发的-4-个工具"><a href="#一、先复习-Go-并发的-4-个工具" class="headerlink" title="一、先复习 Go 并发的 4 个工具"></a>一、先复习 Go 并发的 4 个工具</h2><table>
+<thead>
+<tr>
+<th>工具</th>
+<th>用途</th>
+<th>本项目用在哪</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>goroutine</code></td>
+<td>并发执行</td>
+<td>HTTP 请求（gin 自带）、WS 读写泵、扇出推送</td>
+</tr>
+<tr>
+<td><code>channel</code></td>
+<td>goroutine 通信 &#x2F; 队列</td>
+<td>每个 WS 连接的发送队列</td>
+</tr>
+<tr>
+<td><code>sync.Mutex / RWMutex</code></td>
+<td>保护共享内存</td>
+<td>Hub 连接表</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td>取消 &#x2F; 超时</td>
+<td>所有 IO、优雅退出</td>
+</tr>
+</tbody></table>
+<p><strong>核心原则</strong>：</p>
+<blockquote>
+<p>能用 <strong>channel 传递数据</strong> 就别用共享内存；必须共享内存才加锁。<br>能用 <strong>数据库唯一索引&#x2F;条件更新</strong> 解决的并发，就不要加锁。</p>
+</blockquote>
+<h2 id="二、场景-1：HTTP-并发（gin-天然并发）"><a href="#二、场景-1：HTTP-并发（gin-天然并发）" class="headerlink" title="二、场景 1：HTTP 并发（gin 天然并发）"></a>二、场景 1：HTTP 并发（gin 天然并发）</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 每个请求 = 一个 goroutine，不用你写任何并发代码</span><br>r.GET(<span class="hljs-string">&quot;/health&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(c *gin.Context)</span></span> &#123; ... &#125;)<br></code></pre></td></tr></table></figure>
+
+<p><strong>但共享状态要注意</strong>：<code>global.DB</code>&#x2F;<code>global.Redis</code> 是并发安全的（内部连接池），<br>而<strong>普通 map 并发读写会直接 panic</strong>。</p>
+<h2 id="三、场景-2：Hub-的读写锁"><a href="#三、场景-2：Hub-的读写锁" class="headerlink" title="三、场景 2：Hub 的读写锁"></a>三、场景 2：Hub 的读写锁</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Hub <span class="hljs-keyword">struct</span> &#123;<br>    mu      sync.RWMutex<br>    clients <span class="hljs-keyword">map</span>[<span class="hljs-type">uint64</span>]<span class="hljs-keyword">map</span>[*Client]<span class="hljs-keyword">struct</span>&#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>注册&#x2F;注销：<code>Lock()</code>（写）</li>
+<li>推送：<code>RLock()</code>（读），读多写少 → RWMutex 优于 Mutex</li>
+</ul>
+<p><strong>关键细节：持锁不做 IO</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go">h.mu.RLock()<br>list := <span class="hljs-built_in">make</span>([]*Client, <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(conns))<br><span class="hljs-keyword">for</span> c := <span class="hljs-keyword">range</span> conns &#123; list = <span class="hljs-built_in">append</span>(list, c) &#125;<br>h.mu.RUnlock()           <span class="hljs-comment">// 先复制再释放锁</span><br><span class="hljs-keyword">for</span> _, c := <span class="hljs-keyword">range</span> list &#123; c.Enqueue(frame) &#125;  <span class="hljs-comment">// 锁外做 channel 操作</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>为什么</strong>：持锁调用 <code>Enqueue</code>（可能阻塞&#x2F;关闭连接）会阻塞其他 goroutine 获取锁。</p>
+<h2 id="四、场景-3：每个连接的读-写双泵"><a href="#四、场景-3：每个连接的读-写双泵" class="headerlink" title="四、场景 3：每个连接的读&#x2F;写双泵"></a>四、场景 3：每个连接的读&#x2F;写双泵</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">go</span> client.WritePump()   <span class="hljs-comment">// 唯一往 socket 写</span><br><span class="hljs-keyword">go</span> client.ReadPump()    <span class="hljs-comment">// 唯一从 socket 读</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>为什么必须分开</strong>：gorilla&#x2F;websocket <strong>不允许并发写</strong>，并发写会 panic。<br>其他 goroutine 想发消息 → 只能往 <code>send chan []byte</code> 塞。</p>
+<p><strong>这里体现的原则</strong>：<strong>共享资源（socket）单 goroutine 独占</strong>，其他 goroutine 通过 channel 排队。</p>
+<h2 id="五、场景-4：慢消费者隔离"><a href="#五、场景-4：慢消费者隔离" class="headerlink" title="五、场景 4：慢消费者隔离"></a>五、场景 4：慢消费者隔离</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Client)</span></span> Enqueue(payload []<span class="hljs-type">byte</span>) &#123;<br>    <span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; _ = <span class="hljs-built_in">recover</span>() &#125;()   <span class="hljs-comment">// 连接关闭后 channel 已关，防 panic</span><br>    <span class="hljs-keyword">select</span> &#123;<br>    <span class="hljs-keyword">case</span> c.send &lt;- payload:<br>    <span class="hljs-keyword">default</span>:<br>        c.Close()      <span class="hljs-comment">// 队列满 → 断开慢连接</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>问题</strong>：如果客户端很慢，<code>send</code> 队列会满；如果用阻塞写 <code>c.send &lt;- payload</code>，<br>推送方（可能正在给其他用户推消息）会被卡住。</p>
+<p><strong>解法</strong>：non-blocking 入队 + 断开慢连接 &#x3D; 一个慢客户端不影响其他人。</p>
+<h2 id="六、场景-5：群消息扇出限并发"><a href="#六、场景-5：群消息扇出限并发" class="headerlink" title="六、场景 5：群消息扇出限并发"></a>六、场景 5：群消息扇出限并发</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">const</span> pushConcurrency = <span class="hljs-number">16</span><br><span class="hljs-keyword">var</span> pushSem = <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;, pushConcurrency)<br><br><span class="hljs-keyword">for</span> _, uid := <span class="hljs-keyword">range</span> memberIDs &#123;<br>    wg.Add(<span class="hljs-number">1</span>)<br>    pushSem &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125;        <span class="hljs-comment">// 获取令牌，满了就阻塞</span><br>    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(uid <span class="hljs-type">uint64</span>)</span></span> &#123;<br>        <span class="hljs-keyword">defer</span> wg.Done()<br>        <span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; &lt;-pushSem &#125;()   <span class="hljs-comment">// 释放令牌</span><br>        hub.SendToUser(uid, frame)<br>    &#125;(uid)<br>&#125;<br>wg.Wait()<br></code></pre></td></tr></table></figure>
+
+<p><strong>为什么</strong>：200 人的群无脑起 200 goroutine 会瞬时膨胀。<br>用带缓冲 channel 当信号量，把并发限制在 16。</p>
+<blockquote>
+<p>小会话（≤10 人）直接顺序推，避免 goroutine 开销。</p>
+</blockquote>
+<h2 id="七、场景-6：并发控制交给数据库（最推荐）"><a href="#七、场景-6：并发控制交给数据库（最推荐）" class="headerlink" title="七、场景 6：并发控制交给数据库（最推荐）"></a>七、场景 6：并发控制交给数据库（最推荐）</h2><p>很多并发问题不需要锁，<strong>数据库的原子操作就够了</strong>：</p>
+<h3 id="唯一索引兜底"><a href="#唯一索引兜底" class="headerlink" title="唯一索引兜底"></a>唯一索引兜底</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">UNIQUE</span> (sender_id, client_msg_id)   <span class="hljs-comment">-- 并发重复发送，第二个报 Duplicate</span><br><span class="hljs-keyword">UNIQUE</span> (from_user_id, to_user_id)   <span class="hljs-comment">-- 并发重复申请</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="条件更新-RowsAffected"><a href="#条件更新-RowsAffected" class="headerlink" title="条件更新 + RowsAffected"></a>条件更新 + RowsAffected</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs go">res := tx.Model(&amp;FriendRequest&#123;&#125;).<br>    Where(<span class="hljs-string">&quot;id = ? AND to_user_id = ? AND status = 0&quot;</span>, reqID, userID).<br>    Update(<span class="hljs-string">&quot;status&quot;</span>, <span class="hljs-number">1</span>)<br><span class="hljs-keyword">if</span> res.RowsAffected == <span class="hljs-number">0</span> &#123;<br>    <span class="hljs-keyword">return</span> errors.New(<span class="hljs-string">&quot;申请不存在或已被处理&quot;</span>)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><code>WHERE status=0</code> 让「判断 + 修改」原子化，天然抗并发（双击、重试都安全）。</p>
+<h3 id="原子表达式"><a href="#原子表达式" class="headerlink" title="原子表达式"></a>原子表达式</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs go">tx.Model(&amp;Group&#123;&#125;).Where(<span class="hljs-string">&quot;id = ?&quot;</span>, g.ID).<br>    Update(<span class="hljs-string">&quot;member_count&quot;</span>, gorm.Expr(<span class="hljs-string">&quot;member_count + ?&quot;</span>, n))<br></code></pre></td></tr></table></figure>
+
+<p>不要「先读再写」，并发会丢更新。</p>
+<h2 id="八、场景-7：优雅退出（信号-context）"><a href="#八、场景-7：优雅退出（信号-context）" class="headerlink" title="八、场景 7：优雅退出（信号 + context）"></a>八、场景 7：优雅退出（信号 + context）</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs go">mCtx, cancel := context.WithCancel(context.Background())<br>mq.StartOutboxWorker(mCtx)<br>mq.StartConsumer(mCtx)<br><br>quit := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> os.Signal, <span class="hljs-number">1</span>)<br>signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)<br>&lt;-quit<br><br>srv.Shutdown(ctx)      <span class="hljs-comment">// 等待在途请求</span><br>ws.DefaultHub.CloseAll()<br>cancel()               <span class="hljs-comment">// 通知 worker/consumer 退出</span><br>core.CloseBaseServices()<br></code></pre></td></tr></table></figure>
+
+<p><strong>要点</strong>：每个后台 goroutine 都要有「退出路径」（ctx.Done &#x2F; conn 关闭 &#x2F; channel 关闭）。</p>
+<h2 id="九、并发常见-bug-清单"><a href="#九、并发常见-bug-清单" class="headerlink" title="九、并发常见 bug 清单"></a>九、并发常见 bug 清单</h2><table>
+<thead>
+<tr>
+<th>bug</th>
+<th>现象</th>
+<th>避免方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>数据竞争</strong></td>
+<td>偶发数据错乱</td>
+<td><code>go test -race</code></td>
+</tr>
+<tr>
+<td><strong>goroutine 泄漏</strong></td>
+<td>内存&#x2F;协程数持续涨</td>
+<td>每个 goroutine 有退出条件</td>
+</tr>
+<tr>
+<td><strong>死锁</strong></td>
+<td>程序卡死</td>
+<td>锁顺序一致、不嵌套锁</td>
+</tr>
+<tr>
+<td><strong>panic: send on closed channel</strong></td>
+<td>连接关闭后仍推送</td>
+<td><code>sync.Once</code> 关闭 + <code>recover</code></td>
+</tr>
+<tr>
+<td><strong>闭包捕获循环变量</strong></td>
+<td>所有 goroutine 用同一个值</td>
+<td>传参 <code>go func(uid uint64){...}(uid)</code></td>
+</tr>
+<tr>
+<td><strong>map 并发读写</strong></td>
+<td><code>fatal error: concurrent map read and map write</code></td>
+<td><code>sync.Map</code> 或加锁</td>
+</tr>
+</tbody></table>
+<h3 id="闭包陷阱（Go-1-22-前常见）"><a href="#闭包陷阱（Go-1-22-前常见）" class="headerlink" title="闭包陷阱（Go 1.22 前常见）"></a>闭包陷阱（Go 1.22 前常见）</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// ❌ 所有 goroutine 可能都拿到最后一个 uid</span><br><span class="hljs-keyword">for</span> _, uid := <span class="hljs-keyword">range</span> ids &#123; <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; send(uid) &#125;() &#125;<br><span class="hljs-comment">// ✅ 显式传参</span><br><span class="hljs-keyword">for</span> _, uid := <span class="hljs-keyword">range</span> ids &#123; <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(u <span class="hljs-type">uint64</span>)</span></span> &#123; send(u) &#125;(uid) &#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="十、怎么验证并发安全"><a href="#十、怎么验证并发安全" class="headerlink" title="十、怎么验证并发安全"></a>十、怎么验证并发安全</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 数据竞争检测（需要 cgo + gcc）</span><br>go <span class="hljs-built_in">test</span> ./internal/ws/ -race -count=1<br><br><span class="hljs-comment"># 2. 并发测试：200 goroutine 同时注册/推送/注销</span><br>go <span class="hljs-built_in">test</span> ./internal/ws/ -v<br><br><span class="hljs-comment"># 3. 观察 goroutine 数量（需接 pprof）</span><br><span class="hljs-comment"># import _ &quot;net/http/pprof&quot;</span><br><span class="hljs-comment"># go tool pprof http://localhost:6060/debug/pprof/goroutine</span><br></code></pre></td></tr></table></figure>
+
+<p>本项目 <code>hub_test.go</code> 覆盖了：并发注册&#x2F;推送&#x2F;注销、多端在线、关闭全部连接、慢消费者不阻塞。</p>
+<h2 id="十一、面试问法"><a href="#十一、面试问法" class="headerlink" title="十一、面试问法"></a>十一、面试问法</h2><ol>
+<li>Go 的 goroutine 和线程的区别？</li>
+<li>channel 有缓冲和无缓冲的区别？什么场景用哪个？</li>
+<li>Mutex vs RWMutex？什么时候用读写锁？</li>
+<li>什么是数据竞争？怎么检测？</li>
+<li>goroutine 泄漏的常见原因？怎么排查？</li>
+<li>如何限制并发数？（信号量&#x2F;worker pool）</li>
+<li>什么时候用锁、什么时候用数据库唯一索引？</li>
+<li>为什么锁里不能做 IO？</li>
+<li>如何做优雅退出？为什么每个 goroutine 都要有退出路径？</li>
+<li>慢消费者怎么处理？</li>
+</ol>
+<hr>
+<p>相关：<a href="/blog/2026/11/13/WebSocket%E5%85%A8%E8%A7%A3-%E6%8F%A1%E6%89%8B%E5%BF%83%E8%B7%B3%E9%87%8D%E8%BF%9E%E4%B8%8Ewss/">WebSocket 全解</a>、<a href="/blog/2026/11/13/94-M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/">M4 并发加固详情</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E6%B7%B1%E5%BA%A6%E4%B8%93%E9%A2%98/" class="category-chain-item">深度专题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" class="print-no-link">#并发</a>
+      
+        <a href="/blog/tags/goroutine/" class="print-no-link">#goroutine</a>
+      
+        <a href="/blog/tags/channel/" class="print-no-link">#channel</a>
+      
+        <a href="/blog/tags/%E9%94%81/" class="print-no-link">#锁</a>
+      
+        <a href="/blog/tags/context/" class="print-no-link">#context</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>并发编程实战：项目里的 7 个并发场景</div>
+      <div>http://127.0.0.1:8080/blog/2026/11/13/22-并发编程实战-7个并发场景/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gochat</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2026/11/13/21-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8%E8%AE%BE%E8%AE%A1-12%E5%BC%A0%E8%A1%A8%E9%80%90%E5%BC%A0%E8%AE%B2/" title="数据库表设计：12 张表逐张讲清楚">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">数据库表设计：12 张表逐张讲清楚</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2026/11/13/23-WebSocket%E5%85%A8%E8%A7%A3-%E6%8F%A1%E6%89%8B%E5%BF%83%E8%B7%B3%E9%87%8D%E8%BF%9E%E4%B8%8Ewss/" title="WebSocket 全解：握手、心跳、重连与 wss">
+                        <span class="hidden-mobile">WebSocket 全解：握手、心跳、重连与 wss</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
