@@ -60,19 +60,16 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：✅ M0 完成；**M1 认证闭环（注册/登录/刷新/登出）已端到端跑通**。
-  - M0：`internal/config`（5 结构体）、`core.LoadConfig`、`global`、`internal/router`（NewRouter + HealthRouter）、`main.go`。`curl /health` → 200。
-  - M1 第 1 步 ✅：`DB_DSN()`；`LoadMysql()`（DSN → gorm.Open → 连接池 → global.DB）。
-  - M1 第 2 步 ✅：6 个 GORM 模型（`internal/model/user_model/` 包 `usermodel`、`friend_model/` 包 `friendmodel`，均匿名嵌入 `model.Model`）+ `InitMysqlTables()` AutoMigrate。6 张表 + 索引正确。
-  - M1 第 1.5 步 ✅：Redis 连接（`LoadRedis` 带 Ping）、JWT 配置扩展（`access_expire_minutes=120`、`refresh_expire_hours=720`）。
-  - M1 第 3 步 ✅：`internal/auth/` —— `password_util.go`（bcrypt）、`jwt.go`（双 token，HS256 + jti + type）、`token_store.go`（Redis jti 白名单 + GETDEL 原子消费）。
-  - M1 第 4 步 ✅：`internal/middleware/auth.go`（Bearer 解析 + type=access 校验 + c.Set）。
-  - M1 第 5 步 ✅：`internal/service/user_service/` —— Register / Login / Refresh（rotation + 复用检测）/ Logout。
-  - M1 第 6 步 ✅：`internal/router/user_router/user_api.go`（4 个 handler + 公开/鉴权两个 Group）、`router.go` 挂载。
-  - **✅ 端到端实测（9 项全过）**：注册 200 / 重复注册 400 / 密码错误 401 / 登录拿到双 token / 刷新成功 / 旧 refresh 再用 401 / 登出 200 / 登出后 refresh 401 / 无 token 登出 401。
-- **下一步**：M1 剩余业务 —— `GET/PUT /api/v1/users/me`（我的资料）、`GET /users/search`、设置、**好友申请/接受（事务）/好友列表**。之后 M1 收尾。
-- **数据库状态**：✅ 6 张表已建；`users` 表有测试用户（alice221959 等）
-- **最近 commit**：见 git log（M1 步骤陆续提交）
+- **项目状态**：✅ M0 完成；✅ **M1 全部完成**（认证 + 用户 + 好友）。
+  - M0：`internal/config`、`core.LoadConfig`、`global`、`internal/router`、`main.go`。
+  - M1 认证：`internal/auth/`（bcrypt / 双 token HS256+jti+type / Redis jti 白名单+GETDEL 原子消费）、`internal/middleware/auth.go`、`user_service`（Register/Login/Refresh rotation/Logout）、`user_router`。
+  - M1 用户：`GET/PUT /users/me`、`GET /users/search`、`GET/PUT /users/settings`。
+  - M1 好友：`friend_service`（发申请含 6 条规则 / 收申请 / **接受申请事务 + 条件更新抗并发** / 拒绝 / 好友列表 / 备注 / 删除 / 黑名单）、`friend_router`。
+  - **✅ 端到端实测全过**：认证 9 项 + 用户搜索/资料/设置 + 好友全流程（申请→接受→列表→重复接受拦截→删除→软删后重新加回恢复旧行）+ 黑名单。
+- **下一步**：**M2 单聊** —— conversations/messages 模型、发消息/拉历史、WebSocket 长连接、在线状态、离线消息。
+- **文档**：`gochat-study/learn/00-学习总览.md`、`learn/m1-认证与好友.md`、`面试集.md`、`场景集.md`。
+- **数据库状态**：6 张表已建（含测试数据）
+- **git**：M1 分步提交（`95bebcf` 认证 / `cb456d4` 资料 / `bb8c74d` 好友）
 
 ## 六、关键决策记录（追加式）
 
