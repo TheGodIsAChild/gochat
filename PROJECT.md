@@ -60,16 +60,20 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：✅ M0 完成；✅ **M1 全部完成**（认证 + 用户 + 好友）。
+- **项目状态**：✅ M0；✅ **M1 全部完成**；✅ **M2 完成**（单聊 + WebSocket）。
   - M0：`internal/config`、`core.LoadConfig`、`global`、`internal/router`、`main.go`。
-  - M1 认证：`internal/auth/`（bcrypt / 双 token HS256+jti+type / Redis jti 白名单+GETDEL 原子消费）、`internal/middleware/auth.go`、`user_service`（Register/Login/Refresh rotation/Logout）、`user_router`。
+  - M1 认证：`internal/auth/`（bcrypt / 双 token HS256+jti+type / Redis jti 白名单+GETDEL）、`middleware/auth.go`、`user_service`（Register/Login/Refresh/Logout）、`user_router`。
   - M1 用户：`GET/PUT /users/me`、`GET /users/search`、`GET/PUT /users/settings`。
-  - M1 好友：`friend_service`（发申请含 6 条规则 / 收申请 / **接受申请事务 + 条件更新抗并发** / 拒绝 / 好友列表 / 备注 / 删除 / 黑名单）、`friend_router`。
-  - **✅ 端到端实测全过**：认证 9 项 + 用户搜索/资料/设置 + 好友全流程（申请→接受→列表→重复接受拦截→删除→软删后重新加回恢复旧行）+ 黑名单。
-- **下一步**：**M2 单聊** —— conversations/messages 模型、发消息/拉历史、WebSocket 长连接、在线状态、离线消息。
-- **文档**：`gochat-study/learn/00-学习总览.md`、`learn/m1-认证与好友.md`、`面试集.md`、`场景集.md`。
-- **数据库状态**：6 张表已建（含测试数据）
-- **git**：M1 分步提交（`95bebcf` 认证 / `cb456d4` 资料 / `bb8c74d` 好友）
+  - M1 好友：`friend_service`（6 条规则发申请 / **接受事务+条件更新** / 列表 / 备注 / 删除 / 黑名单）、`friend_router`。
+  - **M2 模型**：`chat_model`（conversations / conversation_members / messages，单聊群聊共用；`UNIQUE(sender_id,client_msg_id)` 幂等）。
+  - **M2 服务**：`chat_service`（会话创建去重 / 会话列表含未读 / **消息幂等发送 + 事务** / 游标分页历史 / 已读）。
+  - **M2 WebSocket**：`internal/ws/`（Hub 连接管理 RWMutex / Client 读写双泵 / 心跳 ping-pong / 慢消费者断开 / 握手前 token 鉴权 / 统一 PushMessage）。
+  - **M2 接口**：`POST/GET /conversations`、`POST/GET /conversations/:id/messages`、`POST /conversations/:id/read`、`GET /online`、`GET /ws`。
+  - **✅ 端到端实测全过**：会话复用、消息幂等（同 client_msg_id 返回同 id）、未读数 1→0、HTTP→WS 推送、WS 发消息→ack+广播、ping/pong、历史落库。
+- **下一步**：**M3 群聊** —— groups/group_members 模型、建群/加群/退群/踢人、群消息扇出。
+- **文档**：`gochat-study/learn/00-学习总览.md`、`m1-认证与好友.md`、`m2-单聊与WebSocket.md`、`面试集.md`、`场景集.md`。
+- **数据库状态**：9 张表（M1 六张 + M2 三张）
+- **git**：M1 `95bebcf`/`cb456d4`/`bb8c74d`；M2 见最新 commit
 
 ## 六、关键决策记录（追加式）
 
