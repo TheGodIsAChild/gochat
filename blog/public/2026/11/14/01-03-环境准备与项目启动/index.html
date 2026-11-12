@@ -19,24 +19,24 @@
   <meta name="author" content="gochat">
   <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
   
-    <meta name="description" content="目标：搞懂「从一条命令到服务能响应」，这中间发生了什么。读完你能理解 main.go、config.yaml、core&#x2F; 三者的关系。  一、先看项目怎么启动12docker compose up -d    # 起 MySQL &#x2F; Redis &#x2F; RabbitMQgo run . -db            # 编译并运行，-db 表示顺便建表  go run . 会找当前目录的 packa">
+    <meta name="description" content="目标：30 分钟内让项目跑起来，并看懂启动过程中每一步在做什么。本文所有配置和日志都来自真实项目，不是示例。  一、你需要装什么   软件 版本 检查命令 用途    Go 1.21+ go version 编译运行项目   Docker Desktop 最新 docker version 跑 MySQL&#x2F;Redis&#x2F;RabbitMQ   编辑器 VS Code + Go 插">
 <meta property="og:type" content="article">
-<meta property="og:title" content="环境准备与项目启动（逐行讲解）">
+<meta property="og:title" content="环境准备与项目启动">
 <meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/14/01-03-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/index.html">
 <meta property="og:site_name" content="gochat 项目学习博客">
-<meta property="og:description" content="目标：搞懂「从一条命令到服务能响应」，这中间发生了什么。读完你能理解 main.go、config.yaml、core&#x2F; 三者的关系。  一、先看项目怎么启动12docker compose up -d    # 起 MySQL &#x2F; Redis &#x2F; RabbitMQgo run . -db            # 编译并运行，-db 表示顺便建表  go run . 会找当前目录的 packa">
+<meta property="og:description" content="目标：30 分钟内让项目跑起来，并看懂启动过程中每一步在做什么。本文所有配置和日志都来自真实项目，不是示例。  一、你需要装什么   软件 版本 检查命令 用途    Go 1.21+ go version 编译运行项目   Docker Desktop 最新 docker version 跑 MySQL&#x2F;Redis&#x2F;RabbitMQ   编辑器 VS Code + Go 插">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-11-14T15:57:00.000Z">
-<meta property="article:modified_time" content="2026-11-12T17:23:22.821Z">
+<meta property="article:modified_time" content="2026-11-12T17:35:08.710Z">
 <meta property="article:author" content="gochat">
-<meta property="article:tag" content="main">
+<meta property="article:tag" content="Docker">
 <meta property="article:tag" content="入门">
 <meta property="article:tag" content="配置">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>环境准备与项目启动（逐行讲解） - gochat 项目学习博客</title>
+  <title>环境准备与项目启动 - gochat 项目学习博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -300,7 +300,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="环境准备与项目启动（逐行讲解）"></span>
+            <span id="subtitle" data-typed-text="环境准备与项目启动"></span>
           
         </div>
 
@@ -323,7 +323,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4.9k 字
+          6.5k 字
         
       </span>
     
@@ -334,7 +334,7 @@
         
         
         
-          41 分钟
+          55 分钟
         
       </span>
     
@@ -373,92 +373,233 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">环境准备与项目启动（逐行讲解）</h1>
+            <h1 id="seo-header">环境准备与项目启动</h1>
             
             
               <div class="markdown-body">
                 
                 <blockquote>
-<p>目标：搞懂「从一条命令到服务能响应」，这中间发生了什么。<br>读完你能理解 <code>main.go</code>、<code>config.yaml</code>、<code>core/</code> 三者的关系。</p>
+<p>目标：30 分钟内让项目跑起来，并<strong>看懂启动过程中每一步在做什么</strong>。<br>本文所有配置和日志都来自真实项目，不是示例。</p>
 </blockquote>
-<h2 id="一、先看项目怎么启动"><a href="#一、先看项目怎么启动" class="headerlink" title="一、先看项目怎么启动"></a>一、先看项目怎么启动</h2><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs applescript">docker compose up -d    <span class="hljs-comment"># 起 MySQL / Redis / RabbitMQ</span><br>go <span class="hljs-built_in">run</span> . -db            <span class="hljs-comment"># 编译并运行，-db 表示顺便建表</span><br></code></pre></td></tr></table></figure>
-
-<p><code>go run .</code> 会找当前目录的 <code>package main</code>，也就是 <code>main.go</code>。</p>
-<h2 id="二、config-yaml：配置为什么单独放文件"><a href="#二、config-yaml：配置为什么单独放文件" class="headerlink" title="二、config.yaml：配置为什么单独放文件"></a>二、config.yaml：配置为什么单独放文件</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">server:</span><br>  <span class="hljs-attr">addr:</span> <span class="hljs-string">&quot;:8080&quot;</span><br><span class="hljs-attr">mysql:</span><br>  <span class="hljs-attr">host:</span> <span class="hljs-string">&quot;127.0.0.1&quot;</span><br>  <span class="hljs-attr">port:</span> <span class="hljs-number">3307</span><br>  <span class="hljs-attr">user:</span> <span class="hljs-string">&quot;gochat&quot;</span><br>  <span class="hljs-attr">password:</span> <span class="hljs-string">&quot;gochat123&quot;</span><br>  <span class="hljs-attr">database:</span> <span class="hljs-string">&quot;gochat&quot;</span><br><span class="hljs-attr">redis:</span><br>  <span class="hljs-attr">addr:</span> <span class="hljs-string">&quot;127.0.0.1:6379&quot;</span><br><span class="hljs-attr">jwt:</span><br>  <span class="hljs-attr">secret:</span> <span class="hljs-string">&quot;gochat-dev-secret-change-me&quot;</span><br>  <span class="hljs-attr">access_expire_minutes:</span> <span class="hljs-number">120</span><br>  <span class="hljs-attr">refresh_expire_hours:</span> <span class="hljs-number">720</span><br><span class="hljs-attr">grpc:</span><br>  <span class="hljs-attr">user_addr:</span> <span class="hljs-string">&quot;127.0.0.1:9001&quot;</span><br>  <span class="hljs-attr">chat_addr:</span> <span class="hljs-string">&quot;127.0.0.1:9002&quot;</span><br></code></pre></td></tr></table></figure>
-
-<p><strong>为什么不硬编码在代码里？</strong></p>
-<ul>
-<li>开发&#x2F;测试&#x2F;生产环境配置不同，改配置不用改代码</li>
-<li>密码、密钥不应该进 git（生产用环境变量&#x2F;配置中心）</li>
-<li>运维可以直接改配置重启，不用重新编译</li>
-</ul>
-<h2 id="三、internal-config：配置的-Go-结构体"><a href="#三、internal-config：配置的-Go-结构体" class="headerlink" title="三、internal&#x2F;config：配置的 Go 结构体"></a>三、internal&#x2F;config：配置的 Go 结构体</h2><p>YAML 是文本，Go 需要结构体来接。<code>internal/config/mysql_config.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Mysql <span class="hljs-keyword">struct</span> &#123;<br>    Host     <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;host&quot;`</span><br>    Port     <span class="hljs-type">int</span>    <span class="hljs-string">`yaml:&quot;port&quot;`</span><br>    User     <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;user&quot;`</span><br>    Password <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;password&quot;`</span><br>    Database <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;database&quot;`</span><br>    Charset  <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;charset&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// DB_DSN 把结构体拼成 GORM 需要的 DSN 字符串</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m Mysql)</span></span> DB_DSN() <span class="hljs-type">string</span> &#123;<br>    <span class="hljs-keyword">return</span> fmt.Sprintf(<span class="hljs-string">&quot;%s:%s@tcp(%s:%d)/%s?charset=%s&amp;parseTime=True&amp;loc=Local&quot;</span>,<br>        m.User, m.Password, m.Host, m.Port, m.Database, m.Charset)<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p><strong>逐行解释</strong>：</p>
-<ul>
-<li><code>`yaml:&quot;host&quot;`</code> 是 <strong>struct tag</strong>，告诉 YAML 库：YAML 里的 <code>host</code> 对应这个字段</li>
-<li><code>DB_DSN()</code> 是<strong>方法</strong>（值接收者），把配置拼成 DSN</li>
-<li><code>parseTime=True</code>：让 MySQL 的 DATETIME 自动解析成 Go 的 <code>time.Time</code>（否则拿到的是字符串）</li>
-<li><code>loc=Local</code>：时区用本地时区</li>
-</ul>
+<h2 id="一、你需要装什么"><a href="#一、你需要装什么" class="headerlink" title="一、你需要装什么"></a>一、你需要装什么</h2><table>
+<thead>
+<tr>
+<th>软件</th>
+<th>版本</th>
+<th>检查命令</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Go</td>
+<td>1.21+</td>
+<td><code>go version</code></td>
+<td>编译运行项目</td>
+</tr>
+<tr>
+<td>Docker Desktop</td>
+<td>最新</td>
+<td><code>docker version</code></td>
+<td>跑 MySQL&#x2F;Redis&#x2F;RabbitMQ</td>
+</tr>
+<tr>
+<td>编辑器</td>
+<td>VS Code + Go 插件</td>
+<td>—</td>
+<td>读代码、断点调试</td>
+</tr>
+<tr>
+<td>浏览器</td>
+<td>Chrome&#x2F;Edge</td>
+<td>—</td>
+<td>体验前端</td>
+</tr>
+</tbody></table>
 <blockquote>
-<p><strong>注意点</strong>：<code>type Mysql struct{}</code> 只放「数据定义」，不放「读取逻辑」——读取逻辑在 <code>core/</code> 里。<br>这是用户最初就要求的分工：<strong>定义与读取分离</strong>。</p>
+<p><strong>不需要在本机安装 MySQL&#x2F;Redis</strong>——全部用 Docker，卸载干净、不污染环境。</p>
 </blockquote>
-<h2 id="四、core-init-config-go：读取配置的三步"><a href="#四、core-init-config-go：读取配置的三步" class="headerlink" title="四、core&#x2F;init_config.go：读取配置的三步"></a>四、core&#x2F;init_config.go：读取配置的三步</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 1. 解析命令行参数</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">LoadConfigFile</span><span class="hljs-params">()</span></span> &#123;<br>    flag.StringVar(&amp;flagConfig.ConfigPath, <span class="hljs-string">&quot;config&quot;</span>, <span class="hljs-string">&quot;./config.yaml&quot;</span>, <span class="hljs-string">&quot;配置文件路径&quot;</span>)<br>    flag.BoolVar(&amp;flagConfig.InitDB, <span class="hljs-string">&quot;db&quot;</span>, <span class="hljs-literal">false</span>, <span class="hljs-string">&quot;是否初始化数据库表&quot;</span>)<br>    flag.Parse()<br>    global.ConfigPath = &amp;flagConfig.ConfigPath<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="二、为什么数据库端口是-3307-而不是-3306"><a href="#二、为什么数据库端口是-3307-而不是-3306" class="headerlink" title="二、为什么数据库端口是 3307 而不是 3306"></a>二、为什么数据库端口是 3307 而不是 3306</h2><p>看 <code>docker-compose.yml</code> 里 MySQL 的完整定义：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">mysql:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">mysql:8.0</span><br>    <span class="hljs-attr">container_name:</span> <span class="hljs-string">gochat-mysql</span><br>    <span class="hljs-attr">environment:</span><br>      <span class="hljs-attr">MYSQL_ROOT_PASSWORD:</span> <span class="hljs-string">root</span><br>      <span class="hljs-attr">MYSQL_DATABASE:</span> <span class="hljs-string">gochat</span><br>      <span class="hljs-attr">MYSQL_USER:</span> <span class="hljs-string">gochat</span><br>      <span class="hljs-attr">MYSQL_PASSWORD:</span> <span class="hljs-string">gochat123</span><br>    <span class="hljs-attr">command:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">--character-set-server=utf8mb4</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">--collation-server=utf8mb4_unicode_ci</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;3307:3306&quot;</span>       <span class="hljs-comment"># ← 关键：宿主机 3307 映射到容器 3306</span><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">gochat_mysql_data:/var/lib/mysql</span><br>    <span class="hljs-attr">healthcheck:</span><br>      <span class="hljs-attr">test:</span> [<span class="hljs-string">&quot;CMD&quot;</span>, <span class="hljs-string">&quot;mysqladmin&quot;</span>, <span class="hljs-string">&quot;ping&quot;</span>, <span class="hljs-string">&quot;-h&quot;</span>, <span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-string">&quot;-uroot&quot;</span>, <span class="hljs-string">&quot;-proot&quot;</span>]<br>      <span class="hljs-attr">interval:</span> <span class="hljs-string">5s</span><br>      <span class="hljs-attr">timeout:</span> <span class="hljs-string">3s</span><br>      <span class="hljs-attr">retries:</span> <span class="hljs-number">12</span><br></code></pre></td></tr></table></figure>
 
-<p><strong>逐行</strong>：</p>
-<ul>
-<li><code>flag.StringVar(指针, 参数名, 默认值, 说明)</code> —— 注意第 3 个参数是<strong>默认值</strong>，不是说明文字（这里踩过坑！）</li>
-<li><code>-db</code> 参数决定要不要执行 AutoMigrate（建表）</li>
-<li>解析结果存到 <code>global.ConfigPath</code>（全局变量）</li>
-</ul>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 2. 读文件 + 解析 YAML</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">LoadConfig</span><span class="hljs-params">()</span></span> (<span class="hljs-type">bool</span>, <span class="hljs-type">error</span>) &#123;<br>    bytes, err := os.ReadFile(*global.ConfigPath)<br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>, fmt.Errorf(<span class="hljs-string">&quot;config 加载失败: %w&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">if</span> err := yaml.Unmarshal(bytes, &amp;global.Config); err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>, fmt.Errorf(<span class="hljs-string">&quot;yaml 配置解析错误: %w&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="逐项解释"><a href="#逐项解释" class="headerlink" title="逐项解释"></a>逐项解释</h3><table>
+<thead>
+<tr>
+<th>配置</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>image: mysql:8.0</code></td>
+<td>用官方 MySQL 8.0 镜像</td>
+</tr>
+<tr>
+<td><code>container_name</code></td>
+<td>固定容器名，方便 <code>docker exec -it gochat-mysql ...</code></td>
+</tr>
+<tr>
+<td><code>MYSQL_*</code> 环境变量</td>
+<td>首次启动时自动建库、建用户（<strong>只在数据卷为空时生效</strong>）</td>
+</tr>
+<tr>
+<td><code>--character-set-server=utf8mb4</code></td>
+<td>支持中文和 emoji（<code>utf8</code> 只有 3 字节，存不了 emoji）</td>
+</tr>
+<tr>
+<td><code>ports: &quot;3307:3306&quot;</code></td>
+<td>宿主机 3307 → 容器 3306。<strong>为什么？</strong> 很多开发机 3306 已被本机 MySQL 占用，用 3307 避开冲突</td>
+</tr>
+<tr>
+<td><code>volumes: gochat_mysql_data</code></td>
+<td>数据持久化到 Docker 卷，容器删了数据还在</td>
+</tr>
+<tr>
+<td><code>healthcheck</code></td>
+<td>每 5 秒 ping 一次，<code>docker ps</code> 显示 <code>(healthy)</code> 才说明真起来了</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>注意点</strong>：<code>MYSQL_*</code> 只在「数据卷为空」时生效。改了密码但卷还在，新密码不会应用——需要 <code>docker compose down -v</code> 删卷重来。</p>
+</blockquote>
+<h3 id="Redis-和-RabbitMQ"><a href="#Redis-和-RabbitMQ" class="headerlink" title="Redis 和 RabbitMQ"></a>Redis 和 RabbitMQ</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">redis:</span><br>  <span class="hljs-attr">image:</span> <span class="hljs-string">redis:7-alpine</span><br>  <span class="hljs-attr">ports:</span> [<span class="hljs-string">&quot;6379:6379&quot;</span>]<br><br><span class="hljs-attr">rabbitmq:</span><br>  <span class="hljs-attr">image:</span> <span class="hljs-string">rabbitmq:3-management</span><br>  <span class="hljs-attr">environment:</span><br>    <span class="hljs-attr">RABBITMQ_DEFAULT_USER:</span> <span class="hljs-string">gochat</span><br>    <span class="hljs-attr">RABBITMQ_DEFAULT_PASS:</span> <span class="hljs-string">gochat123</span><br>  <span class="hljs-attr">ports:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;5672:5672&quot;</span>      <span class="hljs-comment"># AMQP 协议（程序连这个）</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;15672:15672&quot;</span>    <span class="hljs-comment"># 管理界面（浏览器看这个）</span><br></code></pre></td></tr></table></figure>
 
-<p><strong>逐行</strong>：</p>
+<p><strong>两个端口别搞混</strong>：<code>5672</code> 是程序用的 AMQP 端口；<code>15672</code> 是 Web 管理界面，浏览器打开 <code>http://127.0.0.1:15672</code>，账号 <code>gochat/gochat123</code>。</p>
+<h2 id="三、启动依赖"><a href="#三、启动依赖" class="headerlink" title="三、启动依赖"></a>三、启动依赖</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> gochat<br>docker compose up -d<br></code></pre></td></tr></table></figure>
+
+<p>第一次会下载镜像（约 500MB，视网络情况）。等待后检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker ps<br></code></pre></td></tr></table></figure>
+
+<p>三个容器都应为 <code>Up ... (healthy)</code>：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs dns">gochat-mysql       Up <span class="hljs-number">2</span> minutes <span class="hljs-punctuation">(</span>healthy<span class="hljs-punctuation">)</span><br>gochat-redis       Up <span class="hljs-number">2</span> minutes <span class="hljs-punctuation">(</span>healthy<span class="hljs-punctuation">)</span><br>gochat-rabbitmq    Up <span class="hljs-number">2</span> minutes <span class="hljs-punctuation">(</span>healthy<span class="hljs-punctuation">)</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>MySQL 一直不是 healthy 怎么办</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker logs gochat-mysql --<span class="hljs-built_in">tail</span> 50<br></code></pre></td></tr></table></figure>
+
+<p>常见原因是 3307 端口被占用，或磁盘空间不足。</p>
+<h2 id="四、配置文件逐行讲"><a href="#四、配置文件逐行讲" class="headerlink" title="四、配置文件逐行讲"></a>四、配置文件逐行讲</h2><p><code>config.yaml</code> 全文（30 行）：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-comment"># gochat 配置文件（开发环境）</span><br><span class="hljs-attr">server:</span><br>  <span class="hljs-attr">addr:</span> <span class="hljs-string">&quot;:8080&quot;</span><br>  <span class="hljs-attr">mode:</span> <span class="hljs-string">&quot;debug&quot;</span>        <span class="hljs-comment"># gin 运行模式：debug / release / test</span><br><br><span class="hljs-attr">mysql:</span><br>  <span class="hljs-attr">host:</span> <span class="hljs-string">&quot;127.0.0.1&quot;</span><br>  <span class="hljs-attr">port:</span> <span class="hljs-number">3307</span>           <span class="hljs-comment"># ← 对应 docker-compose 里的宿主机端口</span><br>  <span class="hljs-attr">user:</span> <span class="hljs-string">&quot;gochat&quot;</span><br>  <span class="hljs-attr">password:</span> <span class="hljs-string">&quot;gochat123&quot;</span><br>  <span class="hljs-attr">database:</span> <span class="hljs-string">&quot;gochat&quot;</span><br>  <span class="hljs-attr">charset:</span> <span class="hljs-string">&quot;utf8mb4&quot;</span><br><br><span class="hljs-attr">redis:</span><br>  <span class="hljs-attr">addr:</span> <span class="hljs-string">&quot;127.0.0.1:6379&quot;</span><br>  <span class="hljs-attr">password:</span> <span class="hljs-string">&quot;&quot;</span><br>  <span class="hljs-attr">db:</span> <span class="hljs-number">0</span>                <span class="hljs-comment"># Redis 有 16 个逻辑库，0 是默认</span><br><br><span class="hljs-attr">rabbitmq:</span><br>  <span class="hljs-attr">url:</span> <span class="hljs-string">&quot;amqp://gochat:gochat123@127.0.0.1:5672/&quot;</span><br><br><span class="hljs-attr">jwt:</span><br>  <span class="hljs-attr">secret:</span> <span class="hljs-string">&quot;gochat-dev-secret-change-me&quot;</span><br>  <span class="hljs-attr">access_expire_minutes:</span> <span class="hljs-number">120</span>     <span class="hljs-comment"># access token 有效期 2 小时</span><br>  <span class="hljs-attr">refresh_expire_hours:</span> <span class="hljs-number">720</span>      <span class="hljs-comment"># refresh token 有效期 30 天</span><br><br><span class="hljs-attr">grpc:</span>                            <span class="hljs-comment"># M6 微服务：gRPC 服务地址</span><br>  <span class="hljs-attr">user_addr:</span> <span class="hljs-string">&quot;127.0.0.1:9001&quot;</span><br>  <span class="hljs-attr">chat_addr:</span> <span class="hljs-string">&quot;127.0.0.1:9002&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="三个要点"><a href="#三个要点" class="headerlink" title="三个要点"></a>三个要点</h3><ol>
+<li><strong><code>jwt.secret</code> 是签名密钥</strong>，绝不能提交到公开仓库（生产用环境变量注入）</li>
+<li><strong><code>access_expire_minutes: 120</code></strong> 想验证无感刷新，把它改成 <code>1</code>，1 分钟后 token 过期，观察前端怎么自动续期</li>
+<li><strong><code>grpc.*_addr</code></strong> 是 M6 微服务地址。单进程演示时，服务端和客户端在同一个进程里</li>
+</ol>
+<h2 id="五、配置是怎么被读进程序的"><a href="#五、配置是怎么被读进程序的" class="headerlink" title="五、配置是怎么被读进程序的"></a>五、配置是怎么被读进程序的</h2><p>YAML 是文本，Go 程序需要结构体来接。分两步：</p>
+<h3 id="第-1-步：定义结构体（internal-config-）"><a href="#第-1-步：定义结构体（internal-config-）" class="headerlink" title="第 1 步：定义结构体（internal/config/）"></a>第 1 步：定义结构体（<code>internal/config/</code>）</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Mysql <span class="hljs-keyword">struct</span> &#123;<br>    Host     <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;host&quot;`</span><br>    Port     <span class="hljs-type">int</span>    <span class="hljs-string">`yaml:&quot;port&quot;`</span><br>    User     <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;user&quot;`</span><br>    Password <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;password&quot;`</span><br>    Database <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;database&quot;`</span><br>    Charset  <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;charset&quot;`</span><br>&#125;<br><br><span class="hljs-comment">// 把结构体拼成 GORM 需要的 DSN 字符串</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m Mysql)</span></span> DB_DSN() <span class="hljs-type">string</span> &#123;<br>    <span class="hljs-keyword">return</span> fmt.Sprintf(<span class="hljs-string">&quot;%s:%s@tcp(%s:%d)/%s?charset=%s&amp;parseTime=True&amp;loc=Local&quot;</span>,<br>        m.User, m.Password, m.Host, m.Port, m.Database, m.Charset)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong><code>yaml:&quot;host&quot;</code> 是 struct tag</strong>，告诉 YAML 库：文件里的 <code>host</code> 对应这个字段。</p>
+<p><strong><code>parseTime=True</code> 很关键</strong>：不加的话 MySQL 的 <code>DATETIME</code> 会以字符串返回，GORM 扫描到 <code>time.Time</code> 字段会报错。</p>
+<h3 id="第-2-步：读文件-解析（core-init-config-go）"><a href="#第-2-步：读文件-解析（core-init-config-go）" class="headerlink" title="第 2 步：读文件 + 解析（core/init_config.go）"></a>第 2 步：读文件 + 解析（<code>core/init_config.go</code>）</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">LoadConfig</span><span class="hljs-params">()</span></span> (<span class="hljs-type">bool</span>, <span class="hljs-type">error</span>) &#123;<br>    bytes, err := os.ReadFile(*global.ConfigPath)<br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>, fmt.Errorf(<span class="hljs-string">&quot;config 加载失败: %w&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">if</span> err := yaml.Unmarshal(bytes, &amp;global.Config); err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>, fmt.Errorf(<span class="hljs-string">&quot;yaml 配置解析错误: %w&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>逐行说</strong>：</p>
 <ul>
 <li><code>os.ReadFile</code> 把整个文件读成 <code>[]byte</code></li>
-<li><code>yaml.Unmarshal(bytes, &amp;global.Config)</code> —— 第二个参数<strong>必须传指针</strong>，否则解析结果写不进去</li>
-<li><code>%w</code> 是 Go 的错误包装语法，保留原始错误链（<code>errors.Is</code> 能判断）</li>
+<li><code>yaml.Unmarshal(bytes, &amp;global.Config)</code> —— <strong>第二个参数必须传指针</strong>，否则解析结果写不进原变量（新手最常犯的错）</li>
+<li><code>%w</code> 是 Go 的错误包装语法，保留原始错误链</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 3. 初始化各种基础服务</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">InitBaseServices</span><span class="hljs-params">()</span></span> <span class="hljs-type">error</span> &#123;<br>    <span class="hljs-keyword">if</span> _, err := db.LoadMysql(); err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;数据库连接失败: %w&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">if</span> flagConfig.InitDB &#123;<br>        <span class="hljs-keyword">if</span> _, err := db.InitMysqlTables(); err != <span class="hljs-literal">nil</span> &#123;<br>            <span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;数据库建表失败: %w&quot;</span>, err)<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">if</span> _, err := db.LoadRedis(); err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;初始化 Redis 失败: %w&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">if</span> err := mq.LoadMq(); err != <span class="hljs-literal">nil</span> &#123;<br>        log.Printf(<span class="hljs-string">&quot;RabbitMQ 连接失败，消息将使用同步推送: %v&quot;</span>, err)   <span class="hljs-comment">// 可选依赖，失败降级</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>为什么要把「定义」和「读取」分开？</strong><br>结构体只描述「配置长什么样」；读取逻辑在 <code>core/</code> 层。以后改从环境变量&#x2F;配置中心读，只改 <code>core/</code>，结构体不动。</p>
+</blockquote>
+<h2 id="六、启动服务并读懂日志"><a href="#六、启动服务并读懂日志" class="headerlink" title="六、启动服务并读懂日志"></a>六、启动服务并读懂日志</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">go run . -db<br></code></pre></td></tr></table></figure>
 
-<p><strong>逐行</strong>：</p>
-<ul>
-<li>MySQL&#x2F;Redis 是<strong>必需依赖</strong>：失败就返回 error，main 里 <code>log.Fatal</code> 退出</li>
-<li>RabbitMQ 是<strong>可选依赖</strong>：失败只打日志，应用继续跑（消息改为同步推送）——这就是「降级设计」</li>
-</ul>
-<h2 id="五、db-LoadMysql：GORM-连接数据库"><a href="#五、db-LoadMysql：GORM-连接数据库" class="headerlink" title="五、db.LoadMysql：GORM 连接数据库"></a>五、db.LoadMysql：GORM 连接数据库</h2><p><code>core/db/init_mysql.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">LoadMysql</span><span class="hljs-params">()</span></span> (*gorm.DB, <span class="hljs-type">error</span>) &#123;<br>    dsn := global.Config.Mysql.DB_DSN()<br><br>    db, err := gorm.Open(mysql.Open(dsn), &amp;gorm.Config&#123;<br>        DisableForeignKeyConstraintWhenMigrating: <span class="hljs-literal">true</span>,  <span class="hljs-comment">// 不生成物理外键</span><br>        TranslateError: <span class="hljs-literal">true</span>,                            <span class="hljs-comment">// Duplicate 错误翻译成哨兵错误</span><br>    &#125;)<br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> db, fmt.Errorf(<span class="hljs-string">&quot;数据库连接失败: %w&quot;</span>, err)<br>    &#125;<br><br>    sqlDB, _ := db.DB()            <span class="hljs-comment">// 取出底层 *sql.DB</span><br>    sqlDB.SetMaxOpenConns(<span class="hljs-number">50</span>)      <span class="hljs-comment">// 最大连接数</span><br>    sqlDB.SetMaxIdleConns(<span class="hljs-number">10</span>)      <span class="hljs-comment">// 最大空闲连接</span><br>    sqlDB.SetConnMaxLifetime(time.Hour)  <span class="hljs-comment">// 连接最长存活时间</span><br><br>    global.DB = db                 <span class="hljs-comment">// 存到全局，供 service 层使用</span><br>    <span class="hljs-keyword">return</span> db, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p><code>-db</code> 表示「顺便建表」（AutoMigrate）。生产环境一般不用。</p>
+<p>启动成功的日志：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs routeros">数据库连接成功<br>[GIN-<span class="hljs-built_in">debug</span>] <span class="hljs-built_in">..</span>. 各种路由注册日志 <span class="hljs-built_in">..</span>.<br>2026/11/14 12:00:00 gRPC 服务启动: <span class="hljs-attribute">user</span>=127.0.0.1:9001 <span class="hljs-attribute">chat</span>=127.0.0.1:9002<br>2026/11/14 12:00:00 HTTP 服务启动: :8080<br></code></pre></td></tr></table></figure>
 
-<p><strong>逐行</strong>：</p>
-<ul>
-<li><code>gorm.Open(mysql.Open(dsn), ...)</code> —— 注意第一个参数是 <strong><code>gorm.Dialector</code></strong>，不是 dsn 字符串（这里踩过坑）</li>
-<li><code>DisableForeignKeyConstraintWhenMigrating</code>：迁移时不建物理外键，约束交给应用层</li>
-<li><code>TranslateError</code>：MySQL 的 <code>Duplicate entry</code> 会变成 <code>gorm.ErrDuplicatedKey</code>，业务代码能用 <code>errors.Is</code> 判断</li>
-<li><strong>连接池</strong>：不设置的话默认可能无限开连接，DB 会被打爆</li>
-</ul>
-<h2 id="六、main-go：把所有东西串起来"><a href="#六、main-go：把所有东西串起来" class="headerlink" title="六、main.go：把所有东西串起来"></a>六、main.go：把所有东西串起来</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    core.LoadConfigFile()                                    <span class="hljs-comment">// 1. 解析参数</span><br>    <span class="hljs-keyword">if</span> _, err := core.LoadConfig(); err != <span class="hljs-literal">nil</span> &#123;             <span class="hljs-comment">// 2. 读配置</span><br>        log.Fatalf(<span class="hljs-string">&quot;加载配置失败: %v&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">if</span> err := core.InitBaseServices(); err != <span class="hljs-literal">nil</span> &#123;          <span class="hljs-comment">// 3. 连 DB/Redis/MQ</span><br>        log.Fatalf(<span class="hljs-string">&quot;初始化基础服务失败: %v&quot;</span>, err)<br>    &#125;<br><br>    grpcServers, err := grpcx.StartServers(...)              <span class="hljs-comment">// 4. 起 gRPC 微服务</span><br>    grpcx.Dial(...)                                          <span class="hljs-comment">//    建立客户端连接</span><br><br>    srv := &amp;http.Server&#123;Addr: ..., Handler: router.NewRouter()&#125;  <span class="hljs-comment">// 5. 起 HTTP</span><br>    <span class="hljs-keyword">go</span> srv.ListenAndServe()<br><br>    <span class="hljs-comment">// 6. 等退出信号，优雅关闭</span><br>    &lt;-quit<br>    srv.Shutdown(ctx)<br>    ws.DefaultHub.CloseAll()<br>    core.CloseBaseServices()<br>&#125;<br></code></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>日志</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>数据库连接成功</code></td>
+<td>GORM 连上 MySQL，连接池已建好</td>
+</tr>
+<tr>
+<td><code>[GIN-debug] GET /api/v1/users/me --&gt; ...</code></td>
+<td>每条路由注册成功（debug 模式才打印）</td>
+</tr>
+<tr>
+<td><code>gRPC 服务启动</code></td>
+<td>M6 的两个微服务在 9001&#x2F;9002 监听</td>
+</tr>
+<tr>
+<td><code>HTTP 服务启动: :8080</code></td>
+<td>主服务开始接收请求</td>
+</tr>
+</tbody></table>
+<p><strong>看到最后一行，才说明真的起来了。</strong></p>
+<h3 id="建表是什么时候做的"><a href="#建表是什么时候做的" class="headerlink" title="建表是什么时候做的"></a>建表是什么时候做的</h3><p><code>-db</code> 参数触发 <code>AutoMigrate</code>：GORM 对比结构体和数据库，<strong>自动补上缺的表和缺的列</strong>。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs go">global.DB.AutoMigrate(<br>    &amp;usermodel.User&#123;&#125;,<br>    &amp;usermodel.UserSettings&#123;&#125;,<br>    &amp;friendmodel.FriendRequest&#123;&#125;,<br>    <span class="hljs-comment">// ... 12 张表</span><br>)<br></code></pre></td></tr></table></figure>
 
-<p><strong>为什么用 <code>http.Server</code> 而不是 <code>r.Run()</code>？</strong></p>
-<p><code>r.Run()</code> 是阻塞的，进程被 kill 时处理中的请求会被硬切断。<br>用 <code>http.Server</code> + 信号监听，可以做到「停止接收新请求 → 等待处理中的请求完成 → 释放资源」。</p>
-<h2 id="七、-health：最简单的接口"><a href="#七、-health：最简单的接口" class="headerlink" title="七、&#x2F;health：最简单的接口"></a>七、&#x2F;health：最简单的接口</h2><p><code>internal/router/health/health_api.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">HealthRouter</span><span class="hljs-params">(r *gin.Engine)</span></span> &#123;<br>    r.GET(<span class="hljs-string">&quot;/health&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(c *gin.Context)</span></span> &#123;<br>        c.JSON(<span class="hljs-number">200</span>, gin.H&#123;<span class="hljs-string">&quot;status&quot;</span>: <span class="hljs-string">&quot;ok&quot;</span>&#125;)<br>    &#125;)<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>AutoMigrate 只「加」不「删」</strong>——改字段类型它不会帮你改。所以表结构大改时用 <code>docker compose down -v</code> 重建库。</p>
+<h2 id="七、第一个请求：注册-→-登录-→-访问"><a href="#七、第一个请求：注册-→-登录-→-访问" class="headerlink" title="七、第一个请求：注册 → 登录 → 访问"></a>七、第一个请求：注册 → 登录 → 访问</h2><h3 id="1-注册"><a href="#1-注册" class="headerlink" title="1. 注册"></a>1. 注册</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -X POST http://127.0.0.1:8080/api/v1/register \<br>  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> \<br>  -d <span class="hljs-string">&#x27;&#123;&quot;username&quot;:&quot;alice&quot;,&quot;password&quot;:&quot;123456&quot;,&quot;nickname&quot;:&quot;爱丽丝&quot;&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
 
-<p><strong>逐行</strong>：</p>
-<ul>
-<li><code>r.GET(路径, handler)</code> 注册一个 GET 路由</li>
-<li><code>c *gin.Context</code> 是 gin 的请求上下文（拿参数、写响应都用它）</li>
-<li><code>gin.H</code> 就是 <code>map[string]any</code> 的简写</li>
-<li><strong>为什么要有健康检查？</strong> 负载均衡&#x2F;K8s 用它判断服务是否存活</li>
-</ul>
-<h2 id="八、动手练习"><a href="#八、动手练习" class="headerlink" title="八、动手练习"></a>八、动手练习</h2><ol>
-<li>把 <code>server.addr</code> 改成 <code>:9090</code>，重启，访问 <code>http://127.0.0.1:9090/health</code></li>
-<li>把 <code>-db</code> 参数去掉，观察启动日志（不再建表，但服务正常）</li>
-<li>故意把 MySQL 密码改错，观察启动报错信息</li>
+<p>预期：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;code&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ok&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;user_id&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;username&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;alice&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;nickname&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;爱丽丝&quot;</span><span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-登录，拿双-token"><a href="#2-登录，拿双-token" class="headerlink" title="2. 登录，拿双 token"></a>2. 登录，拿双 token</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -X POST http://127.0.0.1:8080/api/v1/login \<br>  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> \<br>  -d <span class="hljs-string">&#x27;&#123;&quot;username&quot;:&quot;alice&quot;,&quot;password&quot;:&quot;123456&quot;&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>预期（token 已截断）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;code&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;access_token&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;eyJhbGciOiJIUzI1NiIs...&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;refresh_token&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;eyJhbGciOiJIUzI1NiIs...&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;expires_in&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">7200</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;user&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;username&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;alice&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;nickname&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;爱丽丝&quot;</span><span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-带-token-访问需要登录的接口"><a href="#3-带-token-访问需要登录的接口" class="headerlink" title="3. 带 token 访问需要登录的接口"></a>3. 带 token 访问需要登录的接口</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">TOKEN=<span class="hljs-string">&quot;把上一步的 access_token 粘到这里&quot;</span><br><br>curl http://127.0.0.1:8080/api/v1/users/me \<br>  -H <span class="hljs-string">&quot;Authorization: Bearer <span class="hljs-variable">$TOKEN</span>&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-故意不带-token"><a href="#4-故意不带-token" class="headerlink" title="4. 故意不带 token"></a>4. 故意不带 token</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -i http://127.0.0.1:8080/api/v1/users/me<br></code></pre></td></tr></table></figure>
+
+<p>返回 <code>401</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;code&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">401</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;缺少 Authorization&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>这验证了鉴权中间件在工作。</strong></p>
+<h2 id="八、启动失败排查表"><a href="#八、启动失败排查表" class="headerlink" title="八、启动失败排查表"></a>八、启动失败排查表</h2><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>原因</th>
+<th>解决</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dial tcp 127.0.0.1:3307: connect: connection refused</code></td>
+<td>MySQL 没起来</td>
+<td><code>docker ps</code> 看状态；<code>docker logs gochat-mysql</code></td>
+</tr>
+<tr>
+<td><code>Access denied for user &#39;gochat&#39;</code></td>
+<td>密码不对 &#x2F; 卷里是旧密码</td>
+<td><code>docker compose down -v</code> 后重新 <code>up -d</code></td>
+</tr>
+<tr>
+<td><code>listen tcp :8080: bind: address already in use</code></td>
+<td>8080 被占用</td>
+<td>改 <code>server.addr</code>，或杀掉占用进程</td>
+</tr>
+<tr>
+<td>启动即 panic</td>
+<td>配置没读到（路径错）</td>
+<td>确认在 <code>gochat/</code> 目录执行，或用 <code>-config</code> 指定路径</td>
+</tr>
+<tr>
+<td>日志停在 <code>数据库连接成功</code> 后卡住</td>
+<td>Redis 连不上</td>
+<td>检查 <code>docker ps</code></td>
+</tr>
+<tr>
+<td><code>RabbitMQ 连接失败，消息将使用同步推送</code></td>
+<td>MQ 没起来</td>
+<td><strong>警告不是错误</strong>，功能会降级继续跑</td>
+</tr>
+</tbody></table>
+<p>最后一条特别说明：<strong>RabbitMQ 是可选依赖</strong>。连不上时程序不退出，而是降级为「同步推送」——这是设计好的降级路径，不是 bug。</p>
+<h2 id="九、动手练习"><a href="#九、动手练习" class="headerlink" title="九、动手练习"></a>九、动手练习</h2><ol>
+<li>把 <code>server.addr</code> 改成 <code>&quot;:9090&quot;</code>，重启，访问 <code>http://127.0.0.1:9090/health</code></li>
+<li>去掉 <code>-db</code> 参数启动，观察日志有什么不同</li>
+<li>把 <code>jwt.access_expire_minutes</code> 改成 <code>1</code>，登录后等 2 分钟再调 <code>/users/me</code>，看返回什么</li>
+<li>把 <code>mysql.port</code> 改成 <code>3306</code>（本机可能没有 MySQL），观察启动报错</li>
 </ol>
 <hr>
-<p>下一篇 → <a href="/blog/2026/11/14/01-04-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF/">一次 HTTP 请求的完整链路（逐行）</a></p>
+<p>下一篇 → <a href="/blog/2026/11/14/01-04-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF/">一次 HTTP 请求的完整链路</a></p>
 
                 
               </div>
@@ -496,7 +637,7 @@
       
         <a href="/blog/tags/%E9%85%8D%E7%BD%AE/" class="print-no-link">#配置</a>
       
-        <a href="/blog/tags/main/" class="print-no-link">#main</a>
+        <a href="/blog/tags/Docker/" class="print-no-link">#Docker</a>
       
     </div>
   
@@ -508,7 +649,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>环境准备与项目启动（逐行讲解）</div>
+      <div>环境准备与项目启动</div>
       <div>http://127.0.0.1:8080/blog/2026/11/14/01-03-环境准备与项目启动/</div>
     </div>
     <div class="license-meta">
@@ -553,9 +694,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2026/11/14/01-02-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE/" title="学习路线图：这个项目该怎么学">
+                      <a href="/blog/2026/11/14/01-02-%E9%A1%B9%E7%9B%AE%E5%85%A8%E6%99%AF%E9%80%9F%E6%9F%A5/" title="项目全景速查：功能、接口、表、命令">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">学习路线图：这个项目该怎么学</span>
+                        <span class="hidden-mobile">项目全景速查：功能、接口、表、命令</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     

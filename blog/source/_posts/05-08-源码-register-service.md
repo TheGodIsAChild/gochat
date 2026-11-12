@@ -1,6 +1,6 @@
 ---
 title: "源码走读 S08：register_service.go"
-date: 2026-11-14 23:15:00
+date: 2026-11-14 23:18:00
 categories:
   - 05-源码
 tags:

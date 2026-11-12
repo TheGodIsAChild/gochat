@@ -522,197 +522,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/blog/2026/11/14/06-01-%E9%9D%A2%E8%AF%95%E9%9B%8672%E9%A2%98/" target="_self">
-          面试集：72 道高频题（含简答与代码位置）
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/06-01-%E9%9D%A2%E8%AF%95%E9%9B%8672%E9%A2%98/" target="_self">
-        <div>
-          从项目代码提炼的面试题。每题包含：问题 → 简答 → 本项目代码位置。建议练法：先自己答，再看简答，最后对照代码。标记：⭐ 高频 &#x2F; ⭐⭐ 必会   一、Go 语言基础⭐ 1. context.Context 是干什么的？简答：用来在调用链上传递「取消信号、超时、请求范围的值」。本项目里所有可能慢的操作（Redis、DB、下游调用）第一个参数都是 ctx，客户端断开时 c.Reques
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:26" pubdate>
-              2026-11-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/06-%E9%9D%A2%E8%AF%95/" class="category-chain-item">06-面试</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
-            
-              <a href="/blog/tags/%E5%85%AB%E8%82%A1/">#八股</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/14/06-02-%E5%9C%BA%E6%99%AF%E9%9B%8630%E4%B8%AA/" target="_self">
-          场景集：30 个业务场景怎么实现
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/06-02-%E5%9C%BA%E6%99%AF%E9%9B%8630%E4%B8%AA/" target="_self">
-        <div>
-          从项目里提炼的关键业务场景：问题 → 处理方案 → 代码位置 → 关键点。用途：面试讲项目时按场景展开，或排查&#x2F;扩展功能时对照。   M1 · 认证与好友场景 1：用户注册问题：注册要保证「用户名唯一」，并同时创建默认设置。 方案：  先查用户名是否已存在（友好提示） bcrypt 加密密码 事务：插入 users + user_settings  代码：internal/servic
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:25" pubdate>
-              2026-11-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/06-%E9%9D%A2%E8%AF%95/" class="category-chain-item">06-面试</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/">#场景题</a>
-            
-              <a href="/blog/tags/%E8%AE%BE%E8%AE%A1/">#设计</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/14/06-03-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/" target="_self">
-          项目总结与面试话术：怎么讲这个项目
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/06-03-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/" target="_self">
-        <div>
-          M0–M7 已全部完成。本文用于面试时讲这个项目，以及自己复盘。详细技术点见 learn/ 各里程碑文档，题目见 面试集.md，场景见 场景集.md。   一、一句话介绍 “我用 Go 从零实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，并且完整走过了『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进过程。”
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:24" pubdate>
-              2026-11-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/06-%E9%9D%A2%E8%AF%95/" class="category-chain-item">06-面试</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
-            
-              <a href="/blog/tags/%E8%AF%9D%E6%9C%AF/">#话术</a>
-            
-              <a href="/blog/tags/%E5%A4%8D%E7%9B%98/">#复盘</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/blog/2026/11/14/05-00-%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB%E6%80%BB%E7%B4%A2%E5%BC%95/" target="_self">
           源码走读总索引：核心文件全览
         </a>
@@ -729,7 +538,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:23" pubdate>
+            <time datetime="2026-11-14 23:26" pubdate>
               2026-11-14
             </time>
           </div>
@@ -792,7 +601,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:22" pubdate>
+            <time datetime="2026-11-14 23:25" pubdate>
               2026-11-14
             </time>
           </div>
@@ -853,7 +662,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:21" pubdate>
+            <time datetime="2026-11-14 23:24" pubdate>
               2026-11-14
             </time>
           </div>
@@ -907,6 +716,189 @@
       <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/05-03-%E6%BA%90%E7%A0%81-init-mysql/" target="_self">
         <div>
           文件路径：core/db/init_mysql.go　行数：69 行职责：GORM 连接 MySQL：DSN、连接池、AutoMigrate 建表  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  12345678910111213141516171819202122232425262
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-14 23:23" pubdate>
+              2026-11-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/05-%E6%BA%90%E7%A0%81/" class="category-chain-item">05-源码</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/14/05-04-%E6%BA%90%E7%A0%81-global/" target="_self">
+          源码走读 S04：global.go
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/05-04-%E6%BA%90%E7%A0%81-global/" target="_self">
+        <div>
+          文件路径：global/global.go　行数：29 行职责：全局状态：Config &#x2F; DB &#x2F; Redis &#x2F; MQ 的位置  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  1234567891011121314151617181920212223
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-14 23:22" pubdate>
+              2026-11-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/05-%E6%BA%90%E7%A0%81/" class="category-chain-item">05-源码</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/14/05-05-%E6%BA%90%E7%A0%81-auth/" target="_self">
+          源码走读 S05：auth.go
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/05-05-%E6%BA%90%E7%A0%81-auth/" target="_self">
+        <div>
+          文件路径：internal/middleware/auth.go　行数：73 行职责：JWT 鉴权中间件：解析 Bearer、校验 type、写 context  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  1234567891011121314151617181920212223
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-14 23:21" pubdate>
+              2026-11-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/05-%E6%BA%90%E7%A0%81/" class="category-chain-item">05-源码</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/14/05-06-%E6%BA%90%E7%A0%81-jwt/" target="_self">
+          源码走读 S06：jwt.go
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/05-06-%E6%BA%90%E7%A0%81-jwt/" target="_self">
+        <div>
+          文件路径：internal/auth/jwt.go　行数：140 行职责：双 Token 签发与解析：Claims、HS256、jti、算法校验  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  123456789101112131415161718192021222324252627
         </div>
       </a>
 

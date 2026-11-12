@@ -335,7 +335,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/01-01-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/" target="_self">
         <div>
-          这是一篇「课程说明书」。花 10 分钟读完，能帮你少走很多弯路。  一、这门课面向谁如果你满足以下条件，这篇博客就是为你写的：  ✅ 会 Go 基本语法（变量、函数、struct、interface、goroutine 的写法见过） ✅ 懂计算机基础（进程&#x2F;线程、HTTP、数据库是什么、SQL 会写一点） ❌ 没做过完整项目（不知道分层怎么分、项目怎么组织） ❌ 没用过 Gin &#x
+          这是一篇学习说明书，不是技术文章。读完它，你会知道：这个项目做了什么、你要按什么顺序学、每天花多久、怎么判断自己学会了。  一、这个项目到底做了什么先说结论：一个能跑起来的「仿微信」后端。 具体到你可以在浏览器里做的操作：  打开 http://127.0.0.1:8080/，注册一个账号 再开一个无痕窗口，注册第二个账号 两个账号加好友、发消息（对方窗口秒收，不需要刷新） 建一个群，拉第三个人
         </div>
       </a>
 
@@ -390,15 +390,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/blog/2026/11/14/01-02-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE/" target="_self">
-          学习路线图：这个项目该怎么学
+        <a href="/blog/2026/11/14/01-02-%E9%A1%B9%E7%9B%AE%E5%85%A8%E6%99%AF%E9%80%9F%E6%9F%A5/" target="_self">
+          项目全景速查：功能、接口、表、命令
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/01-02-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/01-02-%E9%A1%B9%E7%9B%AE%E5%85%A8%E6%99%AF%E9%80%9F%E6%9F%A5/" target="_self">
         <div>
-          上图由项目手绘 SVG 说明，配合下文阅读效果更好。   本目录是 gochat 项目的学习文档中心。代码在 gochat/，文档在 gochat-study/。阅读顺序：本文 → 各里程碑文档 → 面试集 &#x2F; 场景集 → 对照代码。   一、项目定位gochat 是一个「仿微信」的即时通讯后端，用来练并发编程、微服务拆分、消息队列。 技术栈：    层 技术    Web 框架 G
+          这是一篇速查表，不是教程。开发&#x2F;学习时随时回来查：有哪些接口、有哪些表、怎么连数据库、日志在哪。  一、功能清单（按用户能看到的功能）   功能 说明 涉及里程碑    注册 &#x2F; 登录 &#x2F; 登出 双 token，无感刷新 M1   个人资料 昵称、头像、签名、地区 M1   隐私设置 是否可被搜索、是否接受好友申请 M1   搜索用户 按用户名&#x2F;昵称搜 M
         </div>
       </a>
 
@@ -437,9 +437,11 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/">#学习路线</a>
+              <a href="/blog/tags/%E5%85%A5%E9%97%A8/">#入门</a>
             
-              <a href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/">#阅读方法</a>
+              <a href="/blog/tags/%E9%80%9F%E6%9F%A5/">#速查</a>
+            
+              <a href="/blog/tags/%E7%B4%A2%E5%BC%95/">#索引</a>
             
           </div>
         
@@ -454,14 +456,14 @@
       <h2 class="index-header">
         
         <a href="/blog/2026/11/14/01-03-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/" target="_self">
-          环境准备与项目启动（逐行讲解）
+          环境准备与项目启动
         </a>
       </h2>
 
       
       <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/01-03-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/" target="_self">
         <div>
-          目标：搞懂「从一条命令到服务能响应」，这中间发生了什么。读完你能理解 main.go、config.yaml、core/ 三者的关系。  一、先看项目怎么启动12docker compose up -d    # 起 MySQL / Redis / RabbitMQgo run . -db            # 编译并运行，-db 表示顺便建表  go run . 会找当前目录的 packa
+          目标：30 分钟内让项目跑起来，并看懂启动过程中每一步在做什么。本文所有配置和日志都来自真实项目，不是示例。  一、你需要装什么   软件 版本 检查命令 用途    Go 1.21+ go version 编译运行项目   Docker Desktop 最新 docker version 跑 MySQL&#x2F;Redis&#x2F;RabbitMQ   编辑器 VS Code + Go 插
         </div>
       </a>
 
@@ -504,7 +506,7 @@
             
               <a href="/blog/tags/%E9%85%8D%E7%BD%AE/">#配置</a>
             
-              <a href="/blog/tags/main/">#main</a>
+              <a href="/blog/tags/Docker/">#Docker</a>
             
           </div>
         
@@ -526,7 +528,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/01-04-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF/" target="_self">
         <div>
-          以「用户注册」为例，从 URL 一路追到数据库，把分层彻底看懂。这是最重要的一篇——看懂这条链路，项目里 80% 的代码你都能读懂。  一、请求长什么样1234POST /api/v1/registerContent-Type: application/json&#123;&quot;username&quot;:&quot;alice&quot;,&quot;password&quot;:&q
+          这是整套文章里最重要的一篇。我们以「用户注册」为例，从一条 curl 命令开始，一路追到 MySQL 的 INSERT 语句，把中间经过的 9 个环节全部拆开，每段代码都来自项目真实源码。  看完这篇，项目里 80% 的代码你都能读懂。 一、先看请求长什么样123curl -X POST http://127.0.0.1:8080/api/v1/register \  -H &quot;Cont
         </div>
       </a>
 
@@ -567,11 +569,11 @@
             
               <a href="/blog/tags/%E5%85%A5%E9%97%A8/">#入门</a>
             
-              <a href="/blog/tags/%E5%88%86%E5%B1%82/">#分层</a>
+              <a href="/blog/tags/Gin/">#Gin</a>
             
               <a href="/blog/tags/GORM/">#GORM</a>
             
-              <a href="/blog/tags/Gin/">#Gin</a>
+              <a href="/blog/tags/%E5%88%86%E5%B1%82/">#分层</a>
             
           </div>
         
@@ -760,11 +762,11 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
+              <a href="/blog/tags/%E5%88%86%E5%B1%82/">#分层</a>
+            
               <a href="/blog/tags/%E6%9E%B6%E6%9E%84/">#架构</a>
             
               <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">#微服务</a>
-            
-              <a href="/blog/tags/%E5%88%86%E5%B1%82/">#分层</a>
             
           </div>
         
@@ -786,7 +788,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/02-02-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8%E8%AE%BE%E8%AE%A1/" target="_self">
         <div>
-          表设计不是「把字段列出来」，而是用约束表达业务规则。本文逐张表讲：为什么有这张表、每个字段干什么、索引为什么这么建。   一、5 条设计原则   原则 说明 例子    按领域分表 一张表只服务一个业务概念 friend_requests 与 friendships 分开   软删除 保留历史，IM 需要审计&#x2F;回溯 friendships.status=2   双向两行 好友关系（A,
+          表设计不是「把字段列出来」，而是用数据库的约束表达业务规则。本文逐张表讲：为什么有这张表、每个字段干嘛、索引为什么这么建，并附上项目真实的 GORM 模型代码。  一、设计表之前先想清楚 3 件事1. 这张表描述的是什么「东西」一个表 &#x3D; 一类实体。如果你想不出「它描述什么」，大概率是表拆错了。 2. 哪些规则必须由数据库保证   规则 用数据库保证（强） 只用代码保证（弱）    用
         </div>
       </a>
 
@@ -825,13 +827,11 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
+              <a href="/blog/tags/%E7%B4%A2%E5%BC%95/">#索引</a>
+            
               <a href="/blog/tags/MySQL/">#MySQL</a>
             
               <a href="/blog/tags/%E8%A1%A8%E8%AE%BE%E8%AE%A1/">#表设计</a>
-            
-              <a href="/blog/tags/%E7%B4%A2%E5%BC%95/">#索引</a>
-            
-              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
             
           </div>
         
@@ -853,7 +853,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/02-03-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/" target="_self">
         <div>
-          这个项目的并发点都在哪？每个点用了什么手段、为什么、怎么验证。读完你应该能回答：「什么时候该加锁，什么时候不该加」。  一、先复习 Go 并发的 4 个工具   工具 用途 本项目用在哪    goroutine 并发执行 HTTP 请求（gin 自带）、WS 读写泵、扇出推送   channel goroutine 通信 &#x2F; 队列 每个 WS 连接的发送队列   sync.Mutex
+          并发是这个项目最重要的技术含量。本文不讲语法，只讲项目里真实存在的 7 个并发点：为什么需要并发、用了什么手段、为什么不用别的手段。所有代码都来自 internal/ws/ 和 internal/service/，可直接对照源码。  一、先复习：Go 并发的 4 个工具   工具 解决什么 什么时候用    goroutine 让任务并行执行 IO 密集（网络、数据库）、需要后台处理   cha
         </div>
       </a>
 
@@ -900,8 +900,6 @@
             
               <a href="/blog/tags/%E9%94%81/">#锁</a>
             
-              <a href="/blog/tags/context/">#context</a>
-            
           </div>
         
       </div>
@@ -922,7 +920,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/02-04-WebSocket%E5%85%A8%E8%A7%A3/" target="_self">
         <div>
-          从「为什么不用 HTTP 轮询」讲到「生产环境怎么用 wss + Nginx 反代」。读完你应该能独立设计一个能扛住断线、跨实例的实时消息通道。   一、为什么 IM 必须用 WebSocket   方案 实时性 开销 双向 适用    短轮询 差（间隔延迟） 每次建连接 否 低频状态查询   长轮询 较好 每条消息重建连接 半双工 兼容性要求高   SSE 好 单连接 只下行 通知推送   W
+          从「为什么不用 HTTP 轮询」讲到「生产环境怎么上 wss + Nginx」。服务端代码全部来自 internal/ws/，前端代码来自 web/js/ws.js。  一、为什么 IM 必须用 WebSocket   方案 实时性 连接开销 双向 适用场景    短轮询 差（取决于间隔） 每次都建连接 ❌ 低频状态查询   长轮询 较好 每条消息重建 半双工 兼容性优先   SSE 好 单连接
         </div>
       </a>
 

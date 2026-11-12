@@ -19,15 +19,15 @@
   <meta name="author" content="gochat">
   <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
   
-    <meta name="description" content="全站 58 篇文章的完整索引。按顺序读 &#x3D; 按学习路径学。  01 入门篇 —— 先跑起来，再读懂骨架   序号 文章    02 学习路线图：这个项目该怎么学   04 里程碑篇 —— 项目介绍与 M1–M7   序号 文章    09 M1 详细设计：认证与好友（双 token &#x2F; 事务 &#x2F; 软删除）   10 M2 详细设计：单聊与 WebSocket（幂等">
+    <meta name="description" content="第一次来？按下面 4 步走，2 周能读懂这个项目。     步骤 做什么 看哪篇    第 1 步 先把项目跑起来，亲手发一条消息 环境准备与项目启动   第 2 步 搞懂一条请求怎么走完全程 一次 HTTP 请求的完整链路   第 3 步 按 M1–M7 逐个理解模块 里程碑篇   第 4 步 练面试表达 面试篇    ① 入门篇难度：⭐ 入门　单篇时长：15–40 分钟　适合：第一次接触本项">
 <meta property="og:type" content="website">
 <meta property="og:title" content="文章目录">
 <meta property="og:url" content="http://127.0.0.1:8080/blog/catalog/index.html">
 <meta property="og:site_name" content="gochat 项目学习博客">
-<meta property="og:description" content="全站 58 篇文章的完整索引。按顺序读 &#x3D; 按学习路径学。  01 入门篇 —— 先跑起来，再读懂骨架   序号 文章    02 学习路线图：这个项目该怎么学   04 里程碑篇 —— 项目介绍与 M1–M7   序号 文章    09 M1 详细设计：认证与好友（双 token &#x2F; 事务 &#x2F; 软删除）   10 M2 详细设计：单聊与 WebSocket（幂等">
+<meta property="og:description" content="第一次来？按下面 4 步走，2 周能读懂这个项目。     步骤 做什么 看哪篇    第 1 步 先把项目跑起来，亲手发一条消息 环境准备与项目启动   第 2 步 搞懂一条请求怎么走完全程 一次 HTTP 请求的完整链路   第 3 步 按 M1–M7 逐个理解模块 里程碑篇   第 4 步 练面试表达 面试篇    ① 入门篇难度：⭐ 入门　单篇时长：15–40 分钟　适合：第一次接触本项">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-11-14T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-11-12T17:23:27.363Z">
+<meta property="article:modified_time" content="2026-11-12T17:35:08.899Z">
 <meta property="article:author" content="gochat">
 <meta property="article:tag" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
 <meta name="twitter:card" content="summary_large_image">
@@ -323,172 +323,415 @@
 
 <article class="page-content">
   <blockquote>
-<p>全站 58 篇文章的完整索引。<strong>按顺序读 &#x3D; 按学习路径学</strong>。</p>
+<p><strong>第一次来？按下面 4 步走，2 周能读懂这个项目。</strong></p>
 </blockquote>
-<h2 id="01-入门篇-——-先跑起来，再读懂骨架"><a href="#01-入门篇-——-先跑起来，再读懂骨架" class="headerlink" title="01 入门篇 —— 先跑起来，再读懂骨架"></a>01 入门篇 —— 先跑起来，再读懂骨架</h2><table>
+<table>
 <thead>
 <tr>
-<th>序号</th>
-<th>文章</th>
+<th>步骤</th>
+<th>做什么</th>
+<th>看哪篇</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>02</td>
-<td><a href="/blog/2026/11/14/01-02-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE/">学习路线图：这个项目该怎么学</a></td>
+<td>第 1 步</td>
+<td>先把项目跑起来，亲手发一条消息</td>
+<td><a href="/blog/2026/11/14/01-03-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/">环境准备与项目启动</a></td>
+</tr>
+<tr>
+<td>第 2 步</td>
+<td>搞懂一条请求怎么走完全程</td>
+<td><a href="/blog/2026/11/14/01-04-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF/">一次 HTTP 请求的完整链路</a></td>
+</tr>
+<tr>
+<td>第 3 步</td>
+<td>按 M1–M7 逐个理解模块</td>
+<td><a href="#4-%E9%87%8C%E7%A8%8B%E7%A2%91%E7%AF%87">里程碑篇</a></td>
+</tr>
+<tr>
+<td>第 4 步</td>
+<td>练面试表达</td>
+<td><a href="#6-%E9%9D%A2%E8%AF%95%E7%AF%87">面试篇</a></td>
 </tr>
 </tbody></table>
-<h2 id="04-里程碑篇-——-项目介绍与-M1–M7"><a href="#04-里程碑篇-——-项目介绍与-M1–M7" class="headerlink" title="04 里程碑篇 —— 项目介绍与 M1–M7"></a>04 里程碑篇 —— 项目介绍与 M1–M7</h2><table>
+<hr>
+<h2 id="①-入门篇"><a href="#①-入门篇" class="headerlink" title="① 入门篇"></a>① 入门篇</h2><p><strong>难度</strong>：⭐ 入门　<strong>单篇时长</strong>：15–40 分钟　<strong>适合</strong>：第一次接触本项目，先跑通再理解</p>
+<table>
 <thead>
 <tr>
-<th>序号</th>
+<th>#</th>
 <th>文章</th>
+<th>说明</th>
 </tr>
 </thead>
 <tbody><tr>
+<td>01</td>
+<td><a href="/blog/2026/11/14/01-01-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/">课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目</a></td>
+<td></td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="/blog/2026/11/14/01-02-%E9%A1%B9%E7%9B%AE%E5%85%A8%E6%99%AF%E9%80%9F%E6%9F%A5/">项目全景速查：功能、接口、表、命令</a></td>
+<td></td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="/blog/2026/11/14/01-03-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/">环境准备与项目启动</a></td>
+<td></td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="/blog/2026/11/14/01-04-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF/">一次 HTTP 请求的完整链路（逐行）</a></td>
+<td></td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="/blog/2026/11/14/01-05-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE/">代码地图：每个文件是干什么的</a></td>
+<td></td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="/blog/2026/11/14/01-06-%E8%B8%A9%E5%9D%91%E9%9B%86/">踩坑集：24 个真实坑（含原因与解法）</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="②-设计篇"><a href="#②-设计篇" class="headerlink" title="② 设计篇"></a>② 设计篇</h2><p><strong>难度</strong>：⭐⭐ 进阶　<strong>单篇时长</strong>：30–50 分钟　<strong>适合</strong>：已经能跑通，想搞懂架构与关键机制</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>文章</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td><a href="/blog/2026/11/14/02-01-%E6%9E%B6%E6%9E%84%E6%80%BB%E8%A7%88/">架构总览：从单体到微服务，为什么这么设计</a></td>
+<td></td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="/blog/2026/11/14/02-02-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8%E8%AE%BE%E8%AE%A1/">数据库表设计：12 张表逐张讲清楚</a></td>
+<td></td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="/blog/2026/11/14/02-03-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/">并发编程实战：项目里的 7 个并发场景</a></td>
+<td></td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="/blog/2026/11/14/02-04-WebSocket%E5%85%A8%E8%A7%A3/">WebSocket 全解：握手、心跳、重连与 wss</a></td>
+<td></td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="/blog/2026/11/14/02-05-Redis%E7%94%A8%E6%B3%95/">Redis 在本项目的 5 种用法</a></td>
+<td></td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="/blog/2026/11/14/02-06-MySQL%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96/">MySQL 索引与查询优化实战</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="③-工程篇"><a href="#③-工程篇" class="headerlink" title="③ 工程篇"></a>③ 工程篇</h2><p><strong>难度</strong>：⭐⭐ 进阶　<strong>单篇时长</strong>：25–40 分钟　<strong>适合</strong>：想知道「真实项目怎么开发」</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>文章</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td><a href="/blog/2026/11/14/03-01-%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F/">开发模式：Go 后端最常用的 8 种模式</a></td>
+<td></td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="/blog/2026/11/14/03-02-%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B/">接到需求怎么动手：标准开发流程 9 步</a></td>
+<td></td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="/blog/2026/11/14/03-03-%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83/">接口设计规范：URL、状态码、分页与错误码</a></td>
+<td></td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="/blog/2026/11/14/03-04-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E4%B8%8E%E6%97%A5%E5%BF%97/">错误处理与日志：Go 工程化实践</a></td>
+<td></td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="/blog/2026/11/14/03-05-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%E4%B8%8E%E9%99%8D%E7%BA%A7/">配置管理与优雅降级：让服务在各种环境下都能跑</a></td>
+<td></td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="/blog/2026/11/14/03-06-%E6%B5%8B%E8%AF%95%E4%B8%8E%E8%B0%83%E8%AF%95/">测试与调试：怎么验证你的代码是对的</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="④-里程碑篇"><a href="#④-里程碑篇" class="headerlink" title="④ 里程碑篇"></a>④ 里程碑篇</h2><p><strong>难度</strong>：⭐⭐ 进阶　<strong>单篇时长</strong>：40–70 分钟　<strong>适合</strong>：按 M1–M7 逐个击破</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>文章</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td><a href="/blog/2026/11/14/04-01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/">项目介绍：从零实现一个仿微信 IM 后端</a></td>
+<td>里程碑详解</td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="/blog/2026/11/14/04-02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">认证与好友：双 token 与事务</a></td>
+<td>里程碑详解</td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="/blog/2026/11/14/04-03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/">实时消息与 WebSocket</a></td>
+<td>里程碑详解</td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="/blog/2026/11/14/04-04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/">群聊设计与权限</a></td>
+<td>里程碑详解</td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="/blog/2026/11/14/04-05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">并发加固与优雅退出</a></td>
+<td>里程碑详解</td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="/blog/2026/11/14/04-06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">WebRTC 语音通话实现</a></td>
+<td>里程碑详解</td>
+</tr>
+<tr>
+<td>07</td>
+<td><a href="/blog/2026/11/14/04-07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">微服务与消息队列</a></td>
+<td>里程碑详解</td>
+</tr>
+<tr>
+<td>08</td>
+<td><a href="/blog/2026/11/14/04-08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">仿微信前端与面试准备</a></td>
+<td>里程碑详解</td>
+</tr>
+<tr>
 <td>09</td>
 <td><a href="/blog/2026/11/14/04-09-M1%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/">M1 详细设计：认证与好友（双 token &#x2F; 事务 &#x2F; 软删除）</a></td>
+<td>里程碑详解</td>
 </tr>
 <tr>
 <td>10</td>
 <td><a href="/blog/2026/11/14/04-10-M2%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/">M2 详细设计：单聊与 WebSocket（幂等 &#x2F; 分页 &#x2F; 读写泵）</a></td>
+<td>里程碑详解</td>
 </tr>
 <tr>
 <td>11</td>
 <td><a href="/blog/2026/11/14/04-11-M3%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/">M3 详细设计：群聊（建群事务 &#x2F; 权限 &#x2F; 人数统计）</a></td>
+<td>里程碑详解</td>
 </tr>
 <tr>
 <td>12</td>
 <td><a href="/blog/2026/11/14/04-12-M4%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/">M4 详细设计：并发加固（优雅退出 &#x2F; 限流 &#x2F; goroutine）</a></td>
+<td>里程碑详解</td>
 </tr>
 <tr>
 <td>13</td>
 <td><a href="/blog/2026/11/14/04-13-M5%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/">M5 详细设计：WebRTC 语音通话（信令 &#x2F; SDP &#x2F; ICE）</a></td>
+<td>里程碑详解</td>
 </tr>
 <tr>
 <td>14</td>
 <td><a href="/blog/2026/11/14/04-14-M6%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/">M6 详细设计：微服务化与 gRPC</a></td>
+<td>里程碑详解</td>
 </tr>
 <tr>
 <td>15</td>
 <td><a href="/blog/2026/11/14/04-15-M7%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/">M7 详细设计：RabbitMQ 与 Outbox 最终一致性</a></td>
+<td>里程碑详解</td>
 </tr>
 </tbody></table>
-<h2 id="05-源码篇-——-核心文件完整源码"><a href="#05-源码篇-——-核心文件完整源码" class="headerlink" title="05 源码篇 —— 核心文件完整源码"></a>05 源码篇 —— 核心文件完整源码</h2><table>
+<h2 id="⑤-源码篇"><a href="#⑤-源码篇" class="headerlink" title="⑤ 源码篇"></a>⑤ 源码篇</h2><p><strong>难度</strong>：⭐⭐⭐ 深入　<strong>单篇时长</strong>：按需查阅　<strong>适合</strong>：要逐行读实现的阶段</p>
+<blockquote>
+<p>源码篇是<strong>参考手册</strong>，不需要从头读到尾。建议先读 <code>05-00 总索引</code>，再按需查具体文件。</p>
+</blockquote>
+<table>
 <thead>
 <tr>
-<th>序号</th>
+<th>#</th>
 <th>文章</th>
+<th>说明</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>00</td>
 <td><a href="/blog/2026/11/14/05-00-%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB%E6%80%BB%E7%B4%A2%E5%BC%95/">源码走读总索引：核心文件全览</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>01</td>
 <td><a href="/blog/2026/11/14/05-01-%E6%BA%90%E7%A0%81-main/">源码走读 S01：main.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>02</td>
 <td><a href="/blog/2026/11/14/05-02-%E6%BA%90%E7%A0%81-init-config/">源码走读 S02：init_config.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>03</td>
 <td><a href="/blog/2026/11/14/05-03-%E6%BA%90%E7%A0%81-init-mysql/">源码走读 S03：init_mysql.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>04</td>
 <td><a href="/blog/2026/11/14/05-04-%E6%BA%90%E7%A0%81-global/">源码走读 S04：global.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>05</td>
 <td><a href="/blog/2026/11/14/05-05-%E6%BA%90%E7%A0%81-auth/">源码走读 S05：auth.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>06</td>
 <td><a href="/blog/2026/11/14/05-06-%E6%BA%90%E7%A0%81-jwt/">源码走读 S06：jwt.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>07</td>
 <td><a href="/blog/2026/11/14/05-07-%E6%BA%90%E7%A0%81-token-store/">源码走读 S07：token_store.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>08</td>
 <td><a href="/blog/2026/11/14/05-08-%E6%BA%90%E7%A0%81-register-service/">源码走读 S08：register_service.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>09</td>
 <td><a href="/blog/2026/11/14/05-09-%E6%BA%90%E7%A0%81-login-service/">源码走读 S09：login_service.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>10</td>
 <td><a href="/blog/2026/11/14/05-10-%E6%BA%90%E7%A0%81-refresh-service/">源码走读 S10：refresh_service.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>11</td>
 <td><a href="/blog/2026/11/14/05-11-%E6%BA%90%E7%A0%81-friend-service/">源码走读 S11：friend_service.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>12</td>
 <td><a href="/blog/2026/11/14/05-12-%E6%BA%90%E7%A0%81-message-service/">源码走读 S12：message_service.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>13</td>
 <td><a href="/blog/2026/11/14/05-13-%E6%BA%90%E7%A0%81-group-service/">源码走读 S13：group_service.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>14</td>
 <td><a href="/blog/2026/11/14/05-14-%E6%BA%90%E7%A0%81-call-service/">源码走读 S14：call_service.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>15</td>
 <td><a href="/blog/2026/11/14/05-15-%E6%BA%90%E7%A0%81-hub/">源码走读 S15：hub.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>16</td>
 <td><a href="/blog/2026/11/14/05-16-%E6%BA%90%E7%A0%81-client/">源码走读 S16：client.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>17</td>
 <td><a href="/blog/2026/11/14/05-17-%E6%BA%90%E7%A0%81-handler/">源码走读 S17：handler.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>18</td>
 <td><a href="/blog/2026/11/14/05-18-%E6%BA%90%E7%A0%81-push/">源码走读 S18：push.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>19</td>
 <td><a href="/blog/2026/11/14/05-19-%E6%BA%90%E7%A0%81-server/">源码走读 S19：server.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>20</td>
 <td><a href="/blog/2026/11/14/05-20-%E6%BA%90%E7%A0%81-mq/">源码走读 S20：mq.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 <tr>
 <td>21</td>
 <td><a href="/blog/2026/11/14/05-21-%E6%BA%90%E7%A0%81-outbox/">源码走读 S21：outbox.go</a></td>
+<td>完整源码（参考）</td>
 </tr>
 </tbody></table>
-<h2 id="06-面试篇-——-面试题、场景题与话术"><a href="#06-面试篇-——-面试题、场景题与话术" class="headerlink" title="06 面试篇 —— 面试题、场景题与话术"></a>06 面试篇 —— 面试题、场景题与话术</h2><table>
+<h2 id="⑥-面试篇"><a href="#⑥-面试篇" class="headerlink" title="⑥ 面试篇"></a>⑥ 面试篇</h2><p><strong>难度</strong>：⭐⭐ 进阶　<strong>单篇时长</strong>：20–40 分钟　<strong>适合</strong>：准备面试 &#x2F; 复盘项目</p>
+<table>
 <thead>
 <tr>
-<th>序号</th>
+<th>#</th>
 <th>文章</th>
+<th>说明</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>01</td>
 <td><a href="/blog/2026/11/14/06-01-%E9%9D%A2%E8%AF%95%E9%9B%8672%E9%A2%98/">面试集：72 道高频题（含简答与代码位置）</a></td>
+<td></td>
 </tr>
 <tr>
 <td>02</td>
 <td><a href="/blog/2026/11/14/06-02-%E5%9C%BA%E6%99%AF%E9%9B%8630%E4%B8%AA/">场景集：30 个业务场景怎么实现</a></td>
+<td></td>
 </tr>
 <tr>
 <td>03</td>
 <td><a href="/blog/2026/11/14/06-03-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/">项目总结与面试话术：怎么讲这个项目</a></td>
+<td></td>
 </tr>
 </tbody></table>
+<hr>
+<h2 id="学习节奏建议"><a href="#学习节奏建议" class="headerlink" title="学习节奏建议"></a>学习节奏建议</h2><table>
+<thead>
+<tr>
+<th>周</th>
+<th>每天 1.5 小时做什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 周</td>
+<td>入门篇全部 + 里程碑 M1&#x2F;M2</td>
+</tr>
+<tr>
+<td>第 2 周</td>
+<td>里程碑 M3–M7 + 设计篇</td>
+</tr>
+<tr>
+<td>第 3 周</td>
+<td>工程篇 + 源码篇（挑重点）+ 面试篇</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>判断「学会了」的标准不是「看完了」，而是能合上电脑回答：<br><strong>这个模块解决什么问题？怎么解决的？有什么坑？</strong></p>
+</blockquote>
 
 
   
