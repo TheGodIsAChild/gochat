@@ -23,3 +23,8 @@ jwt:
   secret: "gochat-dev-secret-change-me"
   access_expire_minutes: 120
   refresh_expire_hours: 720
+
+# M6 微服务：gRPC 服务地址
+grpc:
+  user_addr: "127.0.0.1:9001"
+  chat_addr: "127.0.0.1:9002"

@@ -12,6 +12,7 @@ import (
 
 	"gochat/core"
 	"gochat/global"
+	"gochat/internal/grpcx"
 	"gochat/internal/router"
 	"gochat/internal/ws"
 )
@@ -37,6 +38,17 @@ func main() {
 	if err := core.InitBaseServices(); err != nil {
 		log.Fatalf("初始化基础服务失败: %v", err)
 	}
+
+	// M6：启动 gRPC 微服务（用户服务 / 聊天服务），并让 gateway 建立客户端连接。
+	// 真实部署时这两件事分别在不同进程/容器里做；这里为了单进程演示合在一起。
+	grpcServers, err := grpcx.StartServers(global.Config.GRPC.UserAddr, global.Config.GRPC.ChatAddr)
+	if err != nil {
+		log.Fatalf("启动 gRPC 服务失败: %v", err)
+	}
+	if err := grpcx.Dial(global.Config.GRPC.UserAddr, global.Config.GRPC.ChatAddr); err != nil {
+		log.Fatalf("连接 gRPC 服务失败: %v", err)
+	}
+	log.Printf("gRPC 服务启动: user=%s chat=%s", global.Config.GRPC.UserAddr, global.Config.GRPC.ChatAddr)
 
 	srv := &http.Server{
 		Addr:    global.Config.Server.Addr,
@@ -67,7 +79,11 @@ func main() {
 	// 2. 主动断开所有 WebSocket 连接（让客户端立即感知，触发重连）
 	ws.DefaultHub.CloseAll()
 
-	// 3. 释放 DB / Redis
+	// 3. 停止 gRPC 微服务并关闭客户端连接
+	grpcServers.Stop()
+	grpcx.Close()
+
+	// 4. 释放 DB / Redis
 	core.CloseBaseServices()
 
 	log.Println("已退出")

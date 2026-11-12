@@ -8,6 +8,7 @@ import (
 	friendapi "gochat/internal/router/friend_router"
 	groupapi "gochat/internal/router/group_router"
 	"gochat/internal/router/health"
+	rpcapi "gochat/internal/router/rpc_router"
 	userapi "gochat/internal/router/user_router"
 	"gochat/internal/ws"
 )
@@ -24,6 +25,8 @@ func NewRouter() *gin.Engine {
 	chatapi.ChatRouter(r)
 	groupapi.GroupRouter(r)
 	callapi.CallRouter(r)
+	// M6：HTTP gateway 通过 gRPC 调用内部微服务
+	rpcapi.RPCRouter(r)
 
 	// WebSocket：鉴权在 handler 内部做（浏览器 WS 不能带 Authorization 头，用 query 传 token）
 	r.GET("/ws", ws.ServeWS)

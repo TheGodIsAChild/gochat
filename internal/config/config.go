@@ -6,4 +6,5 @@ type Config struct {
 	Rabbitmq Rabbitmq
 	JWT      JWT
 	Server   Server
+	GRPC     GRPC
 }
