@@ -91,3 +91,24 @@ func (h *Hub) OnlineCount() int {
 // DefaultHub 全局连接管理器。
 // 学习项目用一个全局实例最简单；生产环境一般做成依赖注入，避免隐式全局状态。
 var DefaultHub = NewHub()
+
+// CloseAll 关闭所有连接（进程优雅退出时调用）。
+//
+// 【为什么需要】
+// 进程退出时如果不断开 WebSocket，客户端会「假在线」一段时间才超时。
+// 主动发 Close 帧能让客户端立即感知并走重连逻辑。
+func (h *Hub) CloseAll() {
+	h.mu.Lock()
+	all := make([]*Client, 0, len(h.clients))
+	for _, conns := range h.clients {
+		for c := range conns {
+			all = append(all, c)
+		}
+	}
+	h.clients = make(map[uint64]map[*Client]struct{})
+	h.mu.Unlock()
+
+	for _, c := range all {
+		c.Close()
+	}
+}

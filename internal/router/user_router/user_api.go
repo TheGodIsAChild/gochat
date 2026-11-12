@@ -3,6 +3,7 @@ package userapi
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -248,9 +249,15 @@ func UserRouter(r *gin.Engine) {
 	// 公开组：不需要登录
 	pub := r.Group("/api/v1")
 	{
-		pub.POST("/register", Register)
-		pub.POST("/login", Login)
+		// 刷新接口不严格限流（客户端可能频繁刷新，access 过期就会调）
 		pub.POST("/token/refresh", Refresh)
+	}
+
+	// 登录/注册单独限流：防撞库、防批量注册（同一 IP 每分钟最多 20 次）
+	authGroup := r.Group("/api/v1", middleware.RateLimit(20, time.Minute))
+	{
+		authGroup.POST("/register", Register)
+		authGroup.POST("/login", Login)
 	}
 
 	// 鉴权组：整组走 Auth 中间件（漏挂鉴权是最常见的安全事故，用组能防住）
@@ -259,7 +266,8 @@ func UserRouter(r *gin.Engine) {
 		priv.POST("/logout", Logout)
 		priv.GET("/users/me", GetUserProfile)
 		priv.PUT("/users/me", UpdateUserProfile)
-		priv.GET("/users/search", SearchUsers)
+		// 搜索接口单独限流：防批量扫用户
+		priv.GET("/users/search", middleware.RateLimit(30, time.Minute), SearchUsers)
 		priv.GET("/users/settings", GetSettings)
 		priv.PUT("/users/settings", UpdateSettings)
 	}

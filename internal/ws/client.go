@@ -134,7 +134,9 @@ func (c *Client) WritePump() {
 func (c *Client) Close() {
 	c.once.Do(func() {
 		close(c.send)
-		_ = c.conn.Close()
+		if c.conn != nil {
+			_ = c.conn.Close()
+		}
 	})
 }
 
