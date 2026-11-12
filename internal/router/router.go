@@ -5,6 +5,7 @@ import (
 
 	chatapi "gochat/internal/router/chat_router"
 	friendapi "gochat/internal/router/friend_router"
+	groupapi "gochat/internal/router/group_router"
 	"gochat/internal/router/health"
 	userapi "gochat/internal/router/user_router"
 	"gochat/internal/ws"
@@ -20,6 +21,7 @@ func NewRouter() *gin.Engine {
 	userapi.UserRouter(r)
 	friendapi.FriendRouter(r)
 	chatapi.ChatRouter(r)
+	groupapi.GroupRouter(r)
 
 	// WebSocket：鉴权在 handler 内部做（浏览器 WS 不能带 Authorization 头，用 query 传 token）
 	r.GET("/ws", ws.ServeWS)

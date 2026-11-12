@@ -12,6 +12,7 @@ import (
 
 	"gochat/global"
 	chatmodel "gochat/internal/model/chat_model"
+	groupmodel "gochat/internal/model/group_model"
 	usermodel "gochat/internal/model/user_model"
 )
 
@@ -26,7 +27,12 @@ type ConversationItem struct {
 	PeerUserID     uint64     `json:"peer_user_id,omitempty"` // 单聊时是对方
 	PeerNickname   string     `json:"peer_nickname,omitempty"`
 	PeerAvatar     string     `json:"peer_avatar,omitempty"`
-	Unread         int64      `json:"unread"`
+	// 群聊字段
+	GroupID     uint64 `json:"group_id,omitempty"`
+	GroupName   string `json:"group_name,omitempty"`
+	GroupAvatar string `json:"group_avatar,omitempty"`
+	MemberCount int    `json:"member_count,omitempty"`
+	Unread      int64  `json:"unread"`
 }
 
 // CreateOrGetSingleConversation 创建（或获取已存在的）单聊会话。
@@ -154,6 +160,26 @@ func ListConversations(ctx context.Context, userID uint64) ([]ConversationItem, 
 		}
 	}
 
+	// 3.5 群聊：批量查群信息（群名/头像/人数），用于会话列表展示
+	groupMap := make(map[uint]groupmodel.Group)
+	groupConvIDs := make([]uint, 0)
+	for _, c := range convs {
+		if c.Type == 2 {
+			groupConvIDs = append(groupConvIDs, c.ID)
+		}
+	}
+	if len(groupConvIDs) > 0 {
+		var gs []groupmodel.Group
+		if err := global.DB.WithContext(ctx).
+			Where("conversation_id IN ?", groupConvIDs).
+			Find(&gs).Error; err != nil {
+			return nil, err
+		}
+		for _, g := range gs {
+			groupMap[g.ConversationID] = g
+		}
+	}
+
 	// 4. 组装 + 未读数
 	items := make([]ConversationItem, 0, len(convs))
 	for _, c := range convs {
@@ -172,6 +198,15 @@ func ListConversations(ctx context.Context, userID uint64) ([]ConversationItem, 
 			if u, exists := peerMap[peerID]; exists {
 				item.PeerNickname = u.Nickname
 				item.PeerAvatar = u.Avatar
+			}
+		}
+		// 群聊：填群信息
+		if c.Type == 2 {
+			if g, exists := groupMap[c.ID]; exists {
+				item.GroupID = uint64(g.ID)
+				item.GroupName = g.Name
+				item.GroupAvatar = g.Avatar
+				item.MemberCount = g.MemberCount
 			}
 		}
 		// 未读：id > 我最后读到的位置，且不是我自己发的
