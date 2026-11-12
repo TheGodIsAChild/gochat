@@ -3,8 +3,8 @@ package db
 import (
 	"fmt"
 	"gochat/global"
-	"gochat/internal/model/friend"
-	"gochat/internal/model/user"
+	friend "gochat/internal/model/friend_model"
+	user "gochat/internal/model/user_model"
 	"time"
 
 	"gorm.io/driver/mysql"
