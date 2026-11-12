@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>gochat 项目学习博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Go + Gin + GORM + Redis + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记">
+<meta property="og:type" content="website">
+<meta property="og:title" content="gochat 项目学习博客">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="Go + Gin + GORM + Redis + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="gochat 项目学习博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">gochat 项目学习博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">从零实现一个仿微信 IM 后端</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">Home</a>
+        
+          <a class="main-nav-link" href="/blog/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://127.0.0.1:8080/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-08-仿微信前端与面试准备" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T03:10:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">仿微信前端与面试准备</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、前端技术选型"><a href="#一、前端技术选型" class="headerlink" title="一、前端技术选型"></a>一、前端技术选型</h2><p>为了演示所有后端功能，实现了一个<strong>仿微信三栏布局</strong>的单页应用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">┌────┬──────────┬──────────────────┐</span><br><span class="line">│导航│  会话列表 │     聊天区域      │</span><br><span class="line">│ 60 │   300px    │      自适应       │</span><br><span class="line">└────┴──────────┴──────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>选型：<strong>原生 HTML&#x2F;CSS&#x2F;JS</strong>，由 Go 服务直接托管（<code>r.Static</code>）。<br>理由：零构建、零依赖、和后端同源（不用处理 CORS），演示最稳。</p>
+<h2 id="二、前端覆盖的功能"><a href="#二、前端覆盖的功能" class="headerlink" title="二、前端覆盖的功能"></a>二、前端覆盖的功能</h2><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>认证</td>
+<td>登录&#x2F;注册&#x2F;登出、<strong>双 token 无感刷新</strong>（单飞）</td>
+</tr>
+<tr>
+<td>会话</td>
+<td>会话列表、未读数、在线状态</td>
+</tr>
+<tr>
+<td>聊天</td>
+<td>历史分页（滚轮上翻）、WebSocket 实时收发、已读标记</td>
+</tr>
+<tr>
+<td>通讯录</td>
+<td>好友列表、新朋友申请（接受&#x2F;拒绝）、搜索加好友、备注、删除、拉黑</td>
+</tr>
+<tr>
+<td>群聊</td>
+<td>建群、群详情、成员列表、拉人、踢人、改资料、退群、解散</td>
+</tr>
+<tr>
+<td>通话</td>
+<td>通话记录、WebRTC 语音通话（呼叫&#x2F;接听&#x2F;拒绝&#x2F;挂断&#x2F;静音）</td>
+</tr>
+<tr>
+<td>设置</td>
+<td>资料修改、隐私开关、黑名单、退出登录</td>
+</tr>
+</tbody></table>
+<h2 id="三、无感刷新的前端实现"><a href="#三、无感刷新的前端实现" class="headerlink" title="三、无感刷新的前端实现"></a>三、无感刷新的前端实现</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">request</span>(<span class="params">method, path, body</span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> res = <span class="keyword">await</span> <span class="title function_">fetch</span>(path, &#123; <span class="attr">headers</span>: &#123; <span class="title class_">Authorization</span>: <span class="string">&#x27;Bearer &#x27;</span> + access &#125; &#125;);</span><br><span class="line">  <span class="keyword">if</span> (res.<span class="property">status</span> === <span class="number">401</span> &amp;&amp; refresh) &#123;</span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">refreshOnce</span>();          <span class="comment">// 单飞刷新</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">request</span>(...);          <span class="comment">// 重试一次</span></span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>单飞（single-flight）</strong>：并发 401 只发一次刷新请求，其他请求共享同一个 Promise。<br>否则 rotation 会让旧 refresh 被重复使用，触发服务端复用检测 → 用户被强制下线。</p>
+<h2 id="四、WebSocket-客户端要点"><a href="#四、WebSocket-客户端要点" class="headerlink" title="四、WebSocket 客户端要点"></a>四、WebSocket 客户端要点</h2><ol>
+<li>token 走 query（浏览器 WS 不能带 header）</li>
+<li>心跳 ping（25s），服务端 60s 无 pong 会踢连接</li>
+<li>断线自动重连（指数退避，上限 15s）</li>
+<li>事件分发：<code>WS.on(type, handler)</code></li>
+</ol>
+<h2 id="五、WebRTC-通话（浏览器端）"><a href="#五、WebRTC-通话（浏览器端）" class="headerlink" title="五、WebRTC 通话（浏览器端）"></a>五、WebRTC 通话（浏览器端）</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pc = <span class="keyword">new</span> <span class="title class_">RTCPeerConnection</span>(&#123; <span class="attr">iceServers</span>: [] &#125;);</span><br><span class="line">localStream.<span class="title function_">getTracks</span>().<span class="title function_">forEach</span>(<span class="function"><span class="params">t</span> =&gt;</span> pc.<span class="title function_">addTrack</span>(t, localStream));</span><br><span class="line">pc.<span class="property">onicecandidate</span> = <span class="function"><span class="params">e</span> =&gt;</span> <span class="variable constant_">WS</span>.<span class="title function_">send</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;webrtc_ice&#x27;</span>, <span class="attr">candidate</span>: e.<span class="property">candidate</span>, ... &#125;);</span><br><span class="line">pc.<span class="property">ontrack</span> = <span class="function"><span class="params">e</span> =&gt;</span> &#123; audio.<span class="property">srcObject</span> = e.<span class="property">streams</span>[<span class="number">0</span>]; &#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>localhost 是安全上下文 → HTTP 也能采集麦克风</li>
+<li>本机两窗口演示不需要 STUN（host candidate 直连）</li>
+<li>跨网演示需要 STUN&#x2F;TURN</li>
+</ul>
+<h2 id="六、怎么讲这个项目（面试话术）"><a href="#六、怎么讲这个项目（面试话术）" class="headerlink" title="六、怎么讲这个项目（面试话术）"></a>六、怎么讲这个项目（面试话术）</h2><h3 id="开场-30-秒"><a href="#开场-30-秒" class="headerlink" title="开场 30 秒"></a>开场 30 秒</h3><blockquote>
+<p>“我用 Go 实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，<br>并完整走过『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进。”</p>
+</blockquote>
+<h3 id="挑-2–3-个亮点深入"><a href="#挑-2–3-个亮点深入" class="headerlink" title="挑 2–3 个亮点深入"></a>挑 2–3 个亮点深入</h3><p><strong>双 token 无感刷新</strong>：access 2h + refresh 30d，refresh jti 存 Redis 白名单，<br>GETDEL 原子消费 + rotation + 复用检测。</p>
+<p><strong>消息幂等</strong>：client_msg_id + 唯一索引，重试不会重复落库。</p>
+<p><strong>WebSocket 架构</strong>：读写双泵（gorilla 不能并发写）、Hub 用 RWMutex、<br>心跳清理僵尸连接、慢消费者有界队列断开。</p>
+<p><strong>接受好友申请</strong>：事务 + 条件更新（RowsAffected 抗并发）。</p>
+<p><strong>Outbox</strong>：业务事务里写事件，worker 异步发 MQ，保证不丢 + 最终一致。</p>
+<h3 id="被问难点"><a href="#被问难点" class="headerlink" title="被问难点"></a>被问难点</h3><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>答法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最难</td>
+<td>WebSocket 并发管理 + 双 token 并发刷新</td>
+</tr>
+<tr>
+<td>踩的坑</td>
+<td>软删除+唯一索引冲突、GORM 零值陷阱、事务里误用 global.DB、amqp.Table 不支持 uint</td>
+</tr>
+<tr>
+<td>怎么验证</td>
+<td>每个接口 curl 端到端，WS 用 .NET ClientWebSocket 实测</td>
+</tr>
+<tr>
+<td>重做</td>
+<td>会话创建加唯一键、未读数用 Redis、WS 多实例用 Redis 广播</td>
+</tr>
+</tbody></table>
+<h3 id="主动说改进方向（体现深度）"><a href="#主动说改进方向（体现深度）" class="headerlink" title="主动说改进方向（体现深度）"></a>主动说改进方向（体现深度）</h3><ul>
+<li>会话创建并发去重（唯一键）</li>
+<li>未读数 Redis 计数替代 N 次 count</li>
+<li>WS 多实例：Redis Pub&#x2F;Sub 或 MQ 广播</li>
+<li>消息已读回执&#x2F;撤回</li>
+<li>群通话 SFU&#x2F;MCU</li>
+<li>链路追踪、监控、测试覆盖率</li>
+</ul>
+<h2 id="七、项目结构"><a href="#七、项目结构" class="headerlink" title="七、项目结构"></a>七、项目结构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">gochat/</span><br><span class="line">├── main.go              # 入口：配置 → 初始化 → 启动 HTTP/gRPC/MQ</span><br><span class="line">├── core/                # 启动装配层</span><br><span class="line">├── global/              # 全局状态</span><br><span class="line">├── internal/</span><br><span class="line">│   ├── model/           # GORM 模型（按域拆）</span><br><span class="line">│   ├── auth/            # JWT / bcrypt / refresh 存储</span><br><span class="line">│   ├── middleware/      # 鉴权 / 限流</span><br><span class="line">│   ├── service/         # 业务逻辑（按域拆）</span><br><span class="line">│   ├── router/          # HTTP handler（按域拆）</span><br><span class="line">│   ├── ws/              # WebSocket</span><br><span class="line">│   ├── grpcx/           # gRPC 微服务</span><br><span class="line">│   └── mq/              # RabbitMQ worker/consumer</span><br><span class="line">├── web/                 # 仿微信前端</span><br><span class="line">└── blog/                # 本博客（Hexo）</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、学习资料"><a href="#八、学习资料" class="headerlink" title="八、学习资料"></a>八、学习资料</h2><ul>
+<li>每个里程碑的设计文档：<code>gochat-study/learn/</code></li>
+<li>72 道面试题：<code>gochat-study/面试集.md</code></li>
+<li>30 个业务场景：<code>gochat-study/场景集.md</code></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" data-id="cuidWy8YsVS9HYWmfcswfMpj2" data-title="仿微信前端与面试准备" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-07-微服务与消息队列" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T03:00:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">微服务与消息队列</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、为什么要拆微服务"><a href="#一、为什么要拆微服务" class="headerlink" title="一、为什么要拆微服务"></a>一、为什么要拆微服务</h2><p>单体的问题：</p>
+<table>
+<thead>
+<tr>
+<th>痛点</th>
+<th>单体</th>
+<th>微服务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>扩缩容</td>
+<td>整包一起扩</td>
+<td>按服务扩</td>
+</tr>
+<tr>
+<td>故障隔离</td>
+<td>一个模块 OOM 全挂</td>
+<td>只挂一个</td>
+</tr>
+<tr>
+<td>团队协作</td>
+<td>一个仓库</td>
+<td>按服务划分</td>
+</tr>
+<tr>
+<td>部署</td>
+<td>改一行全量发布</td>
+<td>只发布改动的</td>
+</tr>
+</tbody></table>
+<p><strong>代价</strong>：分布式复杂度（网络失败、一致性、服务发现、追踪）。</p>
+<p>本项目先单体（M0–M5）跑通，M6 再拆——先体会痛点才知道为什么拆。</p>
+<h2 id="二、怎么拆：按领域，不按技术"><a href="#二、怎么拆：按领域，不按技术" class="headerlink" title="二、怎么拆：按领域，不按技术"></a>二、怎么拆：按领域，不按技术</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">❌ controller 服务 / service 服务 / dao 服务</span><br><span class="line">✅ 用户服务 / 聊天服务 / 网关</span><br></pre></td></tr></table></figure>
+
+<p>本项目：</p>
+<table>
+<thead>
+<tr>
+<th>服务</th>
+<th>职责</th>
+<th>端口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>user service</td>
+<td>用户查询、批量查询</td>
+<td>9001</td>
+</tr>
+<tr>
+<td>chat service</td>
+<td>发消息、拉历史</td>
+<td>9002</td>
+</tr>
+<tr>
+<td>gateway</td>
+<td>HTTP 入口 + 鉴权 + 限流 + 调 gRPC</td>
+<td>8080</td>
+</tr>
+</tbody></table>
+<h2 id="三、gRPC-核心知识"><a href="#三、gRPC-核心知识" class="headerlink" title="三、gRPC 核心知识"></a>三、gRPC 核心知识</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>REST&#x2F;JSON</th>
+<th>gRPC</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>传输</td>
+<td>HTTP&#x2F;1.1</td>
+<td>HTTP&#x2F;2（多路复用）</td>
+</tr>
+<tr>
+<td>序列化</td>
+<td>JSON</td>
+<td>protobuf（二进制、体积小）</td>
+</tr>
+<tr>
+<td>契约</td>
+<td>OpenAPI（可选）</td>
+<td>.proto 强契约</td>
+</tr>
+<tr>
+<td>流式</td>
+<td>弱</td>
+<td>支持四种流</td>
+</tr>
+</tbody></table>
+<p><strong>结论</strong>：对外 REST，内部服务间 gRPC。</p>
+<blockquote>
+<p>本项目因环境没有 protoc，用 gRPC 的自定义 <strong>JSON codec</strong> 实现。<br>传输层仍是真 gRPC（HTTP&#x2F;2、超时、状态码），换 protobuf 只需替换 codec 和生成代码，<br>架构不变——这说明微服务核心是「服务边界 + 契约」，不是序列化格式。</p>
+</blockquote>
+<h2 id="四、gateway-模式"><a href="#四、gateway-模式" class="headerlink" title="四、gateway 模式"></a>四、gateway 模式</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">客户端 ──HTTP──► gateway ──gRPC──► 内部服务</span><br></pre></td></tr></table></figure>
+
+<p>gateway 负责：协议转换、统一鉴权、限流、聚合。<br>内部服务不直接对外，鉴权在入口做。</p>
+<h2 id="五、微服务带来的-5-个新问题"><a href="#五、微服务带来的-5-个新问题" class="headerlink" title="五、微服务带来的 5 个新问题"></a>五、微服务带来的 5 个新问题</h2><ol>
+<li><strong>服务发现</strong>：怎么知道服务地址？（配置&#x2F;Consul&#x2F;Etcd&#x2F;K8s）</li>
+<li><strong>超时重试</strong>：网络会失败，必须设超时，重试要幂等</li>
+<li><strong>熔断</strong>：下游持续失败时快速失败，防雪崩</li>
+<li><strong>链路追踪</strong>：跨服务请求要用 trace_id 串起来</li>
+<li><strong>数据一致性</strong>：跨服务不能用一个事务 → MQ&#x2F;Saga&#x2F;TCC</li>
+</ol>
+<h2 id="六、RabbitMQ：为什么需要"><a href="#六、RabbitMQ：为什么需要" class="headerlink" title="六、RabbitMQ：为什么需要"></a>六、RabbitMQ：为什么需要</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>不用 MQ</th>
+<th>用 MQ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>发消息后推送</td>
+<td>请求里同步查成员+逐个推送</td>
+<td>写 outbox，worker 异步推</td>
+</tr>
+<tr>
+<td>群消息 200 人</td>
+<td>请求耗时随人数增长</td>
+<td>快速返回，后台慢慢推</td>
+</tr>
+<tr>
+<td>流量高峰</td>
+<td>直接打满</td>
+<td>队列削峰</td>
+</tr>
+<tr>
+<td>跨服务一致性</td>
+<td>无法本地事务</td>
+<td>最终一致性</td>
+</tr>
+</tbody></table>
+<h2 id="七、核心：本地消息表（Transactional-Outbox）"><a href="#七、核心：本地消息表（Transactional-Outbox）" class="headerlink" title="七、核心：本地消息表（Transactional Outbox）"></a>七、核心：本地消息表（Transactional Outbox）</h2><h3 id="问题：落库和发-MQ-无法原子"><a href="#问题：落库和发-MQ-无法原子" class="headerlink" title="问题：落库和发 MQ 无法原子"></a>问题：落库和发 MQ 无法原子</h3><ul>
+<li>先落库后发 MQ：发 MQ 失败 → 消息丢失</li>
+<li>先发 MQ 后落库：落库失败 → 推了不存在的消息</li>
+</ul>
+<h3 id="解法：把「发-MQ」变成「写数据库」"><a href="#解法：把「发-MQ」变成「写数据库」" class="headerlink" title="解法：把「发 MQ」变成「写数据库」"></a>解法：把「发 MQ」变成「写数据库」</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">业务事务 &#123;</span><br><span class="line">    写 messages</span><br><span class="line">    更新 conversations</span><br><span class="line">    写 outbox_messages (status=0)   ← 同一本地事务，原子</span><br><span class="line">&#125;</span><br><span class="line">        ↓</span><br><span class="line">OutboxWorker 轮询 status=0 → 发 RabbitMQ → 标记 status=1</span><br><span class="line">        ↓</span><br><span class="line">Consumer 消费 → 推送 WebSocket</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键洞察</strong>：写数据库是事务性的，发 MQ 不是。所以先记在数据库里，由后台可靠补发。</p>
+<h3 id="至少一次投递-→-消费幂等"><a href="#至少一次投递-→-消费幂等" class="headerlink" title="至少一次投递 → 消费幂等"></a>至少一次投递 → 消费幂等</h3><p>worker 发 MQ 成功但标记失败 → 下次重复发。<br>消费方必须幂等（去重表&#x2F;唯一索引&#x2F;消息 id）。</p>
+<p>本项目消费动作是「推送给在线用户」，重复推影响小；如果是加积分就必须严格去重。</p>
+<h2 id="八、可靠性设置"><a href="#八、可靠性设置" class="headerlink" title="八、可靠性设置"></a>八、可靠性设置</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ch.QueueDeclare(<span class="string">&quot;gochat.events&quot;</span>, <span class="literal">true</span> <span class="comment">/*durable*/</span>, ...)   <span class="comment">// 队列持久化</span></span><br><span class="line">amqp.Publishing&#123; DeliveryMode: amqp.Persistent &#125;          <span class="comment">// 消息持久化</span></span><br><span class="line">ch.Consume(queue, <span class="string">&quot;&quot;</span>, <span class="literal">false</span> <span class="comment">/*autoAck*/</span>, ...)             <span class="comment">// 手动 ack</span></span><br></pre></td></tr></table></figure>
+
+<p>三项结合 &#x3D; 至少一次。</p>
+<h2 id="九、降级设计"><a href="#九、降级设计" class="headerlink" title="九、降级设计"></a>九、降级设计</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MQ 可用 → outbox + 异步推送</span></span><br><span class="line"><span class="comment">// MQ 不可用 → 改回同步推送（功能不中断）</span></span><br><span class="line"><span class="keyword">if</span> global.MQ == <span class="literal">nil</span> || !global.MQ.Enabled &#123;</span><br><span class="line">    ws.PushMessage(convID, item)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>外部依赖要设计降级路径，不能因为 MQ 挂了整个聊天不可用。</p>
+<h2 id="十、踩过的坑"><a href="#十、踩过的坑" class="headerlink" title="十、踩过的坑"></a>十、踩过的坑</h2><ul>
+<li><code>amqp.Table</code> 的 value <strong>不支持 <code>uint</code></strong>，要转 <code>int64</code></li>
+<li>事件契约要用中立的 struct，避免上下游循环依赖</li>
+</ul>
+<h2 id="十一、面试点"><a href="#十一、面试点" class="headerlink" title="十一、面试点"></a>十一、面试点</h2><ol>
+<li>为什么拆微服务？单体有什么问题？</li>
+<li>微服务怎么拆？为什么不能按技术层拆？</li>
+<li>gRPC vs REST？为什么内部用 gRPC？</li>
+<li>gateway 的作用？鉴权为什么放 gateway？</li>
+<li>微服务带来哪些新问题？</li>
+<li>为什么需要消息队列？</li>
+<li>本地消息表解决什么问题？怎么实现？</li>
+<li>如何保证消息不丢&#x2F;不重复？</li>
+<li>最终一致性 vs 强一致？2PC&#x2F;Saga&#x2F;TCC&#x2F;Outbox 怎么选？</li>
+<li>MQ 挂了怎么办？</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" data-id="cuidGpYQ3Z-rorS8dV7KGTAJG" data-title="微服务与消息队列" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-06-WebRTC语音通话" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T02:50:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">WebRTC 语音通话实现</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、WebRTC-是-P2P-的"><a href="#一、WebRTC-是-P2P-的" class="headerlink" title="一、WebRTC 是 P2P 的"></a>一、WebRTC 是 P2P 的</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">浏览器 A ◄══════ 音视频流（P2P，UDP）══════► 浏览器 B</span><br><span class="line">     │                                          │</span><br><span class="line">     └────────► 信令服务器（WebSocket）◄────────┘</span><br><span class="line">               （只转发 SDP/ICE，不传音视频）</span><br></pre></td></tr></table></figure>
+
+<p><strong>服务器不传音视频</strong>——这是 WebRTC 相比服务器混流的最大优势：延迟低、带宽成本低。</p>
+<h2 id="二、建立连接的三个步骤"><a href="#二、建立连接的三个步骤" class="headerlink" title="二、建立连接的三个步骤"></a>二、建立连接的三个步骤</h2><ol>
+<li><strong>交换 SDP</strong><ul>
+<li>A 生成 offer（支持的编解码、网络信息）</li>
+<li>B 返回 answer</li>
+</ul>
+</li>
+<li><strong>交换 ICE candidate</strong><ul>
+<li>双方收集可能的网络路径</li>
+</ul>
+</li>
+<li><strong>P2P 打洞 &#x2F; 中继</strong><ul>
+<li>能直连就直连，失败用 TURN 中继</li>
+</ul>
+</li>
+</ol>
+<h3 id="STUN-TURN-ICE"><a href="#STUN-TURN-ICE" class="headerlink" title="STUN &#x2F; TURN &#x2F; ICE"></a>STUN &#x2F; TURN &#x2F; ICE</h3><table>
+<thead>
+<tr>
+<th>概念</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ICE</td>
+<td>框架：收集候选 + 按优先级尝试连接</td>
+</tr>
+<tr>
+<td>STUN</td>
+<td>发现自己的公网 IP:Port（NAT 映射）</td>
+</tr>
+<tr>
+<td>TURN</td>
+<td>打洞失败时的中继服务器（有带宽成本）</td>
+</tr>
+</tbody></table>
+<h2 id="三、服务器职责：信令状态机"><a href="#三、服务器职责：信令状态机" class="headerlink" title="三、服务器职责：信令状态机"></a>三、服务器职责：信令状态机</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1 呼叫中 ──接听──► 2 已接通 ──挂断──► 5 已结束</span><br><span class="line">   ├──被叫拒绝──► 3 已拒绝</span><br><span class="line">   ├──主叫取消──► 4 已取消</span><br><span class="line">   └──超时──► 6 未接</span><br></pre></td></tr></table></figure>
+
+<p>状态迁移全部用<strong>条件更新</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">res := tx.Model(&amp;Call&#123;&#125;).</span><br><span class="line">    Where(<span class="string">&quot;id = ? AND callee_id = ? AND status = ?&quot;</span>, callID, userID, CallStatusCalling).</span><br><span class="line">    Updates(<span class="keyword">map</span>[<span class="type">string</span>]any&#123;<span class="string">&quot;status&quot;</span>: CallStatusAccepted, <span class="string">&quot;started_at&quot;</span>: now&#125;)</span><br><span class="line"><span class="keyword">if</span> res.RowsAffected == <span class="number">0</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> errors.New(<span class="string">&quot;通话不存在或状态不允许接听&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>连点接听、超时后接、已挂断再挂断，都会被拦住。</p>
+<h2 id="四、信令协议（WebSocket）"><a href="#四、信令协议（WebSocket）" class="headerlink" title="四、信令协议（WebSocket）"></a>四、信令协议（WebSocket）</h2><table>
+<thead>
+<tr>
+<th>方向</th>
+<th>type</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>C→S</td>
+<td>call_invite</td>
+<td>发起通话</td>
+</tr>
+<tr>
+<td>C→S</td>
+<td>call_accept &#x2F; call_reject &#x2F; call_cancel &#x2F; call_end</td>
+<td>状态操作</td>
+</tr>
+<tr>
+<td>C→S</td>
+<td>webrtc_offer &#x2F; webrtc_answer &#x2F; webrtc_ice</td>
+<td>转发信令</td>
+</tr>
+<tr>
+<td>S→C</td>
+<td>call_ack &#x2F; call_incoming &#x2F; call_accepted &#x2F; call_rejected &#x2F; call_canceled &#x2F; call_ended</td>
+<td>状态通知</td>
+</tr>
+<tr>
+<td>S→C</td>
+<td>webrtc_offer &#x2F; webrtc_answer &#x2F; webrtc_ice</td>
+<td>原样转发 + from_user_id</td>
+</tr>
+</tbody></table>
+<h3 id="信令转发实现"><a href="#信令转发实现" class="headerlink" title="信令转发实现"></a>信令转发实现</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Client)</span></span> handleRelay(raw []<span class="type">byte</span>, in inMessage) &#123;</span><br><span class="line">    <span class="keyword">var</span> m <span class="keyword">map</span>[<span class="type">string</span>]any</span><br><span class="line">    json.Unmarshal(raw, &amp;m)</span><br><span class="line">    m[<span class="string">&quot;from_user_id&quot;</span>] = c.UserID   <span class="comment">// 加上发送者</span></span><br><span class="line">    c.hub.SendToUser(in.ToUserID, mustJSON(m))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>服务器不解析 SDP</strong>，只加 <code>from_user_id</code> 原样转发——这就是信令服务器的本质。</p>
+<h2 id="五、完整呼叫流程"><a href="#五、完整呼叫流程" class="headerlink" title="五、完整呼叫流程"></a>五、完整呼叫流程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">A                     服务器                      B</span><br><span class="line">│  call_invite ────────►│                         │</span><br><span class="line">│◄──── call_ack ────────│──── call_incoming ─────►│</span><br><span class="line">│                       │◄─── call_accept ─────────│</span><br><span class="line">│◄── call_accepted ─────│──── call_accepted ──────►│</span><br><span class="line">│── webrtc_offer ──────►│──── webrtc_offer ───────►│</span><br><span class="line">│◄──── webrtc_answer ───│◄─── webrtc_answer ───────│</span><br><span class="line">│── webrtc_ice ────────►│──── webrtc_ice ─────────►│</span><br><span class="line">│      ===== P2P 音视频直连 =====                   │</span><br><span class="line">│── call_end ──────────►│──── call_ended ─────────►│</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、前端实现要点"><a href="#六、前端实现要点" class="headerlink" title="六、前端实现要点"></a>六、前端实现要点</h2><ul>
+<li><code>getUserMedia({ audio: true })</code> 采集麦克风</li>
+<li><code>RTCPeerConnection</code> 建立连接</li>
+<li><code>onicecandidate</code> → 通过 WS 发给对方</li>
+<li><code>ontrack</code> → 把对方音频挂到 <code>&lt;audio&gt;</code> 播放</li>
+<li><strong>localhost 是安全上下文</strong>，所以本地 HTTP 也能采集麦克风</li>
+<li>本机两窗口演示可不用 STUN（host candidate 直连）；跨网需 STUN&#x2F;TURN</li>
+</ul>
+<h2 id="七、面试点"><a href="#七、面试点" class="headerlink" title="七、面试点"></a>七、面试点</h2><ol>
+<li>WebRTC 原理？为什么是 P2P？</li>
+<li>信令服务器的作用？为什么必须要信令？</li>
+<li>SDP &#x2F; ICE &#x2F; STUN &#x2F; TURN？</li>
+<li>为什么需要 TURN？成本？</li>
+<li>通话状态机怎么设计？怎么防重复接听？</li>
+<li>群通话怎么实现？（SFU&#x2F;MCU）</li>
+<li>通话超时无人接怎么处理？</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/" data-id="cuidX6HC2WJUychHzBC5WnkYI" data-title="WebRTC 语音通话实现" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-05-并发加固与优雅退出" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T02:40:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">并发加固与优雅退出</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、优雅退出"><a href="#一、优雅退出" class="headerlink" title="一、优雅退出"></a>一、优雅退出</h2><p>以前 <code>r.Run()</code> 直接阻塞，进程被 kill 时：</p>
+<ul>
+<li>处理中的请求被硬切断</li>
+<li>WebSocket 没 Close 帧，客户端要等超时</li>
+<li>DB&#x2F;Redis 连接没释放</li>
+</ul>
+<p>现在的做法：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">srv := &amp;http.Server&#123;Addr: ..., Handler: router.NewRouter()&#125;</span><br><span class="line"><span class="keyword">go</span> srv.ListenAndServe()</span><br><span class="line"></span><br><span class="line">quit := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal, <span class="number">1</span>)</span><br><span class="line">signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)</span><br><span class="line">&lt;-quit</span><br><span class="line"></span><br><span class="line">srv.Shutdown(ctx)        <span class="comment">// 1. 停止接收新请求，等处理中的完成（10s 超时）</span></span><br><span class="line">ws.DefaultHub.CloseAll() <span class="comment">// 2. 断开所有 WS</span></span><br><span class="line">grpcServers.Stop()       <span class="comment">// 3. 停止 gRPC</span></span><br><span class="line">core.CloseBaseServices() <span class="comment">// 4. 释放 DB/Redis</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>顺序很重要</strong>：先停 HTTP（不再有新请求）→ 再关 WS → 最后关依赖。</p>
+<h2 id="二、限流：滑动窗口"><a href="#二、限流：滑动窗口" class="headerlink" title="二、限流：滑动窗口"></a>二、限流：滑动窗口</h2><p>为什么需要：登录接口可被撞库、注册可被刷、搜索可被扫用户。</p>
+<h3 id="为什么用滑动窗口"><a href="#为什么用滑动窗口" class="headerlink" title="为什么用滑动窗口"></a>为什么用滑动窗口</h3><p>固定窗口在边界会翻倍：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">59 秒发 10 次 + 60 秒发 10 次 = 1 秒内 20 次（虽然每分钟限 10）</span><br></pre></td></tr></table></figure>
+
+<p>滑动窗口只统计「最近 60 秒」，边界平滑。</p>
+<h3 id="实现要点"><a href="#实现要点" class="headerlink" title="实现要点"></a>实现要点</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> rateLimiter <span class="keyword">struct</span> &#123;</span><br><span class="line">    mu     sync.Mutex</span><br><span class="line">    hits   <span class="keyword">map</span>[<span class="type">string</span>][]time.Time  <span class="comment">// key(IP) -&gt; 请求时间</span></span><br><span class="line">    limit  <span class="type">int</span></span><br><span class="line">    window time.Duration</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>每次请求：清理过期 → 判断超限 → 记录。<br><strong>懒清理</strong>（请求时清理），不用后台 goroutine。</p>
+<h3 id="局限"><a href="#局限" class="headerlink" title="局限"></a>局限</h3><p>单机内存限流在多实例下会翻倍。生产用 Redis（INCR + EXPIRE 或 Lua 脚本）。</p>
+<p>实测：连续登录 25 次 → 前 20 次 401，之后 429。</p>
+<h2 id="三、WebSocket-并发安全"><a href="#三、WebSocket-并发安全" class="headerlink" title="三、WebSocket 并发安全"></a>三、WebSocket 并发安全</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h *Hub)</span></span> SendToUser(userID <span class="type">uint64</span>, payload []<span class="type">byte</span>) <span class="type">bool</span> &#123;</span><br><span class="line">    h.mu.RLock()</span><br><span class="line">    conns := h.clients[userID]</span><br><span class="line">    list := <span class="built_in">make</span>([]*Client, <span class="number">0</span>, <span class="built_in">len</span>(conns))  <span class="comment">// 复制</span></span><br><span class="line">    <span class="keyword">for</span> c := <span class="keyword">range</span> conns &#123; list = <span class="built_in">append</span>(list, c) &#125;</span><br><span class="line">    h.mu.RUnlock()                           <span class="comment">// 先释放锁</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _, c := <span class="keyword">range</span> list &#123; c.Enqueue(payload) &#125;  <span class="comment">// 再做 IO</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(list) &gt; <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>持锁不做 IO</strong>，否则会放大锁竞争。</p>
+<h2 id="四、扇出并发控制"><a href="#四、扇出并发控制" class="headerlink" title="四、扇出并发控制"></a>四、扇出并发控制</h2><p>群成员 200 人，无脑起 200 个 goroutine 会有瞬时压力。<br>用带缓冲 channel 当信号量：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pushConcurrency = <span class="number">16</span></span><br><span class="line"><span class="keyword">var</span> pushSem = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;, pushConcurrency)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _, uid := <span class="keyword">range</span> memberIDs &#123;</span><br><span class="line">    wg.Add(<span class="number">1</span>)</span><br><span class="line">    pushSem &lt;- <span class="keyword">struct</span>&#123;&#125;&#123;&#125;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(uid <span class="type">uint64</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">defer</span> wg.Done()</span><br><span class="line">        <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; &lt;-pushSem &#125;()</span><br><span class="line">        hub.SendToUser(uid, frame)</span><br><span class="line">    &#125;(uid)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>小会话（≤10 人）直接顺序推送。</p>
+<h2 id="五、goroutine-泄漏排查"><a href="#五、goroutine-泄漏排查" class="headerlink" title="五、goroutine 泄漏排查"></a>五、goroutine 泄漏排查</h2><table>
+<thead>
+<tr>
+<th>泄漏点</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>启动 goroutine 后没人关</td>
+<td><code>for { &lt;-ch }</code> 但 ch 永不关闭</td>
+</tr>
+<tr>
+<td>阻塞在 channel 发送</td>
+<td>消费者已退出</td>
+</tr>
+<tr>
+<td>阻塞在网络 IO</td>
+<td>没设超时</td>
+</tr>
+<tr>
+<td>定时器没 Stop</td>
+<td><code>time.NewTicker</code> 忘了 Stop</td>
+</tr>
+</tbody></table>
+<p>排查：<code>go test -race</code>（需 cgo）、pprof goroutine 数量。</p>
+<h2 id="六、其他改进"><a href="#六、其他改进" class="headerlink" title="六、其他改进"></a>六、其他改进</h2><ul>
+<li><code>InitBaseServices()</code> 从 <code>os.Exit(0)</code> 改为返回 error（退出码 1，不跳过 defer）</li>
+<li>删掉启动日志里打印完整 Config（会泄露数据库密码&#x2F;JWT secret）</li>
+</ul>
+<h2 id="七、面试点"><a href="#七、面试点" class="headerlink" title="七、面试点"></a>七、面试点</h2><ol>
+<li>优雅退出要做哪些事？顺序为什么重要？</li>
+<li>固定窗口 vs 滑动窗口 vs 令牌桶？</li>
+<li>单机限流 vs 分布式限流？</li>
+<li>如何检测数据竞争？<code>-race</code> 原理？</li>
+<li>goroutine 泄漏怎么排查？常见场景？</li>
+<li>如何控制并发数？</li>
+<li>为什么锁里不能做 IO？</li>
+<li>进程退出怎么保证数据不丢？</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" data-id="cuidgQf-vEXmD05jj-OmaLLbR" data-title="并发加固与优雅退出" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-04-群聊设计与权限" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T02:30:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/">群聊设计与权限</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、复用会话抽象"><a href="#一、复用会话抽象" class="headerlink" title="一、复用会话抽象"></a>一、复用会话抽象</h2><p>M2 已经把「会话 + 成员 + 消息」抽象好了，所以群聊几乎是免费的：</p>
+<ul>
+<li>群聊 &#x3D; <code>type=2</code> 的会话 + <code>groups</code> 表（群元信息）</li>
+<li>群消息发送&#x2F;推送完全复用 M2 的 <code>SendMessage</code> &#x2F; <code>PushMessage</code></li>
+</ul>
+<p>M3 新增的只是<strong>群的生命周期管理</strong>：建群、拉人、踢人、改资料、解散。</p>
+<blockquote>
+<p>这就是好抽象的复利：M2 多花点心思，M3 直接受益。</p>
+</blockquote>
+<h2 id="二、groups-表设计"><a href="#二、groups-表设计" class="headerlink" title="二、groups 表设计"></a>二、groups 表设计</h2><table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>conversation_id</td>
+<td>关联会话（唯一）</td>
+</tr>
+<tr>
+<td>owner_id</td>
+<td>群主</td>
+</tr>
+<tr>
+<td>name &#x2F; avatar</td>
+<td>群名称&#x2F;头像</td>
+</tr>
+<tr>
+<td>announcement</td>
+<td>群公告</td>
+</tr>
+<tr>
+<td>member_count</td>
+<td>冗余人数</td>
+</tr>
+<tr>
+<td>max_members</td>
+<td>上限（默认 200）</td>
+</tr>
+<tr>
+<td>status</td>
+<td>1 正常 &#x2F; 2 已解散</td>
+</tr>
+</tbody></table>
+<h3 id="为什么冗余-member-count"><a href="#为什么冗余-member-count" class="headerlink" title="为什么冗余 member_count"></a>为什么冗余 member_count</h3><p>群列表要显示人数。不冗余的话每次都 <code>COUNT(*)</code>。<br>加人&#x2F;踢人时用 <code>gorm.Expr(&quot;member_count + ?&quot;)</code> <strong>原子自增</strong>，避免并发覆盖。</p>
+<h2 id="三、建群必须用事务"><a href="#三、建群必须用事务" class="headerlink" title="三、建群必须用事务"></a>三、建群必须用事务</h2><p>建群要做 4 件事：</p>
+<ol>
+<li>创建会话（type&#x3D;2）</li>
+<li>创建 groups 行</li>
+<li>插入群主（role&#x3D;1）</li>
+<li>插入其他成员</li>
+</ol>
+<p>不做事务的后果：</p>
+<ul>
+<li>有会话没群 → 会话列表出现无名会话</li>
+<li>有群没群主 → 没人能管理</li>
+<li>有群没会话 → 群消息发不出去</li>
+</ul>
+<h2 id="四、权限模型"><a href="#四、权限模型" class="headerlink" title="四、权限模型"></a>四、权限模型</h2><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>谁可以</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>拉人进群</td>
+<td>任何成员（类微信）</td>
+</tr>
+<tr>
+<td>踢人</td>
+<td>只有群主</td>
+</tr>
+<tr>
+<td>退群</td>
+<td>任何成员（群主不能直接退）</td>
+</tr>
+<tr>
+<td>改群名&#x2F;公告</td>
+<td>只有群主</td>
+</tr>
+<tr>
+<td>解散群</td>
+<td>只有群主</td>
+</tr>
+</tbody></table>
+<p>统一校验套路：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">g, err := getGroupByID(ctx, groupID)   <span class="comment">// 存在且未解散</span></span><br><span class="line"><span class="keyword">if</span> <span class="type">uint64</span>(g.OwnerID) != operatorID &#123; <span class="keyword">return</span> errors.New(<span class="string">&quot;只有群主可以...&quot;</span>) &#125;</span><br><span class="line">ok, _ := isMember(ctx, g.ConversationID, userID)</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、并发问题"><a href="#五、并发问题" class="headerlink" title="五、并发问题"></a>五、并发问题</h2><h3 id="人数上限有竞态"><a href="#人数上限有竞态" class="headerlink" title="人数上限有竞态"></a>人数上限有竞态</h3><p>两个请求同时拉人，可能都通过 <code>member_count + n &gt; max</code> 的校验 → 超员。</p>
+<p>解法：</p>
+<ol>
+<li>事务里 <code>SELECT ... FOR UPDATE</code> 锁群行（悲观锁）</li>
+<li>Redis 分布式锁</li>
+<li>接受轻微超员（产品上可容忍）</li>
+</ol>
+<h3 id="计数用原子表达式"><a href="#计数用原子表达式" class="headerlink" title="计数用原子表达式"></a>计数用原子表达式</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tx.Model(&amp;Group&#123;&#125;).Where(<span class="string">&quot;id = ?&quot;</span>, g.ID).</span><br><span class="line">    Update(<span class="string">&quot;member_count&quot;</span>, gorm.Expr(<span class="string">&quot;member_count + ?&quot;</span>, <span class="built_in">len</span>(addIDs)))</span><br></pre></td></tr></table></figure>
+
+<p>不要「先读再写」，并发会丢更新。</p>
+<h2 id="六、解散群"><a href="#六、解散群" class="headerlink" title="六、解散群"></a>六、解散群</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">status = <span class="number">2</span>          <span class="comment">// 群标记已解散</span></span><br><span class="line">软删除 conversation  <span class="comment">// 会话列表不再出现</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>保留数据</strong>：群消息、群记录保留，便于审计&#x2F;回溯。<br>IM 的群和消息一般软删，个人数据（如黑名单）可以物理删。</p>
+<h2 id="七、面试点"><a href="#七、面试点" class="headerlink" title="七、面试点"></a>七、面试点</h2><ol>
+<li>群聊为什么复用会话模型？</li>
+<li>建群为什么必须事务？</li>
+<li>人数怎么高效统计？为什么冗余？</li>
+<li>并发加人怎么防超员？</li>
+<li>群权限怎么设计？</li>
+<li>群主退群怎么处理？（转让&#x2F;解散）</li>
+<li>群消息扇出到 200 人怎么优化？</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" data-id="cuidqsCFM2LMEQD3sTJI9Lv5W" data-title="群聊设计与权限" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-03-实时消息与WebSocket" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T02:20:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/">实时消息与 WebSocket</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、会话-消息两层抽象"><a href="#一、会话-消息两层抽象" class="headerlink" title="一、会话 + 消息两层抽象"></a>一、会话 + 消息两层抽象</h2><p>单聊和群聊共用一套表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">conversations         会话（type: 1单聊 / 2群聊）</span><br><span class="line">conversation_members  成员（谁在会话、读到哪）</span><br><span class="line">messages              消息（conversation_id + sender_id + content）</span><br></pre></td></tr></table></figure>
+
+<p>好处：消息表不用区分单聊&#x2F;群聊，统一按 <code>conversation_id</code> 查。<br>M3 做群聊时只需要新增 <code>groups</code> 表，消息逻辑完全复用。</p>
+<h2 id="二、消息幂等（重点）"><a href="#二、消息幂等（重点）" class="headerlink" title="二、消息幂等（重点）"></a>二、消息幂等（重点）</h2><p>网络重试、用户连点、WS 重发都会导致同一条消息发多次。</p>
+<p><strong>方案</strong>：客户端生成 <code>client_msg_id</code>，数据库 <code>UNIQUE(sender_id, client_msg_id)</code>。</p>
+<p>服务端：</p>
+<ol>
+<li>先查是否已存在 → 存在直接返回（幂等）</li>
+<li>不存在 → 插入</li>
+<li>并发撞唯一索引 → 捕获 <code>gorm.ErrDuplicatedKey</code> → 再查返回</li>
+</ol>
+<p>配套：GORM 开启 <code>TranslateError: true</code>，把 MySQL 的 Duplicate 错误翻译成哨兵错误。</p>
+<h2 id="三、分页：游标-offset"><a href="#三、分页：游标-offset" class="headerlink" title="三、分页：游标 &gt; offset"></a>三、分页：游标 &gt; offset</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- ❌ offset：越翻越慢，新消息插入还会错位</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> messages <span class="keyword">WHERE</span> conversation_id<span class="operator">=</span>? <span class="keyword">ORDER</span> <span class="keyword">BY</span> id <span class="keyword">DESC</span> LIMIT <span class="number">20</span> <span class="keyword">OFFSET</span> <span class="number">1000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ✅ 游标：用上一页最后一条 id 作锚点</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> messages <span class="keyword">WHERE</span> conversation_id<span class="operator">=</span>? <span class="keyword">AND</span> id <span class="operator">&lt;</span> ? <span class="keyword">ORDER</span> <span class="keyword">BY</span> id <span class="keyword">DESC</span> LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、WebSocket-架构"><a href="#四、WebSocket-架构" class="headerlink" title="四、WebSocket 架构"></a>四、WebSocket 架构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Hub      管理所有连接（userID -&gt; 多个连接），RWMutex 保护</span><br><span class="line">Client   一个连接，读 goroutine + 写 goroutine</span><br><span class="line">ServeWS  HTTP 握手升级 + token 校验</span><br></pre></td></tr></table></figure>
+
+<h3 id="为什么读写分离"><a href="#为什么读写分离" class="headerlink" title="为什么读写分离"></a>为什么读写分离</h3><p>gorilla&#x2F;websocket <strong>不允许并发写</strong>。所以：</p>
+<ul>
+<li><code>ReadPump</code>：唯一从 socket 读</li>
+<li><code>WritePump</code>：唯一往 socket 写</li>
+<li>其他 goroutine 发消息 &#x3D; 往 <code>send</code> channel 塞数据</li>
+</ul>
+<h3 id="心跳"><a href="#心跳" class="headerlink" title="心跳"></a>心跳</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">conn.SetReadDeadline(now + <span class="number">60</span>s)</span><br><span class="line">conn.SetPongHandler(<span class="function"><span class="keyword">func</span><span class="params">(<span class="type">string</span>)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> conn.SetReadDeadline(now + <span class="number">60</span>s)  <span class="comment">// 收到 pong 续期</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// WritePump 每 54s 发一次 ping</span></span><br></pre></td></tr></table></figure>
+
+<p>作用：清理「网线拔了但 TCP 没断」的僵尸连接。</p>
+<h3 id="慢消费者隔离"><a href="#慢消费者隔离" class="headerlink" title="慢消费者隔离"></a>慢消费者隔离</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> &#123;</span><br><span class="line"><span class="keyword">case</span> c.send &lt;- payload:</span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    c.Close()   <span class="comment">// 队列满 → 断开慢连接</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一个慢客户端不能拖垮给其他人推送的 goroutine。</p>
+<h2 id="五、离线消息"><a href="#五、离线消息" class="headerlink" title="五、离线消息"></a>五、离线消息</h2><p><strong>不需要单独离线表</strong>：</p>
+<ul>
+<li>消息落库到 <code>messages</code></li>
+<li>用户上线后拉历史 <code>GET /conversations/:id/messages</code></li>
+<li><code>conversation_members.last_read_message_id</code> 算未读数</li>
+</ul>
+<p>这就是「持久化 + 上线拉取 + 未读数」的标准做法。</p>
+<h2 id="六、WS-鉴权"><a href="#六、WS-鉴权" class="headerlink" title="六、WS 鉴权"></a>六、WS 鉴权</h2><p>浏览器 WebSocket API 不能自定义 header，所以 token 走 query：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ws://host/ws?token=&lt;access&gt;</span><br></pre></td></tr></table></figure>
+
+<p>服务端在<strong>升级连接之前</strong>校验，非法直接 401。</p>
+<h2 id="七、踩过的坑"><a href="#七、踩过的坑" class="headerlink" title="七、踩过的坑"></a>七、踩过的坑</h2><ol>
+<li><code>CheckOrigin</code> 生产环境必须校验（CSWSH 跨站 WebSocket 劫持）</li>
+<li>WS 连接用 <code>context.Background()</code>，不能用 HTTP 请求的 ctx</li>
+<li><code>Enqueue</code> 要做 non-blocking + recover（连接关闭后 channel 会关闭）</li>
+<li>Hub 持锁时不要做 IO，先复制连接列表再释放锁</li>
+</ol>
+<h2 id="八、面试点"><a href="#八、面试点" class="headerlink" title="八、面试点"></a>八、面试点</h2><ol>
+<li>WebSocket 和长轮询&#x2F;SSE 的区别？</li>
+<li>为什么读写要分离？</li>
+<li>心跳解决什么问题？</li>
+<li>大量连接怎么管理？多实例怎么办？</li>
+<li>消息怎么保证不重复？</li>
+<li>离线消息怎么实现？</li>
+<li>慢消费者怎么处理？</li>
+<li>游标分页 vs offset 分页？</li>
+<li>未读数怎么高效计算？</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" data-id="cuidOzWmt0we-TL4uIRC2Qsxb" data-title="实时消息与 WebSocket" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-02-认证与好友" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T02:10:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">认证与好友：双 token 与事务</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、为什么用双-token"><a href="#一、为什么用双-token" class="headerlink" title="一、为什么用双 token"></a>一、为什么用双 token</h2><p>单 token 的矛盾：</p>
+<ul>
+<li>有效期长 → 体验好，但泄露风险大、无法撤销</li>
+<li>有效期短 → 安全，但频繁掉登录</li>
+</ul>
+<p><strong>双 token</strong>：</p>
+<ul>
+<li><code>access token</code>：2 小时，每个请求携带，泄露窗口小</li>
+<li><code>refresh token</code>：30 天，只用来换新 access，存服务端可撤销</li>
+</ul>
+<p>用户只要 30 天内用过，refresh 自动续期 → <strong>无感不掉登录</strong>。</p>
+<h2 id="二、无感刷新的完整流程"><a href="#二、无感刷新的完整流程" class="headerlink" title="二、无感刷新的完整流程"></a>二、无感刷新的完整流程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">① 登录 → 签发 access + refresh(jti) → Redis: SET refresh:&#123;uid&#125;:&#123;jti&#125; 1 EX 30d</span><br><span class="line">② 调接口 → 中间件验 access</span><br><span class="line">③ access 过期(401) → 客户端调 /token/refresh</span><br><span class="line">     → 服务端验 refresh → GETDEL 消费旧 jti → 签发新 token 对（rotation）</span><br><span class="line">④ 登出 → DEL refresh:&#123;uid&#125;:&#123;jti&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关键点-1：用-GETDEL-原子消费"><a href="#关键点-1：用-GETDEL-原子消费" class="headerlink" title="关键点 1：用 GETDEL 原子消费"></a>关键点 1：用 GETDEL 原子消费</h3><p><code>Exists</code> + <code>Del</code> 是两条命令，中间有时间窗口，并发下两个请求都可能通过 → 都签发新 token，<br>rotation 就失效了。<code>GETDEL</code> 是原子命令，只有一个请求能成功。</p>
+<h3 id="关键点-2：rotation-复用检测"><a href="#关键点-2：rotation-复用检测" class="headerlink" title="关键点 2：rotation + 复用检测"></a>关键点 2：rotation + 复用检测</h3><p>每次刷新都换新 refresh，旧的作废。<br>如果旧 jti 不存在却仍被使用 → 可能被盗用 → <strong>撤销该用户所有 refresh</strong>（强制下线）。</p>
+<h3 id="关键点-3：并发刷新怎么办"><a href="#关键点-3：并发刷新怎么办" class="headerlink" title="关键点 3：并发刷新怎么办"></a>关键点 3：并发刷新怎么办</h3><p>5 个请求同时 401 会触发 5 次刷新，rotation 会让第 2~5 次用旧 token → 被判定盗用。</p>
+<p>解法：</p>
+<ol>
+<li><strong>客户端 single-flight</strong>：刷新进行中，其他请求等待同一个结果</li>
+<li>服务端 <code>GETDEL</code> 防双签发</li>
+<li>宽限期：消费标记短 TTL，区分正常重试和盗用</li>
+</ol>
+<h2 id="三、JWT-的安全要点"><a href="#三、JWT-的安全要点" class="headerlink" title="三、JWT 的安全要点"></a>三、JWT 的安全要点</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 必须校验签名算法，防 alg=none / 算法混淆</span></span><br><span class="line"><span class="keyword">if</span> _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;unexpected signing method&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其他要点：</p>
+<ul>
+<li>payload 是 <strong>base64 不是加密</strong>，只放 user_id&#x2F;username，绝不放密码</li>
+<li>secret 从配置读，不硬编码</li>
+<li>access 短命 + refresh 可撤销</li>
+</ul>
+<h2 id="四、好友关系：双向两行"><a href="#四、好友关系：双向两行" class="headerlink" title="四、好友关系：双向两行"></a>四、好友关系：双向两行</h2><p>A、B 成为好友后插 <code>(A,B)</code> 和 <code>(B,A)</code> 两行。</p>
+<ul>
+<li>查「我的好友」只需 <code>WHERE user_id=?</code></li>
+<li>每行可独立存备注&#x2F;分组&#x2F;星标</li>
+<li>代价：写入要写两行 → <strong>必须用事务</strong></li>
+</ul>
+<h2 id="五、接受好友申请：事务-条件更新"><a href="#五、接受好友申请：事务-条件更新" class="headerlink" title="五、接受好友申请：事务 + 条件更新"></a>五、接受好友申请：事务 + 条件更新</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">tx.Transaction(<span class="function"><span class="keyword">func</span><span class="params">(tx *gorm.DB)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="comment">// 条件更新：只有「发给我的、待处理的」才能接受</span></span><br><span class="line">    res := tx.Model(&amp;FriendRequest&#123;&#125;).</span><br><span class="line">        Where(<span class="string">&quot;id = ? AND to_user_id = ? AND status = 0&quot;</span>, reqID, userID).</span><br><span class="line">        Update(<span class="string">&quot;status&quot;</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">if</span> res.RowsAffected == <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> errors.New(<span class="string">&quot;申请不存在或已被处理&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 插两条好友关系</span></span><br><span class="line">    upsertFriendship(tx, fromID, toID)</span><br><span class="line">    upsertFriendship(tx, toID, fromID)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><code>WHERE status=0</code> 让「判断 + 修改」成为原子操作，天然抗并发重复接受。</p>
+<h2 id="六、踩过的坑"><a href="#六、踩过的坑" class="headerlink" title="六、踩过的坑"></a>六、踩过的坑</h2><h3 id="坑-1：软删除-唯一索引"><a href="#坑-1：软删除-唯一索引" class="headerlink" title="坑 1：软删除 + 唯一索引"></a>坑 1：软删除 + 唯一索引</h3><p>删除好友只是 <code>status=2</code>，行还在。重新加好友时 INSERT 会撞唯一索引。<br>解法：<code>Unscoped()</code> 查旧行，存在就恢复 <code>status=1</code>。</p>
+<h3 id="坑-2：GORM-零值陷阱"><a href="#坑-2：GORM-零值陷阱" class="headerlink" title="坑 2：GORM 零值陷阱"></a>坑 2：GORM 零值陷阱</h3><p>改资料时只传昵称，其余字段是零值。用结构体 <code>Updates</code> 可能清空字段。<br>解法：<strong>请求用指针 &#x2F; 用 map 组装 &#x2F; Select 指定字段</strong>。</p>
+<h3 id="坑-3：先查后写的竞态"><a href="#坑-3：先查后写的竞态" class="headerlink" title="坑 3：先查后写的竞态"></a>坑 3：先查后写的竞态</h3><p>注册查重后插入，并发下两个请求都可能通过。<br><strong>唯一索引是最后防线</strong>，业务层查重只是为了友好提示。</p>
+<h2 id="七、面试点"><a href="#七、面试点" class="headerlink" title="七、面试点"></a>七、面试点</h2><ol>
+<li>为什么用双 token？access 和 refresh 各解决什么问题？</li>
+<li>JWT payload 加密吗？能放什么？</li>
+<li>JWT 安全风险有哪些？怎么防算法混淆？</li>
+<li>无状态 JWT 怎么登出？→ jti + Redis 白名单</li>
+<li>并发刷新怎么处理？</li>
+<li>好友关系为什么存两行？</li>
+<li>接受好友申请为什么必须事务？</li>
+<li>如何防止并发重复接受？</li>
+<li>软删除和唯一索引冲突怎么解？</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" data-id="cuidnmLlH5DeIn4Sb86-8voRH" data-title="认证与好友：双 token 与事务" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-01-项目介绍与架构" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T02:00:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/">项目介绍：从零实现一个仿微信 IM 后端</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="为什么做这个项目"><a href="#为什么做这个项目" class="headerlink" title="为什么做这个项目"></a>为什么做这个项目</h2><p>我想系统练习三件事：<strong>并发编程、微服务拆分、消息队列</strong>。普通的 CRUD 项目练不到这些，<br>于是决定做一个「仿微信」的即时通讯后端：</p>
+<ul>
+<li>有长连接（WebSocket）→ 练并发</li>
+<li>有多个业务域（用户&#x2F;好友&#x2F;聊天&#x2F;群&#x2F;通话）→ 练拆分</li>
+<li>有异步推送需求 → 练消息队列</li>
+</ul>
+<h2 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h2><table>
+<thead>
+<tr>
+<th>层</th>
+<th>技术</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Web 框架</td>
+<td>Gin</td>
+</tr>
+<tr>
+<td>ORM</td>
+<td>GORM + MySQL 8</td>
+</tr>
+<tr>
+<td>缓存</td>
+<td>Redis</td>
+</tr>
+<tr>
+<td>鉴权</td>
+<td>JWT 双 token</td>
+</tr>
+<tr>
+<td>实时通信</td>
+<td>gorilla&#x2F;websocket</td>
+</tr>
+<tr>
+<td>语音</td>
+<td>WebRTC（信令服务）</td>
+</tr>
+<tr>
+<td>微服务</td>
+<td>gRPC</td>
+</tr>
+<tr>
+<td>消息队列</td>
+<td>RabbitMQ</td>
+</tr>
+<tr>
+<td>前端</td>
+<td>原生 HTML&#x2F;CSS&#x2F;JS（仿微信三栏）</td>
+</tr>
+</tbody></table>
+<h2 id="架构演进：先单体，再微服务"><a href="#架构演进：先单体，再微服务" class="headerlink" title="架构演进：先单体，再微服务"></a>架构演进：先单体，再微服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">M0–M5：单体</span><br><span class="line">  客户端 ──HTTP/WS──► 单体服务 ──► MySQL / Redis</span><br><span class="line"></span><br><span class="line">M6–M7：拆分</span><br><span class="line">  客户端 ──HTTP──► gateway ──gRPC──► user 服务 / chat 服务</span><br><span class="line">                        │</span><br><span class="line">                        └──► RabbitMQ ──► 异步推送</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么先单体</strong>：只有先体会单体的痛点（扩缩容、故障隔离、部署耦合），才知道为什么要拆。</p>
+<h2 id="里程碑"><a href="#里程碑" class="headerlink" title="里程碑"></a>里程碑</h2><table>
+<thead>
+<tr>
+<th>里程碑</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M0</td>
+<td>脚手架、配置、健康检查</td>
+</tr>
+<tr>
+<td>M1</td>
+<td>注册&#x2F;登录（双 token）、资料、好友（申请&#x2F;事务&#x2F;黑名单）</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>会话、消息幂等、WebSocket、离线消息</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>群聊（建群事务、成员管理、权限）</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>并发加固（优雅退出、限流、并发安全）</td>
+</tr>
+<tr>
+<td>M5</td>
+<td>WebRTC 语音通话（信令转发）</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>gRPC 微服务 + gateway</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>RabbitMQ + 本地消息表（最终一致性）</td>
+</tr>
+</tbody></table>
+<h2 id="代码与文档"><a href="#代码与文档" class="headerlink" title="代码与文档"></a>代码与文档</h2><ul>
+<li>项目代码：<code>gochat/</code></li>
+<li>学习文档：<code>gochat-study/learn/</code>（每个里程碑一篇）</li>
+<li>面试集：<code>gochat-study/面试集.md</code></li>
+<li>场景集：<code>gochat-study/场景集.md</code></li>
+</ul>
+<h2 id="这个博客"><a href="#这个博客" class="headerlink" title="这个博客"></a>这个博客</h2><p>本博客记录每个里程碑的<strong>设计思路、踩过的坑、面试考点</strong>，作为自己的学习笔记，<br>也方便后来者参考。</p>
+<p>下一篇：<a href="/blog/2026/11/13/%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B-%E5%8F%8Ctoken%E4%B8%8E%E4%BA%8B%E5%8A%A1/">认证与好友：双 token 无感刷新与事务</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" data-id="cuidSSAqeYZchdNymi1tDj_Z2" data-title="项目介绍：从零实现一个仿微信 IM 后端" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/GORM/" style="font-size: 10px;">GORM</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/IM/" style="font-size: 10px;">IM</a> <a href="/blog/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/blog/tags/P2P/" style="font-size: 10px;">P2P</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/blog/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/blog/tags/WebRTC/" style="font-size: 20px;">WebRTC</a> <a href="/blog/tags/WebSocket/" style="font-size: 20px;">WebSocket</a> <a href="/blog/tags/gRPC/" style="font-size: 10px;">gRPC</a> <a href="/blog/tags/goroutine/" style="font-size: 10px;">goroutine</a> <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 20px;">事务</a> <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" style="font-size: 10px;">优雅退出</a> <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" style="font-size: 10px;">信令</a> <a href="/blog/tags/%E5%88%86%E9%A1%B5/" style="font-size: 10px;">分页</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">前端</a> <a href="/blog/tags/%E5%B9%82%E7%AD%89/" style="font-size: 10px;">幂等</a> <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" style="font-size: 20px;">并发</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 10px;">微服务</a> <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" style="font-size: 10px;">最终一致性</a> <a href="/blog/tags/%E6%9D%83%E9%99%90/" style="font-size: 10px;">权限</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 10px;">架构</a> <a href="/blog/tags/%E7%BE%A4%E8%81%8A/" style="font-size: 10px;">群聊</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 10px;">限流</a> <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">面试</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/11/">十一月 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">仿微信前端与面试准备</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">微服务与消息队列</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">WebRTC 语音通话实现</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">并发加固与优雅退出</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/">群聊设计与权限</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 gochat<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">Home</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

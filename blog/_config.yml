@@ -1,0 +1,65 @@
+# Hexo 站点配置（gochat 项目学习博客）
+title: gochat 项目学习博客
+subtitle: 从零实现一个仿微信 IM 后端
+description: Go + Gin + GORM + Redis + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记
+keywords: Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程
+author: gochat
+language: zh-CN
+timezone: Asia/Shanghai
+
+# URL
+# root 决定生成的静态资源路径前缀，这里挂在 Go 服务的 /blog/ 下
+url: http://127.0.0.1:8080/blog
+root: /blog/
+permalink: :year/:month/:day/:title/
+permalink_defaults:
+
+# 目录
+source_dir: source
+public_dir: public
+tag_dir: tags
+archive_dir: archives
+category_dir: categories
+code_dir: downloads/code
+i18n_dir: :lang
+skip_render:
+
+# 写作
+new_post_name: :title.md
+default_layout: post
+titlecase: false
+external_link:
+  enable: true
+  field: site
+  exclude:
+filename_case: 0
+render_drafts: false
+post_asset_folder: false
+relative_link: false
+future: true
+highlight:
+  enable: true
+  line_number: true
+  auto_detect: false
+  tab_replace: ''
+
+# 首页
+index_generator:
+  path: ''
+  per_page: 10
+  order_by: -date
+
+# 日期格式
+date_format: YYYY-MM-DD
+time_format: HH:mm:ss
+
+# 分页
+per_page: 10
+pagination_dir: page
+
+# 主题
+theme: landscape
+
+# 部署（本项目直接由 Go 服务托管 public 目录，无需额外部署）
+deploy:
+  type: ''

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>仿微信前端与面试准备 | gochat 项目学习博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="一、前端技术选型为了演示所有后端功能，实现了一个仿微信三栏布局的单页应用： 1234┌────┬──────────┬──────────────────┐│导航│  会话列表 │     聊天区域      ││ 60 │   300px    │      自适应       │└────┴──────────┴──────────────────┘  选型：原生 HTML&#x2F;CSS&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="仿微信前端与面试准备">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="一、前端技术选型为了演示所有后端功能，实现了一个仿微信三栏布局的单页应用： 1234┌────┬──────────┬──────────────────┐│导航│  会话列表 │     聊天区域      ││ 60 │   300px    │      自适应       │└────┴──────────┴──────────────────┘  选型：原生 HTML&#x2F;CSS&amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-13T03:10:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T16:46:18.804Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="WebRTC">
+<meta property="article:tag" content="WebSocket">
+<meta property="article:tag" content="前端">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="gochat 项目学习博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">gochat 项目学习博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">从零实现一个仿微信 IM 后端</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">Home</a>
+        
+          <a class="main-nav-link" href="/blog/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://127.0.0.1:8080/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-08-仿微信前端与面试准备" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T03:10:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      仿微信前端与面试准备
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、前端技术选型"><a href="#一、前端技术选型" class="headerlink" title="一、前端技术选型"></a>一、前端技术选型</h2><p>为了演示所有后端功能，实现了一个<strong>仿微信三栏布局</strong>的单页应用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">┌────┬──────────┬──────────────────┐</span><br><span class="line">│导航│  会话列表 │     聊天区域      │</span><br><span class="line">│ 60 │   300px    │      自适应       │</span><br><span class="line">└────┴──────────┴──────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>选型：<strong>原生 HTML&#x2F;CSS&#x2F;JS</strong>，由 Go 服务直接托管（<code>r.Static</code>）。<br>理由：零构建、零依赖、和后端同源（不用处理 CORS），演示最稳。</p>
+<h2 id="二、前端覆盖的功能"><a href="#二、前端覆盖的功能" class="headerlink" title="二、前端覆盖的功能"></a>二、前端覆盖的功能</h2><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>认证</td>
+<td>登录&#x2F;注册&#x2F;登出、<strong>双 token 无感刷新</strong>（单飞）</td>
+</tr>
+<tr>
+<td>会话</td>
+<td>会话列表、未读数、在线状态</td>
+</tr>
+<tr>
+<td>聊天</td>
+<td>历史分页（滚轮上翻）、WebSocket 实时收发、已读标记</td>
+</tr>
+<tr>
+<td>通讯录</td>
+<td>好友列表、新朋友申请（接受&#x2F;拒绝）、搜索加好友、备注、删除、拉黑</td>
+</tr>
+<tr>
+<td>群聊</td>
+<td>建群、群详情、成员列表、拉人、踢人、改资料、退群、解散</td>
+</tr>
+<tr>
+<td>通话</td>
+<td>通话记录、WebRTC 语音通话（呼叫&#x2F;接听&#x2F;拒绝&#x2F;挂断&#x2F;静音）</td>
+</tr>
+<tr>
+<td>设置</td>
+<td>资料修改、隐私开关、黑名单、退出登录</td>
+</tr>
+</tbody></table>
+<h2 id="三、无感刷新的前端实现"><a href="#三、无感刷新的前端实现" class="headerlink" title="三、无感刷新的前端实现"></a>三、无感刷新的前端实现</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">request</span>(<span class="params">method, path, body</span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> res = <span class="keyword">await</span> <span class="title function_">fetch</span>(path, &#123; <span class="attr">headers</span>: &#123; <span class="title class_">Authorization</span>: <span class="string">&#x27;Bearer &#x27;</span> + access &#125; &#125;);</span><br><span class="line">  <span class="keyword">if</span> (res.<span class="property">status</span> === <span class="number">401</span> &amp;&amp; refresh) &#123;</span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">refreshOnce</span>();          <span class="comment">// 单飞刷新</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">request</span>(...);          <span class="comment">// 重试一次</span></span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>单飞（single-flight）</strong>：并发 401 只发一次刷新请求，其他请求共享同一个 Promise。<br>否则 rotation 会让旧 refresh 被重复使用，触发服务端复用检测 → 用户被强制下线。</p>
+<h2 id="四、WebSocket-客户端要点"><a href="#四、WebSocket-客户端要点" class="headerlink" title="四、WebSocket 客户端要点"></a>四、WebSocket 客户端要点</h2><ol>
+<li>token 走 query（浏览器 WS 不能带 header）</li>
+<li>心跳 ping（25s），服务端 60s 无 pong 会踢连接</li>
+<li>断线自动重连（指数退避，上限 15s）</li>
+<li>事件分发：<code>WS.on(type, handler)</code></li>
+</ol>
+<h2 id="五、WebRTC-通话（浏览器端）"><a href="#五、WebRTC-通话（浏览器端）" class="headerlink" title="五、WebRTC 通话（浏览器端）"></a>五、WebRTC 通话（浏览器端）</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pc = <span class="keyword">new</span> <span class="title class_">RTCPeerConnection</span>(&#123; <span class="attr">iceServers</span>: [] &#125;);</span><br><span class="line">localStream.<span class="title function_">getTracks</span>().<span class="title function_">forEach</span>(<span class="function"><span class="params">t</span> =&gt;</span> pc.<span class="title function_">addTrack</span>(t, localStream));</span><br><span class="line">pc.<span class="property">onicecandidate</span> = <span class="function"><span class="params">e</span> =&gt;</span> <span class="variable constant_">WS</span>.<span class="title function_">send</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;webrtc_ice&#x27;</span>, <span class="attr">candidate</span>: e.<span class="property">candidate</span>, ... &#125;);</span><br><span class="line">pc.<span class="property">ontrack</span> = <span class="function"><span class="params">e</span> =&gt;</span> &#123; audio.<span class="property">srcObject</span> = e.<span class="property">streams</span>[<span class="number">0</span>]; &#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>localhost 是安全上下文 → HTTP 也能采集麦克风</li>
+<li>本机两窗口演示不需要 STUN（host candidate 直连）</li>
+<li>跨网演示需要 STUN&#x2F;TURN</li>
+</ul>
+<h2 id="六、怎么讲这个项目（面试话术）"><a href="#六、怎么讲这个项目（面试话术）" class="headerlink" title="六、怎么讲这个项目（面试话术）"></a>六、怎么讲这个项目（面试话术）</h2><h3 id="开场-30-秒"><a href="#开场-30-秒" class="headerlink" title="开场 30 秒"></a>开场 30 秒</h3><blockquote>
+<p>“我用 Go 实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，<br>并完整走过『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进。”</p>
+</blockquote>
+<h3 id="挑-2–3-个亮点深入"><a href="#挑-2–3-个亮点深入" class="headerlink" title="挑 2–3 个亮点深入"></a>挑 2–3 个亮点深入</h3><p><strong>双 token 无感刷新</strong>：access 2h + refresh 30d，refresh jti 存 Redis 白名单，<br>GETDEL 原子消费 + rotation + 复用检测。</p>
+<p><strong>消息幂等</strong>：client_msg_id + 唯一索引，重试不会重复落库。</p>
+<p><strong>WebSocket 架构</strong>：读写双泵（gorilla 不能并发写）、Hub 用 RWMutex、<br>心跳清理僵尸连接、慢消费者有界队列断开。</p>
+<p><strong>接受好友申请</strong>：事务 + 条件更新（RowsAffected 抗并发）。</p>
+<p><strong>Outbox</strong>：业务事务里写事件，worker 异步发 MQ，保证不丢 + 最终一致。</p>
+<h3 id="被问难点"><a href="#被问难点" class="headerlink" title="被问难点"></a>被问难点</h3><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>答法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最难</td>
+<td>WebSocket 并发管理 + 双 token 并发刷新</td>
+</tr>
+<tr>
+<td>踩的坑</td>
+<td>软删除+唯一索引冲突、GORM 零值陷阱、事务里误用 global.DB、amqp.Table 不支持 uint</td>
+</tr>
+<tr>
+<td>怎么验证</td>
+<td>每个接口 curl 端到端，WS 用 .NET ClientWebSocket 实测</td>
+</tr>
+<tr>
+<td>重做</td>
+<td>会话创建加唯一键、未读数用 Redis、WS 多实例用 Redis 广播</td>
+</tr>
+</tbody></table>
+<h3 id="主动说改进方向（体现深度）"><a href="#主动说改进方向（体现深度）" class="headerlink" title="主动说改进方向（体现深度）"></a>主动说改进方向（体现深度）</h3><ul>
+<li>会话创建并发去重（唯一键）</li>
+<li>未读数 Redis 计数替代 N 次 count</li>
+<li>WS 多实例：Redis Pub&#x2F;Sub 或 MQ 广播</li>
+<li>消息已读回执&#x2F;撤回</li>
+<li>群通话 SFU&#x2F;MCU</li>
+<li>链路追踪、监控、测试覆盖率</li>
+</ul>
+<h2 id="七、项目结构"><a href="#七、项目结构" class="headerlink" title="七、项目结构"></a>七、项目结构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">gochat/</span><br><span class="line">├── main.go              # 入口：配置 → 初始化 → 启动 HTTP/gRPC/MQ</span><br><span class="line">├── core/                # 启动装配层</span><br><span class="line">├── global/              # 全局状态</span><br><span class="line">├── internal/</span><br><span class="line">│   ├── model/           # GORM 模型（按域拆）</span><br><span class="line">│   ├── auth/            # JWT / bcrypt / refresh 存储</span><br><span class="line">│   ├── middleware/      # 鉴权 / 限流</span><br><span class="line">│   ├── service/         # 业务逻辑（按域拆）</span><br><span class="line">│   ├── router/          # HTTP handler（按域拆）</span><br><span class="line">│   ├── ws/              # WebSocket</span><br><span class="line">│   ├── grpcx/           # gRPC 微服务</span><br><span class="line">│   └── mq/              # RabbitMQ worker/consumer</span><br><span class="line">├── web/                 # 仿微信前端</span><br><span class="line">└── blog/                # 本博客（Hexo）</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、学习资料"><a href="#八、学习资料" class="headerlink" title="八、学习资料"></a>八、学习资料</h2><ul>
+<li>每个里程碑的设计文档：<code>gochat-study/learn/</code></li>
+<li>72 道面试题：<code>gochat-study/面试集.md</code></li>
+<li>30 个业务场景：<code>gochat-study/场景集.md</code></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" data-id="cuidWy8YsVS9HYWmfcswfMpj2" data-title="仿微信前端与面试准备" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">微服务与消息队列</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/GORM/" style="font-size: 10px;">GORM</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/IM/" style="font-size: 10px;">IM</a> <a href="/blog/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/blog/tags/P2P/" style="font-size: 10px;">P2P</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/blog/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/blog/tags/WebRTC/" style="font-size: 20px;">WebRTC</a> <a href="/blog/tags/WebSocket/" style="font-size: 20px;">WebSocket</a> <a href="/blog/tags/gRPC/" style="font-size: 10px;">gRPC</a> <a href="/blog/tags/goroutine/" style="font-size: 10px;">goroutine</a> <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 20px;">事务</a> <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" style="font-size: 10px;">优雅退出</a> <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" style="font-size: 10px;">信令</a> <a href="/blog/tags/%E5%88%86%E9%A1%B5/" style="font-size: 10px;">分页</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">前端</a> <a href="/blog/tags/%E5%B9%82%E7%AD%89/" style="font-size: 10px;">幂等</a> <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" style="font-size: 20px;">并发</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 10px;">微服务</a> <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" style="font-size: 10px;">最终一致性</a> <a href="/blog/tags/%E6%9D%83%E9%99%90/" style="font-size: 10px;">权限</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 10px;">架构</a> <a href="/blog/tags/%E7%BE%A4%E8%81%8A/" style="font-size: 10px;">群聊</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 10px;">限流</a> <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">面试</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/11/">十一月 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">仿微信前端与面试准备</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">微服务与消息队列</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">WebRTC 语音通话实现</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">并发加固与优雅退出</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/">群聊设计与权限</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 gochat<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">Home</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

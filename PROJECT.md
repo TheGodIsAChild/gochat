@@ -73,7 +73,16 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
   - **M6 微服务**：`internal/grpcx/`（契约 + JSON codec + 服务端 UnknownServiceHandler 分发 + 客户端 Invoke）、user 服务 :9001 / chat 服务 :9002、`rpc_router`（HTTP gateway → gRPC）。
   - **M7 消息队列**：`core/mq`（RabbitMQ 连接 + 持久化队列）、`mq_model.Outbox`（本地消息表）、`outbox`（事务内写事件）、`internal/mq`（worker 轮询发布 + consumer 消费推送）、MQ 不可用时降级同步推送。
   - **✅ 端到端实测全过**：M1 认证9项+好友全流程；M2 幂等/未读/WS 推送/ping-pong；M3 建群/踢人/权限/解散；M4 限流 429；M5 呼叫→接听→SDP/ICE 转发→挂断→记录；**M6 gRPC 双服务 + gateway 6 项**；**M7 outbox(status0→1) + RabbitMQ consumer + WS 异步推送**。
-- **下一步**：无（M0–M7 完成）。后续可选：前端页面、protoc 换标准 protobuf、单测覆盖率、压测、链路追踪。
+- **✅ 演示前端（M8）**：`web/` —— 仿微信三栏单页（原生 HTML/CSS/JS，Go 托管）。
+  - `index.html`（登录 + 三栏）、`css/app.css`、`js/api.js`（**单飞无感刷新**）、`js/ws.js`（心跳/重连/事件）、`js/webrtc.js`（WebRTC 语音）、`js/app.js`（会话/消息/好友/群/设置/通话全量）。
+  - 覆盖：注册登录、会话列表未读、聊天（WS 实时+历史分页+已读）、通讯录（搜索加好友/申请接受拒绝/备注/删除/拉黑）、群聊（建群/成员/拉人/踢人/改资料/退群/解散）、通话（记录+WebRTC 语音）、设置（资料/隐私/黑名单）。
+  - 新增后端接口：`GET /api/v1/groups/:id/members`（群成员列表）。
+- **✅ 学习博客（M8）**：`blog/` —— **Hexo**（开源博客系统，landscape 主题）。
+  - 源码 `_config.yml` + `source/_posts/`（8 篇文章）；生成产物 `blog/public/` 已提交；由 Go 托管在 `/blog/`。
+  - 文章：项目介绍 / 认证与好友 / 实时消息与 WebSocket / 群聊 / 并发加固 / WebRTC / 微服务与 MQ / 前端与面试准备。
+- **✅ 运行方式**：`docker compose up -d` → `go run . -db` → 打开 `http://127.0.0.1:8080/`（前端）与 `/blog/`（博客）；`scripts/seed-demo.ps1` 一键生成 alice/bob/carol 演示数据（密码 123456）。
+- **下一步**：主目标完成。后续可选：protoc 换标准 protobuf、单测覆盖率、压测、链路追踪、前端移动端适配。
+- **文档**：`gochat-study/learn/00-学习总览.md` 及 m1–m7、`面试集.md`、`场景集.md`、`项目总结与面试话术.md`；`gochat/README.md`（运行指南）。
 - **文档**：`gochat-study/learn/00-学习总览.md`、`m1-认证与好友.md`、`m2-单聊与WebSocket.md`、`m3-群聊.md`、`m4-并发加固.md`、`面试集.md`、`场景集.md`。
 - **数据库状态**：10 张表（M1 6 + M2 3 + M3 1）
 - **git**：M1 `95bebcf`/`cb456d4`/`bb8c74d`；M2 `8ba89ae`；M3 `40a67ed`；M4 `b1d12ea`

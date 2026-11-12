@@ -36,5 +36,8 @@ func NewRouter() *gin.Engine {
 	r.Static("/js", "./web/js")
 	r.StaticFile("/", "./web/index.html")
 
+	// 项目学习博客（Hexo 生成的静态站点）
+	r.Static("/blog", "./blog/public")
+
 	return r
 }

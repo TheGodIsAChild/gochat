@@ -1,0 +1,8 @@
+# Hexo 依赖与临时文件
+node_modules/
+db.json
+.deploy_git/
+*.log
+
+# 生成产物已提交（方便直接由 Go 服务托管演示）
+# 如需重新生成：npm install && npm run build

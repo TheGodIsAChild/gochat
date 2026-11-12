@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>群聊设计与权限 | gochat 项目学习博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="一、复用会话抽象M2 已经把「会话 + 成员 + 消息」抽象好了，所以群聊几乎是免费的：  群聊 &#x3D; type&#x3D;2 的会话 + groups 表（群元信息） 群消息发送&#x2F;推送完全复用 M2 的 SendMessage &#x2F; PushMessage  M3 新增的只是群的生命周期管理：建群、拉人、踢人、改资料、解散。  这就是好抽象的复利：M2 多花点心思，M3 直接受益">
+<meta property="og:type" content="article">
+<meta property="og:title" content="群聊设计与权限">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="一、复用会话抽象M2 已经把「会话 + 成员 + 消息」抽象好了，所以群聊几乎是免费的：  群聊 &#x3D; type&#x3D;2 的会话 + groups 表（群元信息） 群消息发送&#x2F;推送完全复用 M2 的 SendMessage &#x2F; PushMessage  M3 新增的只是群的生命周期管理：建群、拉人、踢人、改资料、解散。  这就是好抽象的复利：M2 多花点心思，M3 直接受益">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-13T02:30:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T16:45:56.073Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="事务">
+<meta property="article:tag" content="权限">
+<meta property="article:tag" content="群聊">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="gochat 项目学习博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">gochat 项目学习博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">从零实现一个仿微信 IM 后端</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">Home</a>
+        
+          <a class="main-nav-link" href="/blog/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://127.0.0.1:8080/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-04-群聊设计与权限" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T02:30:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      群聊设计与权限
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、复用会话抽象"><a href="#一、复用会话抽象" class="headerlink" title="一、复用会话抽象"></a>一、复用会话抽象</h2><p>M2 已经把「会话 + 成员 + 消息」抽象好了，所以群聊几乎是免费的：</p>
+<ul>
+<li>群聊 &#x3D; <code>type=2</code> 的会话 + <code>groups</code> 表（群元信息）</li>
+<li>群消息发送&#x2F;推送完全复用 M2 的 <code>SendMessage</code> &#x2F; <code>PushMessage</code></li>
+</ul>
+<p>M3 新增的只是<strong>群的生命周期管理</strong>：建群、拉人、踢人、改资料、解散。</p>
+<blockquote>
+<p>这就是好抽象的复利：M2 多花点心思，M3 直接受益。</p>
+</blockquote>
+<h2 id="二、groups-表设计"><a href="#二、groups-表设计" class="headerlink" title="二、groups 表设计"></a>二、groups 表设计</h2><table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>conversation_id</td>
+<td>关联会话（唯一）</td>
+</tr>
+<tr>
+<td>owner_id</td>
+<td>群主</td>
+</tr>
+<tr>
+<td>name &#x2F; avatar</td>
+<td>群名称&#x2F;头像</td>
+</tr>
+<tr>
+<td>announcement</td>
+<td>群公告</td>
+</tr>
+<tr>
+<td>member_count</td>
+<td>冗余人数</td>
+</tr>
+<tr>
+<td>max_members</td>
+<td>上限（默认 200）</td>
+</tr>
+<tr>
+<td>status</td>
+<td>1 正常 &#x2F; 2 已解散</td>
+</tr>
+</tbody></table>
+<h3 id="为什么冗余-member-count"><a href="#为什么冗余-member-count" class="headerlink" title="为什么冗余 member_count"></a>为什么冗余 member_count</h3><p>群列表要显示人数。不冗余的话每次都 <code>COUNT(*)</code>。<br>加人&#x2F;踢人时用 <code>gorm.Expr(&quot;member_count + ?&quot;)</code> <strong>原子自增</strong>，避免并发覆盖。</p>
+<h2 id="三、建群必须用事务"><a href="#三、建群必须用事务" class="headerlink" title="三、建群必须用事务"></a>三、建群必须用事务</h2><p>建群要做 4 件事：</p>
+<ol>
+<li>创建会话（type&#x3D;2）</li>
+<li>创建 groups 行</li>
+<li>插入群主（role&#x3D;1）</li>
+<li>插入其他成员</li>
+</ol>
+<p>不做事务的后果：</p>
+<ul>
+<li>有会话没群 → 会话列表出现无名会话</li>
+<li>有群没群主 → 没人能管理</li>
+<li>有群没会话 → 群消息发不出去</li>
+</ul>
+<h2 id="四、权限模型"><a href="#四、权限模型" class="headerlink" title="四、权限模型"></a>四、权限模型</h2><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>谁可以</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>拉人进群</td>
+<td>任何成员（类微信）</td>
+</tr>
+<tr>
+<td>踢人</td>
+<td>只有群主</td>
+</tr>
+<tr>
+<td>退群</td>
+<td>任何成员（群主不能直接退）</td>
+</tr>
+<tr>
+<td>改群名&#x2F;公告</td>
+<td>只有群主</td>
+</tr>
+<tr>
+<td>解散群</td>
+<td>只有群主</td>
+</tr>
+</tbody></table>
+<p>统一校验套路：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">g, err := getGroupByID(ctx, groupID)   <span class="comment">// 存在且未解散</span></span><br><span class="line"><span class="keyword">if</span> <span class="type">uint64</span>(g.OwnerID) != operatorID &#123; <span class="keyword">return</span> errors.New(<span class="string">&quot;只有群主可以...&quot;</span>) &#125;</span><br><span class="line">ok, _ := isMember(ctx, g.ConversationID, userID)</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、并发问题"><a href="#五、并发问题" class="headerlink" title="五、并发问题"></a>五、并发问题</h2><h3 id="人数上限有竞态"><a href="#人数上限有竞态" class="headerlink" title="人数上限有竞态"></a>人数上限有竞态</h3><p>两个请求同时拉人，可能都通过 <code>member_count + n &gt; max</code> 的校验 → 超员。</p>
+<p>解法：</p>
+<ol>
+<li>事务里 <code>SELECT ... FOR UPDATE</code> 锁群行（悲观锁）</li>
+<li>Redis 分布式锁</li>
+<li>接受轻微超员（产品上可容忍）</li>
+</ol>
+<h3 id="计数用原子表达式"><a href="#计数用原子表达式" class="headerlink" title="计数用原子表达式"></a>计数用原子表达式</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tx.Model(&amp;Group&#123;&#125;).Where(<span class="string">&quot;id = ?&quot;</span>, g.ID).</span><br><span class="line">    Update(<span class="string">&quot;member_count&quot;</span>, gorm.Expr(<span class="string">&quot;member_count + ?&quot;</span>, <span class="built_in">len</span>(addIDs)))</span><br></pre></td></tr></table></figure>
+
+<p>不要「先读再写」，并发会丢更新。</p>
+<h2 id="六、解散群"><a href="#六、解散群" class="headerlink" title="六、解散群"></a>六、解散群</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">status = <span class="number">2</span>          <span class="comment">// 群标记已解散</span></span><br><span class="line">软删除 conversation  <span class="comment">// 会话列表不再出现</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>保留数据</strong>：群消息、群记录保留，便于审计&#x2F;回溯。<br>IM 的群和消息一般软删，个人数据（如黑名单）可以物理删。</p>
+<h2 id="七、面试点"><a href="#七、面试点" class="headerlink" title="七、面试点"></a>七、面试点</h2><ol>
+<li>群聊为什么复用会话模型？</li>
+<li>建群为什么必须事务？</li>
+<li>人数怎么高效统计？为什么冗余？</li>
+<li>并发加人怎么防超员？</li>
+<li>群权限怎么设计？</li>
+<li>群主退群怎么处理？（转让&#x2F;解散）</li>
+<li>群消息扇出到 200 人怎么优化？</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" data-id="cuidqsCFM2LMEQD3sTJI9Lv5W" data-title="群聊设计与权限" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          并发加固与优雅退出
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">实时消息与 WebSocket</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/GORM/" style="font-size: 10px;">GORM</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/IM/" style="font-size: 10px;">IM</a> <a href="/blog/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/blog/tags/P2P/" style="font-size: 10px;">P2P</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/blog/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/blog/tags/WebRTC/" style="font-size: 20px;">WebRTC</a> <a href="/blog/tags/WebSocket/" style="font-size: 20px;">WebSocket</a> <a href="/blog/tags/gRPC/" style="font-size: 10px;">gRPC</a> <a href="/blog/tags/goroutine/" style="font-size: 10px;">goroutine</a> <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 20px;">事务</a> <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" style="font-size: 10px;">优雅退出</a> <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" style="font-size: 10px;">信令</a> <a href="/blog/tags/%E5%88%86%E9%A1%B5/" style="font-size: 10px;">分页</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">前端</a> <a href="/blog/tags/%E5%B9%82%E7%AD%89/" style="font-size: 10px;">幂等</a> <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" style="font-size: 20px;">并发</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 10px;">微服务</a> <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" style="font-size: 10px;">最终一致性</a> <a href="/blog/tags/%E6%9D%83%E9%99%90/" style="font-size: 10px;">权限</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 10px;">架构</a> <a href="/blog/tags/%E7%BE%A4%E8%81%8A/" style="font-size: 10px;">群聊</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 10px;">限流</a> <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">面试</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/11/">十一月 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">仿微信前端与面试准备</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">微服务与消息队列</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">WebRTC 语音通话实现</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">并发加固与优雅退出</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/">群聊设计与权限</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 gochat<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">Home</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

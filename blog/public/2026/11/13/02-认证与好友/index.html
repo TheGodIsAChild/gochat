@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>认证与好友：双 token 与事务 | gochat 项目学习博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="一、为什么用双 token单 token 的矛盾：  有效期长 → 体验好，但泄露风险大、无法撤销 有效期短 → 安全，但频繁掉登录  双 token：  access token：2 小时，每个请求携带，泄露窗口小 refresh token：30 天，只用来换新 access，存服务端可撤销  用户只要 30 天内用过，refresh 自动续期 → 无感不掉登录。 二、无感刷新的完整流程123">
+<meta property="og:type" content="article">
+<meta property="og:title" content="认证与好友：双 token 与事务">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="一、为什么用双 token单 token 的矛盾：  有效期长 → 体验好，但泄露风险大、无法撤销 有效期短 → 安全，但频繁掉登录  双 token：  access token：2 小时，每个请求携带，泄露窗口小 refresh token：30 天，只用来换新 access，存服务端可撤销  用户只要 30 天内用过，refresh 自动续期 → 无感不掉登录。 二、无感刷新的完整流程123">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-13T02:10:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T16:45:15.102Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="GORM">
+<meta property="article:tag" content="JWT">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="事务">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="gochat 项目学习博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">gochat 项目学习博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">从零实现一个仿微信 IM 后端</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">Home</a>
+        
+          <a class="main-nav-link" href="/blog/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://127.0.0.1:8080/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-02-认证与好友" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T02:10:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      认证与好友：双 token 与事务
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、为什么用双-token"><a href="#一、为什么用双-token" class="headerlink" title="一、为什么用双 token"></a>一、为什么用双 token</h2><p>单 token 的矛盾：</p>
+<ul>
+<li>有效期长 → 体验好，但泄露风险大、无法撤销</li>
+<li>有效期短 → 安全，但频繁掉登录</li>
+</ul>
+<p><strong>双 token</strong>：</p>
+<ul>
+<li><code>access token</code>：2 小时，每个请求携带，泄露窗口小</li>
+<li><code>refresh token</code>：30 天，只用来换新 access，存服务端可撤销</li>
+</ul>
+<p>用户只要 30 天内用过，refresh 自动续期 → <strong>无感不掉登录</strong>。</p>
+<h2 id="二、无感刷新的完整流程"><a href="#二、无感刷新的完整流程" class="headerlink" title="二、无感刷新的完整流程"></a>二、无感刷新的完整流程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">① 登录 → 签发 access + refresh(jti) → Redis: SET refresh:&#123;uid&#125;:&#123;jti&#125; 1 EX 30d</span><br><span class="line">② 调接口 → 中间件验 access</span><br><span class="line">③ access 过期(401) → 客户端调 /token/refresh</span><br><span class="line">     → 服务端验 refresh → GETDEL 消费旧 jti → 签发新 token 对（rotation）</span><br><span class="line">④ 登出 → DEL refresh:&#123;uid&#125;:&#123;jti&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关键点-1：用-GETDEL-原子消费"><a href="#关键点-1：用-GETDEL-原子消费" class="headerlink" title="关键点 1：用 GETDEL 原子消费"></a>关键点 1：用 GETDEL 原子消费</h3><p><code>Exists</code> + <code>Del</code> 是两条命令，中间有时间窗口，并发下两个请求都可能通过 → 都签发新 token，<br>rotation 就失效了。<code>GETDEL</code> 是原子命令，只有一个请求能成功。</p>
+<h3 id="关键点-2：rotation-复用检测"><a href="#关键点-2：rotation-复用检测" class="headerlink" title="关键点 2：rotation + 复用检测"></a>关键点 2：rotation + 复用检测</h3><p>每次刷新都换新 refresh，旧的作废。<br>如果旧 jti 不存在却仍被使用 → 可能被盗用 → <strong>撤销该用户所有 refresh</strong>（强制下线）。</p>
+<h3 id="关键点-3：并发刷新怎么办"><a href="#关键点-3：并发刷新怎么办" class="headerlink" title="关键点 3：并发刷新怎么办"></a>关键点 3：并发刷新怎么办</h3><p>5 个请求同时 401 会触发 5 次刷新，rotation 会让第 2~5 次用旧 token → 被判定盗用。</p>
+<p>解法：</p>
+<ol>
+<li><strong>客户端 single-flight</strong>：刷新进行中，其他请求等待同一个结果</li>
+<li>服务端 <code>GETDEL</code> 防双签发</li>
+<li>宽限期：消费标记短 TTL，区分正常重试和盗用</li>
+</ol>
+<h2 id="三、JWT-的安全要点"><a href="#三、JWT-的安全要点" class="headerlink" title="三、JWT 的安全要点"></a>三、JWT 的安全要点</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 必须校验签名算法，防 alg=none / 算法混淆</span></span><br><span class="line"><span class="keyword">if</span> _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;unexpected signing method&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其他要点：</p>
+<ul>
+<li>payload 是 <strong>base64 不是加密</strong>，只放 user_id&#x2F;username，绝不放密码</li>
+<li>secret 从配置读，不硬编码</li>
+<li>access 短命 + refresh 可撤销</li>
+</ul>
+<h2 id="四、好友关系：双向两行"><a href="#四、好友关系：双向两行" class="headerlink" title="四、好友关系：双向两行"></a>四、好友关系：双向两行</h2><p>A、B 成为好友后插 <code>(A,B)</code> 和 <code>(B,A)</code> 两行。</p>
+<ul>
+<li>查「我的好友」只需 <code>WHERE user_id=?</code></li>
+<li>每行可独立存备注&#x2F;分组&#x2F;星标</li>
+<li>代价：写入要写两行 → <strong>必须用事务</strong></li>
+</ul>
+<h2 id="五、接受好友申请：事务-条件更新"><a href="#五、接受好友申请：事务-条件更新" class="headerlink" title="五、接受好友申请：事务 + 条件更新"></a>五、接受好友申请：事务 + 条件更新</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">tx.Transaction(<span class="function"><span class="keyword">func</span><span class="params">(tx *gorm.DB)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="comment">// 条件更新：只有「发给我的、待处理的」才能接受</span></span><br><span class="line">    res := tx.Model(&amp;FriendRequest&#123;&#125;).</span><br><span class="line">        Where(<span class="string">&quot;id = ? AND to_user_id = ? AND status = 0&quot;</span>, reqID, userID).</span><br><span class="line">        Update(<span class="string">&quot;status&quot;</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">if</span> res.RowsAffected == <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> errors.New(<span class="string">&quot;申请不存在或已被处理&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 插两条好友关系</span></span><br><span class="line">    upsertFriendship(tx, fromID, toID)</span><br><span class="line">    upsertFriendship(tx, toID, fromID)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><code>WHERE status=0</code> 让「判断 + 修改」成为原子操作，天然抗并发重复接受。</p>
+<h2 id="六、踩过的坑"><a href="#六、踩过的坑" class="headerlink" title="六、踩过的坑"></a>六、踩过的坑</h2><h3 id="坑-1：软删除-唯一索引"><a href="#坑-1：软删除-唯一索引" class="headerlink" title="坑 1：软删除 + 唯一索引"></a>坑 1：软删除 + 唯一索引</h3><p>删除好友只是 <code>status=2</code>，行还在。重新加好友时 INSERT 会撞唯一索引。<br>解法：<code>Unscoped()</code> 查旧行，存在就恢复 <code>status=1</code>。</p>
+<h3 id="坑-2：GORM-零值陷阱"><a href="#坑-2：GORM-零值陷阱" class="headerlink" title="坑 2：GORM 零值陷阱"></a>坑 2：GORM 零值陷阱</h3><p>改资料时只传昵称，其余字段是零值。用结构体 <code>Updates</code> 可能清空字段。<br>解法：<strong>请求用指针 &#x2F; 用 map 组装 &#x2F; Select 指定字段</strong>。</p>
+<h3 id="坑-3：先查后写的竞态"><a href="#坑-3：先查后写的竞态" class="headerlink" title="坑 3：先查后写的竞态"></a>坑 3：先查后写的竞态</h3><p>注册查重后插入，并发下两个请求都可能通过。<br><strong>唯一索引是最后防线</strong>，业务层查重只是为了友好提示。</p>
+<h2 id="七、面试点"><a href="#七、面试点" class="headerlink" title="七、面试点"></a>七、面试点</h2><ol>
+<li>为什么用双 token？access 和 refresh 各解决什么问题？</li>
+<li>JWT payload 加密吗？能放什么？</li>
+<li>JWT 安全风险有哪些？怎么防算法混淆？</li>
+<li>无状态 JWT 怎么登出？→ jti + Redis 白名单</li>
+<li>并发刷新怎么处理？</li>
+<li>好友关系为什么存两行？</li>
+<li>接受好友申请为什么必须事务？</li>
+<li>如何防止并发重复接受？</li>
+<li>软删除和唯一索引冲突怎么解？</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" data-id="cuidnmLlH5DeIn4Sb86-8voRH" data-title="认证与好友：双 token 与事务" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          实时消息与 WebSocket
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">项目介绍：从零实现一个仿微信 IM 后端</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/GORM/" style="font-size: 10px;">GORM</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/IM/" style="font-size: 10px;">IM</a> <a href="/blog/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/blog/tags/P2P/" style="font-size: 10px;">P2P</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/blog/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/blog/tags/WebRTC/" style="font-size: 20px;">WebRTC</a> <a href="/blog/tags/WebSocket/" style="font-size: 20px;">WebSocket</a> <a href="/blog/tags/gRPC/" style="font-size: 10px;">gRPC</a> <a href="/blog/tags/goroutine/" style="font-size: 10px;">goroutine</a> <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 20px;">事务</a> <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" style="font-size: 10px;">优雅退出</a> <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" style="font-size: 10px;">信令</a> <a href="/blog/tags/%E5%88%86%E9%A1%B5/" style="font-size: 10px;">分页</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">前端</a> <a href="/blog/tags/%E5%B9%82%E7%AD%89/" style="font-size: 10px;">幂等</a> <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" style="font-size: 20px;">并发</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 10px;">微服务</a> <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" style="font-size: 10px;">最终一致性</a> <a href="/blog/tags/%E6%9D%83%E9%99%90/" style="font-size: 10px;">权限</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 10px;">架构</a> <a href="/blog/tags/%E7%BE%A4%E8%81%8A/" style="font-size: 10px;">群聊</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 10px;">限流</a> <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 10px;">面试</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/11/">十一月 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">仿微信前端与面试准备</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">微服务与消息队列</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">WebRTC 语音通话实现</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">并发加固与优雅退出</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/">群聊设计与权限</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 gochat<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">Home</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
