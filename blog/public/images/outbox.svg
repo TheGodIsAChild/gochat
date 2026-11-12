@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 470" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">
+  <defs>
+    <marker id="a5" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#475569"/></marker>
+    <marker id="o5" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#ea580c"/></marker>
+  </defs>
+  <rect width="880" height="470" fill="#ffffff"/>
+  <text x="30" y="38" font-size="22" font-weight="700" fill="#0f172a">Outbox 模式：消息异步投递链路</text>
+  <text x="30" y="62" font-size="13" fill="#64748b">落库和发 MQ 无法用同一个事务 → 把「要发 MQ」先写进数据库</text>
+
+  <!-- 事务框 -->
+  <rect x="30" y="90" width="250" height="150" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="46" y="114" font-size="13" font-weight="700" fill="#1e3a8a">① 业务事务（原子）</text>
+  <rect x="46" y="126" width="218" height="28" rx="5" fill="#dbeafe"/>
+  <text x="58" y="145" font-size="12" fill="#1e3a8a">INSERT messages</text>
+  <rect x="46" y="160" width="218" height="28" rx="5" fill="#dbeafe"/>
+  <text x="58" y="179" font-size="12" fill="#1e3a8a">UPDATE conversations</text>
+  <rect x="46" y="194" width="218" height="28" rx="5" fill="#fef3c7"/>
+  <text x="58" y="213" font-size="12" fill="#92400e">INSERT outbox(status=0)</text>
+
+  <!-- worker -->
+  <rect x="330" y="120" width="150" height="90" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="405" y="148" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e">② Outbox Worker</text>
+  <text x="405" y="170" text-anchor="middle" font-size="11" fill="#b45309">每 2s 轮询</text>
+  <text x="405" y="188" text-anchor="middle" font-size="11" fill="#b45309">status=0 的记录</text>
+
+  <!-- MQ -->
+  <rect x="530" y="120" width="140" height="90" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="600" y="148" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">③ RabbitMQ</text>
+  <text x="600" y="170" text-anchor="middle" font-size="11" fill="#15803d">持久化队列</text>
+  <text x="600" y="188" text-anchor="middle" font-size="11" fill="#15803d">gochat.events</text>
+
+  <!-- consumer -->
+  <rect x="720" y="120" width="130" height="90" rx="10" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.5"/>
+  <text x="785" y="148" text-anchor="middle" font-size="14" font-weight="700" fill="#6b21a8">④ Consumer</text>
+  <text x="785" y="170" text-anchor="middle" font-size="11" fill="#7e22ce">解析事件</text>
+  <text x="785" y="188" text-anchor="middle" font-size="11" fill="#7e22ce">手动 ack</text>
+
+  <line x1="285" y1="165" x2="325" y2="165" stroke="#475569" stroke-width="2" marker-end="url(#a5)"/>
+  <line x1="485" y1="165" x2="525" y2="165" stroke="#475569" stroke-width="2" marker-end="url(#a5)"/>
+  <line x1="675" y1="165" x2="715" y2="165" stroke="#475569" stroke-width="2" marker-end="url(#a5)"/>
+
+  <!-- 推送 -->
+  <rect x="530" y="270" width="320" height="70" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="690" y="296" text-anchor="middle" font-size="14" font-weight="700" fill="#9a3412">⑤ ws.PushToConversation</text>
+  <text x="690" y="318" text-anchor="middle" font-size="11" fill="#c2410c">推给会话所有在线成员的 WebSocket</text>
+  <line x1="785" y1="215" x2="785" y2="265" stroke="#ea580c" stroke-width="2" marker-end="url(#o5)"/>
+
+  <!-- 降级 -->
+  <rect x="30" y="270" width="400" height="70" rx="10" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="46" y="296" font-size="13" font-weight="700" fill="#991b1b">降级路径</text>
+  <text x="46" y="316" font-size="11" fill="#b91c1c">MQ 不可用（Enabled=false）→ 直接在 handler 里同步 ws.PushMessage</text>
+
+  <!-- 底部 -->
+  <rect x="30" y="366" width="820" height="80" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="50" y="392" font-size="12" font-weight="700" fill="#334155">为什么这样做</text>
+  <text x="50" y="414" font-size="12" fill="#475569">· 发送消息的 HTTP 请求快速返回，不再同步查成员 + 逐个推送（解耦 + 削峰）</text>
+  <text x="50" y="434" font-size="12" fill="#475569">· MQ 挂了消息也不丢：outbox 记录还在，worker 会重试（至少一次投递 → 消费方需幂等）</text>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 500" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">
+  <defs>
+    <marker id="a4" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#475569"/></marker>
+    <marker id="b4" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#0891b2"/></marker>
+  </defs>
+  <rect width="860" height="500" fill="#ffffff"/>
+  <text x="30" y="38" font-size="22" font-weight="700" fill="#0f172a">WebSocket 连接管理架构</text>
+  <text x="30" y="62" font-size="13" fill="#64748b">一个连接 = 一个读 goroutine + 一个写 goroutine</text>
+
+  <!-- Hub -->
+  <rect x="330" y="90" width="230" height="86" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="445" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#1e3a8a">Hub</text>
+  <text x="445" y="140" text-anchor="middle" font-size="12" fill="#1d4ed8">map[uint64]map[*Client]struct{}</text>
+  <text x="445" y="160" text-anchor="middle" font-size="12" fill="#1d4ed8">sync.RWMutex 保护</text>
+
+  <!-- Clients -->
+  <rect x="60" y="230" width="220" height="120" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="170" y="256" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">Client（用户 A）</text>
+  <rect x="80" y="270" width="180" height="30" rx="6" fill="#dcfce7"/>
+  <text x="170" y="290" text-anchor="middle" font-size="12" fill="#166534">ReadPump（唯一读）</text>
+  <rect x="80" y="306" width="180" height="30" rx="6" fill="#dcfce7"/>
+  <text x="170" y="326" text-anchor="middle" font-size="12" fill="#166534">WritePump（唯一写）</text>
+
+  <rect x="580" y="230" width="220" height="120" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="690" y="256" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">Client（用户 B）</text>
+  <rect x="600" y="270" width="180" height="30" rx="6" fill="#dcfce7"/>
+  <text x="690" y="290" text-anchor="middle" font-size="12" fill="#166534">ReadPump（唯一读）</text>
+  <rect x="600" y="306" width="180" height="30" rx="6" fill="#dcfce7"/>
+  <text x="690" y="326" text-anchor="middle" font-size="12" fill="#166534">WritePump（唯一写）</text>
+
+  <line x1="330" y1="150" x2="270" y2="225" stroke="#475569" stroke-width="2" marker-end="url(#a4)"/>
+  <line x1="560" y1="150" x2="620" y2="225" stroke="#475569" stroke-width="2" marker-end="url(#a4)"/>
+  <text x="250" y="200" font-size="11" fill="#475569">注册/推送</text>
+  <text x="600" y="200" font-size="11" fill="#475569">注册/推送</text>
+
+  <!-- 浏览器 -->
+  <rect x="120" y="390" width="140" height="56" rx="8" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="190" y="414" text-anchor="middle" font-size="13" font-weight="700" fill="#9a3412">浏览器 A</text>
+  <text x="190" y="432" text-anchor="middle" font-size="11" fill="#c2410c">ws://host/ws?token=</text>
+  <rect x="620" y="390" width="140" height="56" rx="8" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="690" y="414" text-anchor="middle" font-size="13" font-weight="700" fill="#9a3412">浏览器 B</text>
+  <text x="690" y="432" text-anchor="middle" font-size="11" fill="#c2410c">ws://host/ws?token=</text>
+  <line x1="170" y1="350" x2="185" y2="385" stroke="#0891b2" stroke-width="2" marker-end="url(#b4)"/>
+  <line x1="690" y1="350" x2="690" y2="385" stroke="#0891b2" stroke-width="2" marker-end="url(#b4)"/>
+
+  <!-- 说明 -->
+  <rect x="330" y="390" width="230" height="86" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="445" y="414" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">关键规则</text>
+  <text x="445" y="434" text-anchor="middle" font-size="11" fill="#475569">gorilla 不允许并发写</text>
+  <text x="445" y="452" text-anchor="middle" font-size="11" fill="#475569">慢消费者：队列满就断开</text>
+  <text x="445" y="470" text-anchor="middle" font-size="11" fill="#475569">心跳 ping/pong 清僵尸连接</text>
+
+  <!-- 心跳标注 -->
+  <rect x="30" y="96" width="250" height="80" rx="8" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.5"/>
+  <text x="46" y="122" font-size="13" font-weight="700" fill="#6b21a8">心跳机制</text>
+  <text x="46" y="144" font-size="11" fill="#7e22ce">服务端每 54s 发 ping</text>
+  <text x="46" y="162" font-size="11" fill="#7e22ce">60s 内没收到 pong → 断开</text>
+</svg>

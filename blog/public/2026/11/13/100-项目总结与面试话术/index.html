@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>项目总结与面试话术：怎么讲这个项目 | gochat 项目学习博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="M0–M7 已全部完成。本文用于面试时讲这个项目，以及自己复盘。详细技术点见 learn&#x2F; 各里程碑文档，题目见 面试集.md，场景见 场景集.md。   一、一句话介绍 “我用 Go 从零实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，并且完整走过了『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进过程。”">
+<meta property="og:type" content="article">
+<meta property="og:title" content="项目总结与面试话术：怎么讲这个项目">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/13/100-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="M0–M7 已全部完成。本文用于面试时讲这个项目，以及自己复盘。详细技术点见 learn&#x2F; 各里程碑文档，题目见 面试集.md，场景见 场景集.md。   一、一句话介绍 “我用 Go 从零实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，并且完整走过了『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进过程。”">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-13T01:40:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:09:07.014Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="复盘">
+<meta property="article:tag" content="话术">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="gochat 项目学习博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+  <!-- 自定义美化样式（source/css/custom.css） -->
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">gochat 项目学习博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">Go + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives">归档</a>
+        
+          <a class="main-nav-link" href="/blog/about/">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://127.0.0.1:8080/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-100-项目总结与面试话术" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/100-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T01:40:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">面试准备</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      项目总结与面试话术：怎么讲这个项目
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>M0–M7 已全部完成。本文用于<strong>面试时讲这个项目</strong>，以及自己复盘。<br>详细技术点见 <code>learn/</code> 各里程碑文档，题目见 <code>面试集.md</code>，场景见 <code>场景集.md</code>。</p>
+</blockquote>
+<hr>
+<h2 id="一、一句话介绍"><a href="#一、一句话介绍" class="headerlink" title="一、一句话介绍"></a>一、一句话介绍</h2><blockquote>
+<p>“我用 Go 从零实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，<br>并且完整走过了『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进过程。”</p>
+</blockquote>
+<hr>
+<h2 id="二、技术栈"><a href="#二、技术栈" class="headerlink" title="二、技术栈"></a>二、技术栈</h2><table>
+<thead>
+<tr>
+<th>层</th>
+<th>技术</th>
+<th>用来解决什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Web</td>
+<td>Gin</td>
+<td>HTTP 路由、中间件</td>
+</tr>
+<tr>
+<td>ORM</td>
+<td>GORM + MySQL 8</td>
+<td>数据持久化</td>
+</tr>
+<tr>
+<td>缓存</td>
+<td>Redis</td>
+<td>refresh token 白名单、原子操作</td>
+</tr>
+<tr>
+<td>鉴权</td>
+<td>JWT 双 token</td>
+<td>无感刷新 + 可撤销</td>
+</tr>
+<tr>
+<td>实时</td>
+<td>gorilla&#x2F;websocket</td>
+<td>消息推送、通话信令</td>
+</tr>
+<tr>
+<td>语音</td>
+<td>WebRTC 信令</td>
+<td>P2P 通话协商</td>
+</tr>
+<tr>
+<td>微服务</td>
+<td>gRPC</td>
+<td>服务间通信</td>
+</tr>
+<tr>
+<td>消息队列</td>
+<td>RabbitMQ</td>
+<td>异步投递、最终一致性</td>
+</tr>
+<tr>
+<td>并发</td>
+<td>goroutine&#x2F;channel&#x2F;RWMutex&#x2F;信号量</td>
+<td>WebSocket 管理、扇出控制</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、架构图"><a href="#三、架构图" class="headerlink" title="三、架构图"></a>三、架构图</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">                     ┌──────────────┐</span><br><span class="line">客户端 ──HTTP──────► │   gateway    │  :8080（鉴权/限流/协议转换）</span><br><span class="line">                     └──────┬───────┘</span><br><span class="line">                            │ gRPC</span><br><span class="line">              ┌─────────────┴─────────────┐</span><br><span class="line">              ▼                           ▼</span><br><span class="line">       ┌────────────┐              ┌────────────┐</span><br><span class="line">       │ user :9001 │              │ chat :9002 │</span><br><span class="line">       └─────┬──────┘              └─────┬──────┘</span><br><span class="line">             │                           │</span><br><span class="line">             └──────────┬────────────────┘</span><br><span class="line">                        ▼</span><br><span class="line">              ┌──────────────────┐</span><br><span class="line">              │ MySQL / Redis    │</span><br><span class="line">              └──────────────────┘</span><br><span class="line">                        │</span><br><span class="line">客户端 ◄──WebSocket──── │ ──► RabbitMQ（outbox worker + consumer）</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、里程碑回顾（每个都能独立讲）"><a href="#四、里程碑回顾（每个都能独立讲）" class="headerlink" title="四、里程碑回顾（每个都能独立讲）"></a>四、里程碑回顾（每个都能独立讲）</h2><table>
+<thead>
+<tr>
+<th>里程碑</th>
+<th>做了什么</th>
+<th>亮点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M0</td>
+<td>脚手架、配置、health</td>
+<td>分层：core&#x2F;global&#x2F;internal</td>
+</tr>
+<tr>
+<td>M1</td>
+<td>认证 + 用户 + 好友</td>
+<td><strong>双 token 无感刷新</strong>、<strong>接受好友申请事务</strong></td>
+</tr>
+<tr>
+<td>M2</td>
+<td>单聊 + WebSocket</td>
+<td><strong>消息幂等</strong>、<strong>游标分页</strong>、<strong>读写双泵</strong></td>
+</tr>
+<tr>
+<td>M3</td>
+<td>群聊</td>
+<td><strong>建群事务</strong>、群主权限、复用会话抽象</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>并发加固</td>
+<td><strong>优雅退出</strong>、<strong>滑动窗口限流</strong>、扇出限并发</td>
+</tr>
+<tr>
+<td>M5</td>
+<td>WebRTC 语音</td>
+<td><strong>信令转发</strong>、通话状态机</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>微服务</td>
+<td><strong>gRPC 拆分</strong>、gateway 模式</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>RabbitMQ</td>
+<td><strong>Outbox 模式</strong>、异步投递、降级</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、面试话术（按这个顺序讲）"><a href="#五、面试话术（按这个顺序讲）" class="headerlink" title="五、面试话术（按这个顺序讲）"></a>五、面试话术（按这个顺序讲）</h2><h3 id="1-开场（30-秒）"><a href="#1-开场（30-秒）" class="headerlink" title="1. 开场（30 秒）"></a>1. 开场（30 秒）</h3><blockquote>
+<p>“这个项目是一个仿微信的 IM 后端，Go + Gin + GORM + Redis + RabbitMQ + gRPC。<br>我按 8 个里程碑推进：先做认证和好友，再做单聊和 WebSocket，然后群聊、并发加固、WebRTC 语音，<br>最后拆微服务和接消息队列。每个里程碑都有完整的接口和测试。”</p>
+</blockquote>
+<h3 id="2-挑-2–3-个亮点深入（不要全讲）"><a href="#2-挑-2–3-个亮点深入（不要全讲）" class="headerlink" title="2. 挑 2–3 个亮点深入（不要全讲）"></a>2. 挑 2–3 个亮点深入（不要全讲）</h3><p><strong>亮点 A：双 token 无感刷新（M1）</strong></p>
+<blockquote>
+<p>“access token 2 小时、refresh token 30 天。refresh 的 jti 存 Redis 白名单，登出就能撤销。<br>刷新时用 <code>GETDEL</code> 原子消费旧 jti，配合 rotation 防止 refresh 被重复使用。<br>如果旧 jti 不存在，判定为盗用，撤销该用户所有 refresh——这就是复用检测。”</p>
+</blockquote>
+<p><strong>亮点 B：消息幂等（M2）</strong></p>
+<blockquote>
+<p>“客户端为每条消息生成 client_msg_id，数据库有 <code>UNIQUE(sender_id, client_msg_id)</code>。<br>先查后插，并发插入撞唯一索引时捕获 <code>gorm.ErrDuplicatedKey</code> 再查一次返回。<br>这样无论重试多少次，库里只有一条消息。”</p>
+</blockquote>
+<p><strong>亮点 C：WebSocket 架构（M2）</strong></p>
+<blockquote>
+<p>“每个连接一个读 goroutine + 一个写 goroutine，因为 gorilla&#x2F;websocket 不允许并发写。<br>Hub 用 RWMutex 管理 userID → 多连接（支持多端登录）。<br>心跳 ping&#x2F;pong 清理僵尸连接，慢消费者有界队列满了就断开，避免拖垮推送方。”</p>
+</blockquote>
+<p><strong>亮点 D：接受好友申请事务（M1）</strong></p>
+<blockquote>
+<p>“接受申请要改状态 + 插两条好友关系，必须在一个事务里。<br>用条件更新 <code>WHERE status=0</code> + RowsAffected 判断，天然抗并发重复接受。<br>还踩过软删除+唯一索引的坑：删除后再加好友会撞索引，所以用 Unscoped 查旧行然后恢复。”</p>
+</blockquote>
+<p><strong>亮点 E：Outbox 模式（M7）</strong></p>
+<blockquote>
+<p>“落库和发 MQ 无法原子。我在业务事务里同时写一条 outbox 记录，后台 worker 轮询发 MQ、标记已发送。<br>这样 MQ 挂了也不丢消息，消费方做幂等即可。MQ 不可用时降级为同步推送。”</p>
+</blockquote>
+<h3 id="3-被问「难点」怎么答"><a href="#3-被问「难点」怎么答" class="headerlink" title="3. 被问「难点」怎么答"></a>3. 被问「难点」怎么答</h3><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>答法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最难的部分</td>
+<td>WebSocket 并发管理（读写分离、慢消费者、心跳）+ 双 token 并发刷新</td>
+</tr>
+<tr>
+<td>踩过的坑</td>
+<td>软删除+唯一索引冲突、GORM 零值陷阱、事务里误用 global.DB、amqp.Table 不支持 uint</td>
+</tr>
+<tr>
+<td>怎么验证的</td>
+<td>每个接口都写了 curl 端到端脚本，WS 用 .NET ClientWebSocket 实测</td>
+</tr>
+<tr>
+<td>如果重做</td>
+<td>会话创建加唯一键防并发重复、未读数用 Redis 计数、WebSocket 多实例用 Redis 广播</td>
+</tr>
+</tbody></table>
+<h3 id="4-主动补充「可改进方向」（体现深度）"><a href="#4-主动补充「可改进方向」（体现深度）" class="headerlink" title="4. 主动补充「可改进方向」（体现深度）"></a>4. 主动补充「可改进方向」（体现深度）</h3><ul>
+<li>会话创建并发去重（唯一键 <code>single_key</code>）</li>
+<li>未读数用 Redis 计数器替代 N 次 count</li>
+<li>WebSocket 多实例：Redis Pub&#x2F;Sub 或 MQ 广播</li>
+<li>消息已读回执、消息撤回</li>
+<li>群通话（SFU&#x2F;MCU）</li>
+<li>链路追踪（trace_id）、监控指标</li>
+<li>测试覆盖率（目前主要是端到端脚本）</li>
+</ul>
+<hr>
+<h2 id="六、数据库表（12-张）"><a href="#六、数据库表（12-张）" class="headerlink" title="六、数据库表（12 张）"></a>六、数据库表（12 张）</h2><table>
+<thead>
+<tr>
+<th>域</th>
+<th>表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户</td>
+<td><code>users</code>、<code>user_settings</code></td>
+</tr>
+<tr>
+<td>好友</td>
+<td><code>friend_requests</code>、<code>friendships</code>、<code>friend_groups</code>、<code>blacklist</code></td>
+</tr>
+<tr>
+<td>聊天</td>
+<td><code>conversations</code>、<code>conversation_members</code>、<code>messages</code></td>
+</tr>
+<tr>
+<td>群聊</td>
+<td><code>groups</code></td>
+</tr>
+<tr>
+<td>通话</td>
+<td><code>call_records</code></td>
+</tr>
+<tr>
+<td>MQ</td>
+<td><code>outbox_messages</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、怎么读这个项目（学习路径）"><a href="#七、怎么读这个项目（学习路径）" class="headerlink" title="七、怎么读这个项目（学习路径）"></a>七、怎么读这个项目（学习路径）</h2><ol>
+<li><strong>先看本文</strong>（了解全貌）</li>
+<li><strong>读 <code>learn/00-学习总览.md</code></strong>（路线图 + 阅读方法）</li>
+<li><strong>按里程碑读</strong>：<code>m1</code> → <code>m7</code>，每篇都是「目标 → 设计思路 → 代码导读 → 注意点 → 面试点」</li>
+<li><strong>对照代码</strong>：每篇的「代码导读」表里有文件路径</li>
+<li><strong>用 <code>面试集.md</code> 自测</strong>：72 题，能讲出来才算会</li>
+<li><strong>用 <code>场景集.md</code> 练表达</strong>：30 个场景，按「问题→方案→关键点」讲</li>
+</ol>
+<h3 id="建议的动手练习"><a href="#建议的动手练习" class="headerlink" title="建议的动手练习"></a>建议的动手练习</h3><table>
+<thead>
+<tr>
+<th>练习</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>把 access token 改成 1 分钟</td>
+<td>观察无感刷新</td>
+</tr>
+<tr>
+<td>给群拉人加行锁</td>
+<td>理解并发控制</td>
+</tr>
+<tr>
+<td>把未读数改成 Redis 计数</td>
+<td>理解读扩散</td>
+</tr>
+<tr>
+<td>加消息撤回功能</td>
+<td>练习软删除&#x2F;事件</td>
+</tr>
+<tr>
+<td>用 protoc 替换 JSON codec</td>
+<td>体验标准 gRPC</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="八、项目状态"><a href="#八、项目状态" class="headerlink" title="八、项目状态"></a>八、项目状态</h2><ul>
+<li>✅ M0–M7 全部完成</li>
+<li>✅ 每个里程碑都有 git 提交</li>
+<li>✅ 每个里程碑都有学习文档</li>
+<li>✅ 所有关键接口都做过端到端实测</li>
+<li>✅ 面试集 72 题、场景集 30 个</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/100-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/" data-id="cuidtXB3-87XcmyzDanNmEXtr" data-title="项目总结与面试话术：怎么讲这个项目" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%A4%8D%E7%9B%98/" rel="tag">复盘</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%AF%9D%E6%9C%AF/" rel="tag">话术</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          仿微信前端与面试准备
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2026/11/13/99-%E5%9C%BA%E6%99%AF%E9%9B%86-30%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">场景集：30 个业务场景怎么实现</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%BB%8E0%E5%88%B01/">从0到1</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D/">开始之前</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/">里程碑</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">面试准备</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Outbox/" rel="tag">Outbox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/main/" rel="tag">main</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/protobuf/" rel="tag">protobuf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%A5%E9%97%A8/" rel="tag">入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%AB%E8%82%A1/" rel="tag">八股</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E5%B1%82/" rel="tag">分层</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" rel="tag">场景题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A4%8D%E7%9B%98/" rel="tag">复盘</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A5%BD%E5%8F%8B/" rel="tag">好友</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" rel="tag">学习路线</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%8E%92%E9%94%99/" rel="tag">排错</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" rel="tag">目录结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1/" rel="tag">设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AF%9D%E6%9C%AF/" rel="tag">话术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%85%8D%E7%BD%AE/" rel="tag">配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" rel="tag">阅读方法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/GORM/" style="font-size: 16.67px;">GORM</a> <a href="/blog/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/IM/" style="font-size: 10px;">IM</a> <a href="/blog/tags/JWT/" style="font-size: 13.33px;">JWT</a> <a href="/blog/tags/Outbox/" style="font-size: 10px;">Outbox</a> <a href="/blog/tags/P2P/" style="font-size: 13.33px;">P2P</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 13.33px;">RabbitMQ</a> <a href="/blog/tags/Redis/" style="font-size: 13.33px;">Redis</a> <a href="/blog/tags/WebRTC/" style="font-size: 16.67px;">WebRTC</a> <a href="/blog/tags/WebSocket/" style="font-size: 16.67px;">WebSocket</a> <a href="/blog/tags/gRPC/" style="font-size: 13.33px;">gRPC</a> <a href="/blog/tags/goroutine/" style="font-size: 13.33px;">goroutine</a> <a href="/blog/tags/main/" style="font-size: 10px;">main</a> <a href="/blog/tags/protobuf/" style="font-size: 10px;">protobuf</a> <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 20px;">事务</a> <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" style="font-size: 13.33px;">优雅退出</a> <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" style="font-size: 13.33px;">信令</a> <a href="/blog/tags/%E5%85%A5%E9%97%A8/" style="font-size: 20px;">入门</a> <a href="/blog/tags/%E5%85%AB%E8%82%A1/" style="font-size: 10px;">八股</a> <a href="/blog/tags/%E5%88%86%E5%B1%82/" style="font-size: 10px;">分层</a> <a href="/blog/tags/%E5%88%86%E9%A1%B5/" style="font-size: 13.33px;">分页</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">前端</a> <a href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" style="font-size: 10px;">场景题</a> <a href="/blog/tags/%E5%A4%8D%E7%9B%98/" style="font-size: 10px;">复盘</a> <a href="/blog/tags/%E5%A5%BD%E5%8F%8B/" style="font-size: 10px;">好友</a> <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" style="font-size: 13.33px;">学习路线</a> <a href="/blog/tags/%E5%B9%82%E7%AD%89/" style="font-size: 13.33px;">幂等</a> <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" style="font-size: 20px;">并发</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%8E%92%E9%94%99/" style="font-size: 10px;">排错</a> <a href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 10px;">最佳实践</a> <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" style="font-size: 13.33px;">最终一致性</a> <a href="/blog/tags/%E6%9D%83%E9%99%90/" style="font-size: 13.33px;">权限</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 10px;">架构</a> <a href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" style="font-size: 10px;">目录结构</a> <a href="/blog/tags/%E7%BE%A4%E8%81%8A/" style="font-size: 13.33px;">群聊</a> <a href="/blog/tags/%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">设计</a> <a href="/blog/tags/%E8%AF%9D%E6%9C%AF/" style="font-size: 10px;">话术</a> <a href="/blog/tags/%E8%B8%A9%E5%9D%91/" style="font-size: 10px;">踩坑</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">配置</a> <a href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" style="font-size: 10px;">阅读方法</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 13.33px;">限流</a> <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 16.67px;">面试</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/11/">十一月 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/">课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/">环境准备与项目启动（逐行讲解）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/">一次 HTTP 请求的完整链路（逐行）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/">代码地图：每个文件是干什么的</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/">踩坑集：24 个真实坑（含原因与解法）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/">项目介绍：从零实现一个仿微信 IM 后端</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">认证与好友：双 token 与事务</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/">实时消息与 WebSocket</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        <span style="color:#9ca3af">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM </span>
+      
+      &copy; 2026 gochat<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">首页</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/blog/about/" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>场景集：30 个业务场景怎么实现 | gochat 项目学习博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="从项目里提炼的关键业务场景：问题 → 处理方案 → 代码位置 → 关键点。用途：面试讲项目时按场景展开，或排查&#x2F;扩展功能时对照。   M1 · 认证与好友场景 1：用户注册问题：注册要保证「用户名唯一」，并同时创建默认设置。 方案：  先查用户名是否已存在（友好提示） bcrypt 加密密码 事务：插入 users + user_settings  代码：internal&#x2F;servic">
+<meta property="og:type" content="article">
+<meta property="og:title" content="场景集：30 个业务场景怎么实现">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/13/99-%E5%9C%BA%E6%99%AF%E9%9B%86-30%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="从项目里提炼的关键业务场景：问题 → 处理方案 → 代码位置 → 关键点。用途：面试讲项目时按场景展开，或排查&#x2F;扩展功能时对照。   M1 · 认证与好友场景 1：用户注册问题：注册要保证「用户名唯一」，并同时创建默认设置。 方案：  先查用户名是否已存在（友好提示） bcrypt 加密密码 事务：插入 users + user_settings  代码：internal&#x2F;servic">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-13T01:30:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:09:07.013Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="场景题">
+<meta property="article:tag" content="设计">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="gochat 项目学习博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+  <!-- 自定义美化样式（source/css/custom.css） -->
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">gochat 项目学习博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">Go + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives">归档</a>
+        
+          <a class="main-nav-link" href="/blog/about/">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://127.0.0.1:8080/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-99-场景集-30个业务场景" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/99-%E5%9C%BA%E6%99%AF%E9%9B%86-30%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T01:30:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">面试准备</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      场景集：30 个业务场景怎么实现
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>从项目里提炼的<strong>关键业务场景</strong>：问题 → 处理方案 → 代码位置 → 关键点。<br>用途：面试讲项目时按场景展开，或排查&#x2F;扩展功能时对照。</p>
+</blockquote>
+<hr>
+<h2 id="M1-·-认证与好友"><a href="#M1-·-认证与好友" class="headerlink" title="M1 · 认证与好友"></a>M1 · 认证与好友</h2><h3 id="场景-1：用户注册"><a href="#场景-1：用户注册" class="headerlink" title="场景 1：用户注册"></a>场景 1：用户注册</h3><p><strong>问题</strong>：注册要保证「用户名唯一」，并同时创建默认设置。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li>先查用户名是否已存在（友好提示）</li>
+<li>bcrypt 加密密码</li>
+<li><strong>事务</strong>：插入 <code>users</code> + <code>user_settings</code></li>
+</ol>
+<p><strong>代码</strong>：<code>internal/service/user_service/register_service.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>查重不是安全边界，<strong>唯一索引</strong>才是并发兜底</li>
+<li>密码永远不存明文，<code>PasswordHash</code> 字段 <code>json:&quot;-&quot;</code> 防泄露</li>
+<li>用户和设置必须成对出现 → 事务</li>
+</ul>
+<hr>
+<h3 id="场景-2：用户登录（签发双-token）"><a href="#场景-2：用户登录（签发双-token）" class="headerlink" title="场景 2：用户登录（签发双 token）"></a>场景 2：用户登录（签发双 token）</h3><p><strong>问题</strong>：登录成功要发 access + refresh 两个 token，并让 refresh 可撤销。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li>按 username 查用户，查不到 → 统一提示”用户名或密码错误”（防枚举）</li>
+<li>bcrypt 校验密码</li>
+<li>检查账号禁用状态</li>
+<li>签 access（2h，type&#x3D;access）</li>
+<li>签 refresh（30d，type&#x3D;refresh，带 jti）</li>
+<li><code>SET refresh:{uid}:{jti} 1 EX 30d</code> 存 Redis</li>
+<li>更新 <code>last_login_at</code>（非关键，失败不影响登录）</li>
+</ol>
+<p><strong>代码</strong>：<code>internal/service/user_service/login_service.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>不暴露”用户是否存在”</li>
+<li>Redis TTL 必须与 refresh 的 exp 对齐</li>
+<li><code>SaveRefresh</code> 失败要整体失败（否则用户能登录但永远刷新不了）</li>
+</ul>
+<hr>
+<h3 id="场景-3：access-token-过期-→-无感刷新"><a href="#场景-3：access-token-过期-→-无感刷新" class="headerlink" title="场景 3：access token 过期 → 无感刷新"></a>场景 3：access token 过期 → 无感刷新</h3><p><strong>问题</strong>：access 2 小时过期，用户不能被踢下线。</p>
+<p><strong>方案</strong>（客户端拦截器驱动）：</p>
+<ol>
+<li>请求返回 401</li>
+<li>客户端用 refresh token 调 <code>/token/refresh</code></li>
+<li>服务端：验签 → type&#x3D;refresh → <code>GETDEL</code> 消费旧 jti → rotation 签发新 token 对 → 存新 jti</li>
+<li>客户端用新 access 重试原请求</li>
+</ol>
+<p><strong>代码</strong>：<code>internal/service/user_service/refresh_service.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li><code>GETDEL</code> 原子消费，防并发双签发</li>
+<li>rotation：每次刷新换新 refresh，旧作废</li>
+<li>旧 jti 不存在 → 复用检测 → 撤销该用户全部 refresh</li>
+</ul>
+<hr>
+<h3 id="场景-4：并发刷新（5-个请求同时-401）"><a href="#场景-4：并发刷新（5-个请求同时-401）" class="headerlink" title="场景 4：并发刷新（5 个请求同时 401）"></a>场景 4：并发刷新（5 个请求同时 401）</h3><p><strong>问题</strong>：客户端同时发多个 refresh，rotation 会让第二个请求用旧 token → 触发复用检测 → 用户被强制下线。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li><strong>客户端 single-flight</strong>：刷新进行中，其他请求等待同一结果（治本）</li>
+<li>服务端 <code>GETDEL</code> 防双签发</li>
+<li>宽限期：消费 jti 时打一个 60s 的 <code>used:{jti}</code> 标记，宽限期内的重复请求不触发撤销</li>
+<li>（进阶）缓存「旧 jti → 新 token 对」实现幂等刷新</li>
+</ol>
+<p><strong>代码</strong>：<code>internal/service/user_service/refresh_service.go</code>（简化版）</p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>这是双 token + rotation 的经典坑</li>
+<li>面试可以讲：problem → 为什么误判 → 三层解法</li>
+</ul>
+<hr>
+<h3 id="场景-5：登出"><a href="#场景-5：登出" class="headerlink" title="场景 5：登出"></a>场景 5：登出</h3><p><strong>问题</strong>：JWT 无状态，怎么让 refresh 立即失效？</p>
+<p><strong>方案</strong>：客户端带 refresh token 调用 <code>/logout</code>，服务端解析出 jti 后 <code>DEL refresh:{uid}:{jti}</code>。<br>登出是幂等的（删不存在的 key 也算成功）。</p>
+<p><strong>代码</strong>：<code>internal/service/user_service/logout_service.go</code></p>
+<hr>
+<h3 id="场景-6：发好友申请"><a href="#场景-6：发好友申请" class="headerlink" title="场景 6：发好友申请"></a>场景 6：发好友申请</h3><p><strong>问题</strong>：要拦住各种非法加好友。</p>
+<p><strong>方案</strong>（6 条规则）：</p>
+<ol>
+<li>不能加自己</li>
+<li>目标用户必须存在</li>
+<li>不能已是好友</li>
+<li>不能重复发待处理申请（已拒绝可重发）</li>
+<li>对方拉黑了我 → 拒绝（模糊提示）</li>
+<li>对方关闭「允许加好友」</li>
+</ol>
+<p>落库时：<strong>有旧申请行就复用（重置为待处理），没有才插入</strong>（避开唯一索引）。</p>
+<p><strong>代码</strong>：<code>internal/service/friend_service/friend_service.go</code> 的 <code>SendRequest</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>先查后写有竞态，唯一索引兜底</li>
+<li>唯一索引 + 复用旧行 &#x3D; 同一对用户永远只有一行申请记录</li>
+</ul>
+<hr>
+<h3 id="场景-7：接受好友申请（事务-抗并发）"><a href="#场景-7：接受好友申请（事务-抗并发）" class="headerlink" title="场景 7：接受好友申请（事务 + 抗并发）"></a>场景 7：接受好友申请（事务 + 抗并发）</h3><p><strong>问题</strong>：接受申请要「改状态 + 插两条好友关系」，且要防重复接受。</p>
+<p><strong>方案</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">事务 &#123;</span><br><span class="line">  条件更新: UPDATE friend_requests SET status=<span class="number">1</span></span><br><span class="line">           WHERE id=? AND to_user_id=? AND status=<span class="number">0</span></span><br><span class="line">  RowsAffected=<span class="number">0</span> → 已被处理，回滚</span><br><span class="line">  查申请人</span><br><span class="line">  upsertFriendship(A→B)  <span class="comment">// 存在则恢复，不存在则插入</span></span><br><span class="line">  upsertFriendship(B→A)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>代码</strong>：<code>internal/service/friend_service/friend_service.go</code> 的 <code>AcceptRequest</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>条件更新让「判断+修改」原子化</li>
+<li>双向两行必须同事务</li>
+<li>软删除后重新加好友要复用旧行（<code>upsertFriendship</code>）</li>
+</ul>
+<hr>
+<h3 id="场景-8：删除好友后重新加回"><a href="#场景-8：删除好友后重新加回" class="headerlink" title="场景 8：删除好友后重新加回"></a>场景 8：删除好友后重新加回</h3><p><strong>问题</strong>：删除好友是软删（status&#x3D;2），重新加好友会撞唯一索引。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li>发申请时：复用旧的 <code>friend_requests</code> 行（重置 status&#x3D;0）</li>
+<li>接受时：<code>upsertFriendship</code> 用 <code>Unscoped()</code> 查到旧行，恢复 <code>status=1</code> 和 <code>deleted_at=null</code></li>
+</ol>
+<p><strong>代码</strong>：<code>SendRequest</code>、<code>upsertFriendship</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>实测：重新加回后 <code>friendship_id</code> 不变，说明是恢复不是重复插入</li>
+<li><strong>面试点</strong>：软删除 + 唯一索引的组合坑</li>
+</ul>
+<hr>
+<h3 id="场景-9：拉黑-取消拉黑"><a href="#场景-9：拉黑-取消拉黑" class="headerlink" title="场景 9：拉黑 &#x2F; 取消拉黑"></a>场景 9：拉黑 &#x2F; 取消拉黑</h3><p><strong>问题</strong>：拉黑要幂等；取消后还能重新拉黑。</p>
+<p><strong>方案</strong>：</p>
+<ul>
+<li>拉黑：<code>INSERT ... ON CONFLICT DO NOTHING</code>（<code>clause.OnConflict{DoNothing:true}</code>）→ 重复拉黑不报错</li>
+<li>取消：<strong>物理删除</strong>（<code>Unscoped().Delete</code>）→ 否则软删行会挡住下次拉黑</li>
+</ul>
+<p><strong>代码</strong>：<code>internal/service/friend_service/friend_service.go</code> 的 <code>AddBlacklist</code>、<code>RemoveBlacklist</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>“开关型”数据用物理删除更简单</li>
+<li><code>OnConflict DoNothing</code> 是幂等写入门槛最低的做法</li>
+</ul>
+<hr>
+<h3 id="场景-10：修改资料（部分更新）"><a href="#场景-10：修改资料（部分更新）" class="headerlink" title="场景 10：修改资料（部分更新）"></a>场景 10：修改资料（部分更新）</h3><p><strong>问题</strong>：用户只改昵称，不能把头像&#x2F;签名清空。</p>
+<p><strong>方案</strong>：</p>
+<ul>
+<li>请求结构体用<strong>指针</strong>：<code>Nickname *string</code> → nil 表示没传</li>
+<li>服务层用 <code>map[string]any</code> 组装要更新的字段</li>
+<li><code>Updates(map)</code> 不会忽略 <code>false</code>&#x2F;<code>0</code>&#x2F;<code>&quot;&quot;</code></li>
+</ul>
+<p><strong>代码</strong>：<code>internal/service/user_service/user_update_service.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>GORM 零值陷阱</li>
+<li>指针 &#x2F; map &#x2F; Select 三种解法</li>
+</ul>
+<hr>
+<h3 id="场景-11：好友列表-申请列表（避免-N-1）"><a href="#场景-11：好友列表-申请列表（避免-N-1）" class="headerlink" title="场景 11：好友列表 &#x2F; 申请列表（避免 N+1）"></a>场景 11：好友列表 &#x2F; 申请列表（避免 N+1）</h3><p><strong>问题</strong>：列表要展示对方的昵称&#x2F;头像，但不能每条查一次。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li>查关系表拿到一批 <code>friend_id</code> &#x2F; <code>from_user_id</code></li>
+<li>收集 id → <code>WHERE id IN (...)</code> 一次查 <code>users</code></li>
+<li>内存里 map 关联组装</li>
+</ol>
+<p><strong>代码</strong>：<code>ListFriends</code>、<code>ListIncomingRequests</code>（friend_service.go）</p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>2 次查询 vs 1+N 次</li>
+<li>慢查询日志 &#x2F; ORM 日志可以发现 N+1</li>
+</ul>
+<hr>
+<h3 id="场景-12：用户搜索"><a href="#场景-12：用户搜索" class="headerlink" title="场景 12：用户搜索"></a>场景 12：用户搜索</h3><p><strong>问题</strong>：加好友前要先找到人。</p>
+<p><strong>方案</strong>：<code>(username LIKE %kw% OR nickname LIKE %kw%) AND id &lt;&gt; self LIMIT 20</code><br>只返回公开字段（id&#x2F;username&#x2F;nickname&#x2F;avatar&#x2F;gender）。</p>
+<p><strong>代码</strong>：<code>internal/service/user_service/user_search_service.go</code>、<code>SearchUsers</code> handler</p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>排除自己、限制条数</li>
+<li><code>LIKE &#39;%x%&#39;</code> 不走索引（面试点）</li>
+<li>线上要限流防批量扫用户</li>
+</ul>
+<hr>
+<h2 id="M2-·-单聊与实时消息"><a href="#M2-·-单聊与实时消息" class="headerlink" title="M2 · 单聊与实时消息"></a>M2 · 单聊与实时消息</h2><h3 id="场景-13：创建单聊会话"><a href="#场景-13：创建单聊会话" class="headerlink" title="场景 13：创建单聊会话"></a>场景 13：创建单聊会话</h3><p><strong>问题</strong>：A、B 之间只能有一个单聊会话；双方谁先点开都要落到同一个 conversation。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li><code>conversation_members</code> 自连接查「同一个 conversation 下同时存在这两个 user」</li>
+<li>存在 → 直接返回；不存在 → 事务创建 conversation + 两个成员</li>
+</ol>
+<p><strong>代码</strong>：<code>internal/service/chat_service/conversation_service.go</code> 的 <code>CreateOrGetSingleConversation</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>单聊&#x2F;群聊共用 conversations 表，所以不能用「存两个 user_id」的方式判断</li>
+<li>并发创建可能产生重复会话（M4 用唯一键&#x2F;分布式锁解决）</li>
+</ul>
+<hr>
+<h3 id="场景-14：发送消息（幂等）"><a href="#场景-14：发送消息（幂等）" class="headerlink" title="场景 14：发送消息（幂等）"></a>场景 14：发送消息（幂等）</h3><p><strong>问题</strong>：网络重试&#x2F;连点会导致同一条消息被发多次。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li>客户端生成 <code>client_msg_id</code></li>
+<li>先查 <code>(sender_id, client_msg_id)</code> → 存在直接返回</li>
+<li>不存在 → <strong>事务</strong>：插消息 + 更新会话 <code>last_message_id/at</code></li>
+<li>并发插入撞唯一索引 → 捕获 <code>gorm.ErrDuplicatedKey</code> → 再查返回</li>
+</ol>
+<p><strong>代码</strong>：<code>internal/service/chat_service/message_service.go</code> 的 <code>SendMessage</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li><code>UNIQUE(sender_id, client_msg_id)</code> 是幂等的根基</li>
+<li><code>TranslateError: true</code> 让 Duplicate 错误可用 <code>errors.Is</code> 判断</li>
+<li>消息 + 会话冗余字段必须同事务</li>
+</ul>
+<hr>
+<h3 id="场景-15：拉取历史消息（分页）"><a href="#场景-15：拉取历史消息（分页）" class="headerlink" title="场景 15：拉取历史消息（分页）"></a>场景 15：拉取历史消息（分页）</h3><p><strong>问题</strong>：消息多，不能一次全拉；翻页不能错位。</p>
+<p><strong>方案</strong>：游标分页 <code>WHERE conversation_id=? AND id &lt; before_id ORDER BY id DESC LIMIT n</code>，<br>返回时翻转成正序。</p>
+<p><strong>代码</strong>：<code>ListMessages</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>不用 offset（越翻越慢、新消息导致错位）</li>
+<li>先校验成员身份，防越权</li>
+</ul>
+<hr>
+<h3 id="场景-16：WebSocket-实时推送"><a href="#场景-16：WebSocket-实时推送" class="headerlink" title="场景 16：WebSocket 实时推送"></a>场景 16：WebSocket 实时推送</h3><p><strong>问题</strong>：消息要实时到达在线用户。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li>客户端连 <code>ws://host/ws?token=&lt;access&gt;</code>，服务端校验 token 后升级</li>
+<li>注册到 Hub（userID → 多个连接）</li>
+<li>发消息成功后，<code>ws.PushMessage</code> 查会话成员 → 逐个 <code>SendToUser</code></li>
+<li>不在线的成员无需处理（消息已落库，上线拉历史）</li>
+</ol>
+<p><strong>代码</strong>：<code>internal/ws/hub.go</code>、<code>client.go</code>、<code>push.go</code>、<code>handler.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>读写下分离（gorilla 不能并发写）</li>
+<li>心跳清理僵尸连接</li>
+<li>慢消费者有界队列 + 断开</li>
+<li>HTTP 发消息和 WS 发消息共用同一个 <code>PushMessage</code></li>
+</ul>
+<hr>
+<h3 id="场景-17：在线状态查询"><a href="#场景-17：在线状态查询" class="headerlink" title="场景 17：在线状态查询"></a>场景 17：在线状态查询</h3><p><strong>问题</strong>：前端要显示好友是否在线。</p>
+<p><strong>方案</strong>：Hub 内存里 <code>IsOnline(userID)</code>；接口 <code>GET /api/v1/online?ids=1,2</code>。</p>
+<p><strong>代码</strong>：<code>internal/ws/hub.go</code>、<code>chat_api.go</code> 的 <code>GetOnlineStatus</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>M2 单机内存；多实例要用 Redis + TTL</li>
+<li>多端登录时「有任一连接在线」即算在线</li>
+</ul>
+<hr>
+<h3 id="场景-18：离线消息"><a href="#场景-18：离线消息" class="headerlink" title="场景 18：离线消息"></a>场景 18：离线消息</h3><p><strong>问题</strong>：用户不在线时别人发的消息，上线后要能看到。</p>
+<p><strong>方案</strong>：消息落库（<code>messages</code>）+ 上线拉历史 + <code>last_read_message_id</code> 算未读。<br><strong>不需要单独的离线消息表&#x2F;队列。</strong></p>
+<p><strong>代码</strong>：<code>SendMessage</code>、<code>ListMessages</code>、<code>ListConversations</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>“离线消息”本质是”持久化 + 拉取 + 未读数”</li>
+<li>未读数在会话列表里直接返回</li>
+</ul>
+<hr>
+<h2 id="M3-·-群聊"><a href="#M3-·-群聊" class="headerlink" title="M3 · 群聊"></a>M3 · 群聊</h2><h3 id="场景-19：建群"><a href="#场景-19：建群" class="headerlink" title="场景 19：建群"></a>场景 19：建群</h3><p><strong>问题</strong>：建群要同时创建会话、群信息、成员，且不能出现半成品。</p>
+<p><strong>方案</strong>：事务里依次：</p>
+<ol>
+<li>创建 <code>conversations</code>（Type&#x3D;2）</li>
+<li>创建 <code>groups</code>（关联 conversation_id，member_count&#x3D;成员数）</li>
+<li>插入群主（Role&#x3D;1）和其他成员</li>
+<li>校验用户存在、去重、人数上限</li>
+</ol>
+<p><strong>代码</strong>：<code>internal/service/group_service/group_service.go</code> 的 <code>CreateGroup</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>群聊复用 M2 的会话&#x2F;消息模型</li>
+<li>事务边界 &#x3D; 建群这个完整业务动作</li>
+</ul>
+<hr>
+<h3 id="场景-20：拉人进群-踢人-退群"><a href="#场景-20：拉人进群-踢人-退群" class="headerlink" title="场景 20：拉人进群 &#x2F; 踢人 &#x2F; 退群"></a>场景 20：拉人进群 &#x2F; 踢人 &#x2F; 退群</h3><p><strong>问题</strong>：成员变更要维护成员表 + 人数冗余，还要做权限控制。</p>
+<p><strong>方案</strong>：</p>
+<ul>
+<li>拉人：任何成员可拉；跳过已在群里的；校验上限；<strong>事务</strong>插成员 + <code>member_count + n</code></li>
+<li>踢人：只有群主；<strong>事务</strong>删成员 + <code>member_count - 1</code></li>
+<li>退群：自己退；群主不能直接退</li>
+</ul>
+<p><strong>代码</strong>：<code>AddMembers</code>、<code>RemoveMember</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>计数用 <code>gorm.Expr</code> 原子操作</li>
+<li>权限校验：群主校验 + 成员校验都要做</li>
+</ul>
+<hr>
+<h3 id="场景-21：改群资料-解散群"><a href="#场景-21：改群资料-解散群" class="headerlink" title="场景 21：改群资料 &#x2F; 解散群"></a>场景 21：改群资料 &#x2F; 解散群</h3><p><strong>问题</strong>：群资料和解散是敏感操作，只有群主能做。</p>
+<p><strong>方案</strong>：</p>
+<ul>
+<li>改群名&#x2F;公告：校验 <code>owner_id == operator</code>，用 map 部分更新</li>
+<li>解散：<code>status=2</code> + 软删会话</li>
+</ul>
+<p><strong>代码</strong>：<code>UpdateGroup</code>、<code>DissolveGroup</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>软删除保留审计数据</li>
+<li>解散后 <code>getGroupByID</code> 会因 <code>status</code> 过滤返回「群不存在或已解散」</li>
+</ul>
+<hr>
+<h3 id="场景-22：群消息"><a href="#场景-22：群消息" class="headerlink" title="场景 22：群消息"></a>场景 22：群消息</h3><p><strong>问题</strong>：群消息要发给所有成员。</p>
+<p><strong>方案</strong>：完全复用 M2：</p>
+<ul>
+<li><code>chatservice.SendMessage(convID, ...)</code> 落库</li>
+<li><code>ws.PushMessage(convID, item)</code> 查群成员逐个推送</li>
+</ul>
+<p><strong>代码</strong>：<code>chat_service</code> + <code>ws/push.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>群消息不需要新代码</li>
+<li>成员多时扇出放大 → M4 优化</li>
+</ul>
+<hr>
+<h2 id="M4-·-并发与稳定性"><a href="#M4-·-并发与稳定性" class="headerlink" title="M4 · 并发与稳定性"></a>M4 · 并发与稳定性</h2><h3 id="场景-23：优雅退出"><a href="#场景-23：优雅退出" class="headerlink" title="场景 23：优雅退出"></a>场景 23：优雅退出</h3><p><strong>问题</strong>：进程被 kill 时请求被硬切断、WS 连接没通知、DB 连接没释放。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li><code>http.Server</code> + <code>signal.Notify(SIGINT,SIGTERM)</code></li>
+<li>收到信号 → <code>srv.Shutdown(10s 超时)</code></li>
+<li><code>ws.DefaultHub.CloseAll()</code> 断开 WS</li>
+<li><code>core.CloseBaseServices()</code> 释放 DB&#x2F;Redis</li>
+</ol>
+<p><strong>代码</strong>：<code>main.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>顺序：HTTP → WS → DB</li>
+<li>Shutdown 必须带超时</li>
+</ul>
+<hr>
+<h3 id="场景-24：接口限流"><a href="#场景-24：接口限流" class="headerlink" title="场景 24：接口限流"></a>场景 24：接口限流</h3><p><strong>问题</strong>：登录&#x2F;注册&#x2F;搜索可被批量刷。</p>
+<p><strong>方案</strong>：滑动窗口限流中间件（内存 map + 懒清理），按 IP 计数。</p>
+<ul>
+<li>登录&#x2F;注册：20 次&#x2F;分钟</li>
+<li>搜索：30 次&#x2F;分钟</li>
+</ul>
+<p><strong>代码</strong>：<code>internal/middleware/ratelimit.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>滑动窗口避免固定窗口的边界突发</li>
+<li>单机内存局限，多实例要 Redis</li>
+</ul>
+<hr>
+<h3 id="场景-25：群消息扇出"><a href="#场景-25：群消息扇出" class="headerlink" title="场景 25：群消息扇出"></a>场景 25：群消息扇出</h3><p><strong>问题</strong>：200 人群一次消息要推 200 次，无脑起 goroutine 会瞬间膨胀。</p>
+<p><strong>方案</strong>：小会话顺序推送；大会话并发推送 + 信号量限制并发数（16）。</p>
+<p><strong>代码</strong>：<code>internal/ws/push.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>信号量（带缓冲 channel）控制并发</li>
+<li>慢消费者隔离（有界队列 + 断开）</li>
+</ul>
+<hr>
+<h3 id="场景-26：并发安全的连接管理"><a href="#场景-26：并发安全的连接管理" class="headerlink" title="场景 26：并发安全的连接管理"></a>场景 26：并发安全的连接管理</h3><p><strong>问题</strong>：Hub 被多个 goroutine 并发读写。</p>
+<p><strong>方案</strong>：<code>sync.RWMutex</code> + 持锁只复制数据、释放后再 IO；单元测试并发验证。</p>
+<p><strong>代码</strong>：<code>internal/ws/hub.go</code>、<code>hub_test.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>读写锁适合读多写少</li>
+<li><code>-race</code> 检测数据竞争（需 cgo）</li>
+</ul>
+<hr>
+<h2 id="M5-·-语音通话信令"><a href="#M5-·-语音通话信令" class="headerlink" title="M5 · 语音通话信令"></a>M5 · 语音通话信令</h2><h3 id="场景-27：发起-接听-挂断通话"><a href="#场景-27：发起-接听-挂断通话" class="headerlink" title="场景 27：发起 &#x2F; 接听 &#x2F; 挂断通话"></a>场景 27：发起 &#x2F; 接听 &#x2F; 挂断通话</h3><p><strong>问题</strong>：双方要建立 WebRTC 连接，需要交换 SDP&#x2F;ICE；同时要有通话状态和记录。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li>主叫 <code>call_invite</code> → 服务端建 call 记录（status&#x3D;呼叫中）→ 推 <code>call_incoming</code> 给被叫</li>
+<li>被叫 <code>call_accept</code> → 条件更新 status&#x3D;已接通、记 started_at → 双方收到 <code>call_accepted</code></li>
+<li>双方通过 <code>webrtc_offer/answer/ice</code> 交换连接信息（服务端原样转发 + from_user_id）</li>
+<li>任一方 <code>call_end</code> → 条件更新 status&#x3D;已结束、算 duration → 对方收到 <code>call_ended</code></li>
+</ol>
+<p><strong>代码</strong>：<code>call_service.go</code>、<code>ws/client.go</code> 的 <code>handleCall*</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>服务器不传音视频，只转发信令</li>
+<li>状态迁移用条件更新防连点</li>
+<li>信令复用 M2 的 WebSocket 长连接</li>
+</ul>
+<hr>
+<h3 id="场景-28：查询通话记录"><a href="#场景-28：查询通话记录" class="headerlink" title="场景 28：查询通话记录"></a>场景 28：查询通话记录</h3><p><strong>问题</strong>：用户要看到历史通话（谁打给谁、多久、什么状态）。</p>
+<p><strong>方案</strong>：<code>GET /api/v1/calls</code> 按时间倒序返回我的通话（作为主叫或被叫），用 <code>CallItem</code> DTO。</p>
+<p><strong>代码</strong>：<code>call_service.ListHistory</code>、<code>call_router</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>越权校验：只有通话双方能看</li>
+<li>DTO 避免暴露 GORM 内部字段</li>
+</ul>
+<hr>
+<h2 id="M6-·-微服务化"><a href="#M6-·-微服务化" class="headerlink" title="M6 · 微服务化"></a>M6 · 微服务化</h2><h3 id="场景-29：HTTP-gateway-→-gRPC-微服务"><a href="#场景-29：HTTP-gateway-→-gRPC-微服务" class="headerlink" title="场景 29：HTTP gateway → gRPC 微服务"></a>场景 29：HTTP gateway → gRPC 微服务</h3><p><strong>问题</strong>：单体里 service 直接调用；拆开后需要跨进程调用，还要统一鉴权入口。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li>按领域拆：user service(:9001)、chat service(:9002)</li>
+<li>gateway 保留 HTTP 入口，鉴权后通过 gRPC 调内部服务</li>
+<li>gRPC 用自定义 JSON codec（无 protoc 环境）</li>
+<li>错误码映射：gRPC NotFound → HTTP 502（带原始信息）</li>
+</ol>
+<p><strong>代码</strong>：<code>internal/grpcx/</code>、<code>internal/router/rpc_router/</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>按领域拆，不按技术层</li>
+<li>gateway 做协议转换 + 鉴权 + 限流</li>
+<li>服务地址来自配置（生产用服务发现）</li>
+</ul>
+<hr>
+<h2 id="M7-·-消息队列与最终一致性"><a href="#M7-·-消息队列与最终一致性" class="headerlink" title="M7 · 消息队列与最终一致性"></a>M7 · 消息队列与最终一致性</h2><h3 id="场景-30：消息异步投递（Outbox-模式）"><a href="#场景-30：消息异步投递（Outbox-模式）" class="headerlink" title="场景 30：消息异步投递（Outbox 模式）"></a>场景 30：消息异步投递（Outbox 模式）</h3><p><strong>问题</strong>：发消息要「落库 + 推送给所有在线成员」，同步做会让请求变慢，且 MQ 和 DB 无法原子。</p>
+<p><strong>方案</strong>：</p>
+<ol>
+<li><code>SendMessage</code> 事务里：写 messages + 更新 conversations + 写 outbox(status&#x3D;0)</li>
+<li>OutboxWorker 每 2s 轮询 status&#x3D;0 → 发 RabbitMQ → 标 status&#x3D;1（失败重试）</li>
+<li>Consumer 消费 → 解析事件 → <code>ws.PushToConversation</code> 推送</li>
+<li>MQ 不可用时降级为同步推送</li>
+</ol>
+<p><strong>代码</strong>：<code>internal/outbox/</code>、<code>internal/mq/mq.go</code>、<code>message_service.go</code></p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>outbox 必须在业务事务内写</li>
+<li>至少一次投递 → 消费需幂等</li>
+<li>MQ 要可降级</li>
+<li><code>amqp.Table</code> 不支持 uint（踩坑记录）</li>
+</ul>
+<hr>
+<h2 id="全部场景总结"><a href="#全部场景总结" class="headerlink" title="全部场景总结"></a>全部场景总结</h2><table>
+<thead>
+<tr>
+<th>里程碑</th>
+<th>场景数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M1 认证与好友</td>
+<td>1–12</td>
+</tr>
+<tr>
+<td>M2 单聊与实时消息</td>
+<td>13–18</td>
+</tr>
+<tr>
+<td>M3 群聊</td>
+<td>19–22</td>
+</tr>
+<tr>
+<td>M4 并发与稳定性</td>
+<td>23–26</td>
+</tr>
+<tr>
+<td>M5 语音通话</td>
+<td>27–28</td>
+</tr>
+<tr>
+<td>M6 微服务</td>
+<td>29</td>
+</tr>
+<tr>
+<td>M7 消息队列</td>
+<td>30</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/99-%E5%9C%BA%E6%99%AF%E9%9B%86-30%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF/" data-id="cuid2NnSNItw9gvCD5ftTtXP_" data-title="场景集：30 个业务场景怎么实现" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" rel="tag">场景题</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1/" rel="tag">设计</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2026/11/13/100-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          项目总结与面试话术：怎么讲这个项目
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2026/11/13/98-%E9%9D%A2%E8%AF%95%E9%9B%86-72%E9%A2%98/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">面试集：72 道高频题（含简答与代码位置）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%BB%8E0%E5%88%B01/">从0到1</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D/">开始之前</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/">里程碑</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">面试准备</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Outbox/" rel="tag">Outbox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/main/" rel="tag">main</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/protobuf/" rel="tag">protobuf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%A5%E9%97%A8/" rel="tag">入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%AB%E8%82%A1/" rel="tag">八股</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E5%B1%82/" rel="tag">分层</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" rel="tag">场景题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A4%8D%E7%9B%98/" rel="tag">复盘</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A5%BD%E5%8F%8B/" rel="tag">好友</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" rel="tag">学习路线</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%8E%92%E9%94%99/" rel="tag">排错</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" rel="tag">目录结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1/" rel="tag">设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AF%9D%E6%9C%AF/" rel="tag">话术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%85%8D%E7%BD%AE/" rel="tag">配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" rel="tag">阅读方法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/GORM/" style="font-size: 16.67px;">GORM</a> <a href="/blog/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/IM/" style="font-size: 10px;">IM</a> <a href="/blog/tags/JWT/" style="font-size: 13.33px;">JWT</a> <a href="/blog/tags/Outbox/" style="font-size: 10px;">Outbox</a> <a href="/blog/tags/P2P/" style="font-size: 13.33px;">P2P</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 13.33px;">RabbitMQ</a> <a href="/blog/tags/Redis/" style="font-size: 13.33px;">Redis</a> <a href="/blog/tags/WebRTC/" style="font-size: 16.67px;">WebRTC</a> <a href="/blog/tags/WebSocket/" style="font-size: 16.67px;">WebSocket</a> <a href="/blog/tags/gRPC/" style="font-size: 13.33px;">gRPC</a> <a href="/blog/tags/goroutine/" style="font-size: 13.33px;">goroutine</a> <a href="/blog/tags/main/" style="font-size: 10px;">main</a> <a href="/blog/tags/protobuf/" style="font-size: 10px;">protobuf</a> <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 20px;">事务</a> <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" style="font-size: 13.33px;">优雅退出</a> <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" style="font-size: 13.33px;">信令</a> <a href="/blog/tags/%E5%85%A5%E9%97%A8/" style="font-size: 20px;">入门</a> <a href="/blog/tags/%E5%85%AB%E8%82%A1/" style="font-size: 10px;">八股</a> <a href="/blog/tags/%E5%88%86%E5%B1%82/" style="font-size: 10px;">分层</a> <a href="/blog/tags/%E5%88%86%E9%A1%B5/" style="font-size: 13.33px;">分页</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">前端</a> <a href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" style="font-size: 10px;">场景题</a> <a href="/blog/tags/%E5%A4%8D%E7%9B%98/" style="font-size: 10px;">复盘</a> <a href="/blog/tags/%E5%A5%BD%E5%8F%8B/" style="font-size: 10px;">好友</a> <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" style="font-size: 13.33px;">学习路线</a> <a href="/blog/tags/%E5%B9%82%E7%AD%89/" style="font-size: 13.33px;">幂等</a> <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" style="font-size: 20px;">并发</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%8E%92%E9%94%99/" style="font-size: 10px;">排错</a> <a href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 10px;">最佳实践</a> <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" style="font-size: 13.33px;">最终一致性</a> <a href="/blog/tags/%E6%9D%83%E9%99%90/" style="font-size: 13.33px;">权限</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 10px;">架构</a> <a href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" style="font-size: 10px;">目录结构</a> <a href="/blog/tags/%E7%BE%A4%E8%81%8A/" style="font-size: 13.33px;">群聊</a> <a href="/blog/tags/%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">设计</a> <a href="/blog/tags/%E8%AF%9D%E6%9C%AF/" style="font-size: 10px;">话术</a> <a href="/blog/tags/%E8%B8%A9%E5%9D%91/" style="font-size: 10px;">踩坑</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">配置</a> <a href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" style="font-size: 10px;">阅读方法</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 13.33px;">限流</a> <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 16.67px;">面试</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/11/">十一月 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/">课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/">环境准备与项目启动（逐行讲解）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/">一次 HTTP 请求的完整链路（逐行）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/">代码地图：每个文件是干什么的</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/">踩坑集：24 个真实坑（含原因与解法）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/">项目介绍：从零实现一个仿微信 IM 后端</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">认证与好友：双 token 与事务</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/">实时消息与 WebSocket</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        <span style="color:#9ca3af">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM </span>
+      
+      &copy; 2026 gochat<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">首页</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/blog/about/" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

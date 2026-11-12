@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵） | gochat 项目学习博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M2: conversations&#x2F;messages models + idempotent send + history pagination + WebSocket hub&#x2F;client + online status   一、里程碑目标 会话管理：创建&#x2F;获取单聊会话、会话列表（含未读数） 消息：发送、历史拉取（">
+<meta property="og:type" content="article">
+<meta property="og:title" content="M2 详细设计：单聊与 WebSocket（幂等 &#x2F; 分页 &#x2F; 读写泵）">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/13/92-M2-%E5%8D%95%E8%81%8A%E4%B8%8EWebSocket-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M2: conversations&#x2F;messages models + idempotent send + history pagination + WebSocket hub&#x2F;client + online status   一、里程碑目标 会话管理：创建&#x2F;获取单聊会话、会话列表（含未读数） 消息：发送、历史拉取（">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://127.0.0.1:8080/blog/blog/images/websocket.svg">
+<meta property="article:published_time" content="2026-11-13T00:20:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:09:07.005Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="WebSocket">
+<meta property="article:tag" content="分页">
+<meta property="article:tag" content="幂等">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://127.0.0.1:8080/blog/blog/images/websocket.svg">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="gochat 项目学习博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+  <!-- 自定义美化样式（source/css/custom.css） -->
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">gochat 项目学习博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">Go + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives">归档</a>
+        
+          <a class="main-nav-link" href="/blog/about/">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://127.0.0.1:8080/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-92-M2-单聊与WebSocket-详细设计" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/11/13/92-M2-%E5%8D%95%E8%81%8A%E4%B8%8EWebSocket-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" class="article-date">
+  <time class="dt-published" datetime="2026-11-13T00:20:00.000Z" itemprop="datePublished">2026-11-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/">里程碑</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵）
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><img src="/blog/blog/images/websocket.svg" alt="WebSocket 连接管理架构"></p>
+<blockquote>
+<p>上图由项目手绘 SVG 说明，配合下文阅读效果更好。</p>
+</blockquote>
+<blockquote>
+<p>对应提交：<code>M2: conversations/messages models + idempotent send + history pagination + WebSocket hub/client + online status</code></p>
+</blockquote>
+<hr>
+<h2 id="一、里程碑目标"><a href="#一、里程碑目标" class="headerlink" title="一、里程碑目标"></a>一、里程碑目标</h2><ul>
+<li>会话管理：创建&#x2F;获取单聊会话、会话列表（含未读数）</li>
+<li>消息：发送、历史拉取（游标分页）、已读</li>
+<li><strong>WebSocket 长连接</strong>：实时收发消息</li>
+<li>在线状态</li>
+<li>离线消息（靠 DB 持久化 + 未读数）</li>
+</ul>
+<p>验收（已实测）：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>创建单聊会话</td>
+<td>200</td>
+</tr>
+<tr>
+<td>重复创建 → 同一会话</td>
+<td>200（conversation_id 相同）</td>
+</tr>
+<tr>
+<td>发消息</td>
+<td>200</td>
+</tr>
+<tr>
+<td>同一 client_msg_id 重发 → 同一条消息</td>
+<td>200（幂等）</td>
+</tr>
+<tr>
+<td>会话列表未读数</td>
+<td>unread&#x3D;1</td>
+</tr>
+<tr>
+<td>标记已读</td>
+<td>unread&#x3D;0</td>
+</tr>
+<tr>
+<td>HTTP 发消息 → 对方 WS 收到推送</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>WS 发消息 → 收到 ack + 广播</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>ping&#x2F;pong</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="二、数据模型：会话-消息-成员"><a href="#二、数据模型：会话-消息-成员" class="headerlink" title="二、数据模型：会话 + 消息 + 成员"></a>二、数据模型：会话 + 消息 + 成员</h2><h3 id="2-1-为什么单聊和群聊共用一张会话表"><a href="#2-1-为什么单聊和群聊共用一张会话表" class="headerlink" title="2.1 为什么单聊和群聊共用一张会话表"></a>2.1 为什么单聊和群聊共用一张会话表</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">conversations        (会话：单聊/群聊)</span><br><span class="line">conversation_members (成员：谁在会话里、读到哪)</span><br><span class="line">messages             (消息：conversation_id + sender_id + content)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>单聊：<code>Type=1</code>，两个成员</li>
+<li>群聊：<code>Type=2</code>，多个成员（M3 复用同一套表）</li>
+</ul>
+<p><strong>好处</strong>：消息表不需要区分单聊&#x2F;群聊，统一按 <code>conversation_id</code> 查。</p>
+<h3 id="2-2-为什么会话冗余最后消息"><a href="#2-2-为什么会话冗余最后消息" class="headerlink" title="2.2 为什么会话冗余最后消息"></a>2.2 为什么会话冗余最后消息</h3><p><code>conversations.last_message_id / last_message_at</code></p>
+<p>如果会话列表要展示”最后一条消息”，每次都去 <code>messages</code> 按 <code>conversation_id</code> 查最新一条，数据量大时很慢。<br>把最后消息信息冗余到会话行 → 列表查询变成一次简单查询（空间换时间）。</p>
+<h3 id="2-3-未读数怎么算"><a href="#2-3-未读数怎么算" class="headerlink" title="2.3 未读数怎么算"></a>2.3 未读数怎么算</h3><p><code>conversation_members.last_read_message_id</code> 记录”我读到哪了”。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">未读数 = messages WHERE conversation_id=? AND id &gt; last_read_message_id AND sender_id != 我</span><br></pre></td></tr></table></figure>
+
+<p>标记已读 &#x3D; 更新 <code>last_read_message_id</code>（只前进不后退）。</p>
+<blockquote>
+<p>比单独建 <code>message_reads</code> 表简单，M2 先用这个方案。</p>
+</blockquote>
+<hr>
+<h2 id="三、消息幂等（重点）"><a href="#三、消息幂等（重点）" class="headerlink" title="三、消息幂等（重点）"></a>三、消息幂等（重点）</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>网络重试、用户连点、WS 重发都会导致<strong>同一条逻辑消息被发送多次</strong>。</p>
+<h3 id="方案：客户端生成唯一-client-msg-id"><a href="#方案：客户端生成唯一-client-msg-id" class="headerlink" title="方案：客户端生成唯一 client_msg_id"></a>方案：客户端生成唯一 <code>client_msg_id</code></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">messages: UNIQUE(sender_id, client_msg_id)</span><br></pre></td></tr></table></figure>
+
+<p>服务端处理：</p>
+<ol>
+<li>先查 <code>(sender_id, client_msg_id)</code> 是否已存在 → 存在直接返回（重复请求返回同一条）</li>
+<li>不存在 → 插入</li>
+<li>并发下两个请求同时插入 → 唯一索引让第二个报 Duplicate</li>
+<li>捕获 <code>gorm.ErrDuplicatedKey</code> → 再查一次返回已有消息</li>
+</ol>
+<p><strong>结果</strong>：无论客户端重试多少次，数据库里只有一条消息。</p>
+<h3 id="配套：TranslateError-true"><a href="#配套：TranslateError-true" class="headerlink" title="配套：TranslateError: true"></a>配套：<code>TranslateError: true</code></h3><p>GORM 配置里开启 <code>TranslateError</code>，把 MySQL 的 <code>Duplicate entry</code> 错误翻译成 <code>gorm.ErrDuplicatedKey</code>，<br>这样业务代码用 <code>errors.Is(err, gorm.ErrDuplicatedKey)</code> 判断，不用匹配错误字符串。</p>
+<hr>
+<h2 id="四、分页：为什么用游标不用-offset"><a href="#四、分页：为什么用游标不用-offset" class="headerlink" title="四、分页：为什么用游标不用 offset"></a>四、分页：为什么用游标不用 offset</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- offset 分页</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> messages <span class="keyword">WHERE</span> conversation_id<span class="operator">=</span>? <span class="keyword">ORDER</span> <span class="keyword">BY</span> id <span class="keyword">DESC</span> LIMIT <span class="number">20</span> <span class="keyword">OFFSET</span> <span class="number">1000</span>;</span><br><span class="line"><span class="comment">-- 越翻越慢：数据库要扫描并跳过前 1000 行；新消息插入还会导致翻页错位/重复</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 游标分页</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> messages <span class="keyword">WHERE</span> conversation_id<span class="operator">=</span>? <span class="keyword">AND</span> id <span class="operator">&lt;</span> ? <span class="keyword">ORDER</span> <span class="keyword">BY</span> id <span class="keyword">DESC</span> LIMIT <span class="number">20</span>;</span><br><span class="line"><span class="comment">-- 用上一页最后一条 id 作锚点，性能稳定、不会错位</span></span><br></pre></td></tr></table></figure>
+
+<p>返回时把倒序结果翻转成正序，前端直接渲染。</p>
+<hr>
+<h2 id="五、WebSocket-架构（M2-最核心）"><a href="#五、WebSocket-架构（M2-最核心）" class="headerlink" title="五、WebSocket 架构（M2 最核心）"></a>五、WebSocket 架构（M2 最核心）</h2><h3 id="5-1-三个角色"><a href="#5-1-三个角色" class="headerlink" title="5.1 三个角色"></a>5.1 三个角色</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Hub      ：管理所有连接（userID → 多个连接），并发安全</span><br><span class="line">Client   ：一个连接，含读 goroutine + 写 goroutine</span><br><span class="line">ServeWS  ：HTTP 握手升级 + token 校验</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-为什么读写分离"><a href="#5-2-为什么读写分离" class="headerlink" title="5.2 为什么读写分离"></a>5.2 为什么读写分离</h3><p>gorilla&#x2F;websocket <strong>不允许并发写</strong>。如果多个 goroutine 同时写同一个连接会 panic。<br>所以：</p>
+<ul>
+<li><code>ReadPump</code>：唯一从 socket 读的 goroutine</li>
+<li><code>WritePump</code>：唯一往 socket 写的 goroutine</li>
+<li>其他 goroutine 想发消息 &#x3D; 往 <code>Client.send</code> channel 里塞数据</li>
+</ul>
+<h3 id="5-3-Hub-的并发安全"><a href="#5-3-Hub-的并发安全" class="headerlink" title="5.3 Hub 的并发安全"></a>5.3 Hub 的并发安全</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Hub <span class="keyword">struct</span> &#123;</span><br><span class="line">    mu      sync.RWMutex</span><br><span class="line">    clients <span class="keyword">map</span>[<span class="type">uint64</span>]<span class="keyword">map</span>[*Client]<span class="keyword">struct</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Hub 被「连接建立&#x2F;断开」和「消息推送」多个 goroutine 同时访问 → 必须加锁</li>
+<li>读写锁：读多写少，比 Mutex 性能好</li>
+<li><code>SendToUser</code> 里先把连接列表<strong>复制</strong>出来，再释放锁发送，避免持锁做 IO</li>
+</ul>
+<h3 id="5-4-心跳机制"><a href="#5-4-心跳机制" class="headerlink" title="5.4 心跳机制"></a>5.4 心跳机制</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">conn.SetReadDeadline(time.Now().Add(pongWait))       <span class="comment">// 60s 没收到 pong 就断开</span></span><br><span class="line">conn.SetPongHandler(<span class="function"><span class="keyword">func</span><span class="params">(<span class="type">string</span>)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> conn.SetReadDeadline(time.Now().Add(pongWait))  <span class="comment">// 收到 pong 续期</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// WritePump 每 54s 发一次 ping</span></span><br></pre></td></tr></table></figure>
+
+<p>作用：清理「网线拔了但 TCP 没断」的僵尸连接。</p>
+<h3 id="5-5-慢消费者隔离"><a href="#5-5-慢消费者隔离" class="headerlink" title="5.5 慢消费者隔离"></a>5.5 慢消费者隔离</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> &#123;</span><br><span class="line"><span class="keyword">case</span> c.send &lt;- payload:</span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    c.Close()   <span class="comment">// 队列满了 → 断开这个慢连接</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果客户端很慢，<code>send</code> channel 满了，直接阻塞会拖垮推送方（可能是给其他用户推消息的 goroutine）。<br>用 non-blocking 写 + 断开慢连接，保证一个慢客户端不影响其他人。</p>
+<blockquote>
+<p>这是消息系统「慢消费者」问题的通用解法（Kafka&#x2F;RabbitMQ 里也有类似思路）。</p>
+</blockquote>
+<h3 id="5-6-推送路径统一"><a href="#5-6-推送路径统一" class="headerlink" title="5.6 推送路径统一"></a>5.6 推送路径统一</h3><p>HTTP 发消息 和 WS 发消息，最终都要「推送给会话所有在线成员」。<br>所以抽出 <code>ws.PushMessage(convID, item)</code>：</p>
+<ul>
+<li>HTTP handler 发完消息调用</li>
+<li>WS 的 <code>handleText</code> 发完消息也调用</li>
+</ul>
+<blockquote>
+<p>为什么放 ws 包而不是 service：service 不应该依赖 WebSocket（M6 拆 gRPC 时没有 WS）。</p>
+</blockquote>
+<hr>
+<h2 id="六、鉴权：WS-怎么带-token"><a href="#六、鉴权：WS-怎么带-token" class="headerlink" title="六、鉴权：WS 怎么带 token"></a>六、鉴权：WS 怎么带 token</h2><p>浏览器 WebSocket API <strong>不能自定义请求头</strong>（不能带 <code>Authorization</code>）。<br>所以：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ws://127.0.0.1:8080/ws?token=&lt;access_token&gt;</span><br></pre></td></tr></table></figure>
+
+<p>服务端在<strong>升级连接之前</strong>先校验 token，非法直接 401，不浪费连接资源。<br>（同时兼容非浏览器客户端的 <code>Authorization: Bearer</code>。）</p>
+<hr>
+<h2 id="七、在线状态与离线消息"><a href="#七、在线状态与离线消息" class="headerlink" title="七、在线状态与离线消息"></a>七、在线状态与离线消息</h2><h3 id="在线状态"><a href="#在线状态" class="headerlink" title="在线状态"></a>在线状态</h3><ul>
+<li>Hub 里 <code>IsOnline(userID)</code> 判断是否在线</li>
+<li>接口：<code>GET /api/v1/online?ids=1,2,3</code> → <code>{&quot;online_ids&quot;:[1]}</code></li>
+</ul>
+<blockquote>
+<p>M2 是单机内存；M4&#x2F;M6 多实例要改成 Redis（每个实例写入在线用户 + TTL 续期）。</p>
+</blockquote>
+<h3 id="离线消息"><a href="#离线消息" class="headerlink" title="离线消息"></a>离线消息</h3><p><strong>不需要单独的表</strong>：</p>
+<ul>
+<li>消息已经落库到 <code>messages</code></li>
+<li>用户上线后通过 <code>GET /conversations/:id/messages</code> 拉历史</li>
+<li>通过 <code>unread</code> 计数知道有多少没读</li>
+</ul>
+<p>这就是”离线消息”的标准做法：<strong>持久化 + 上线拉取 + 未读数</strong>。</p>
+<hr>
+<h2 id="八、代码导读"><a href="#八、代码导读" class="headerlink" title="八、代码导读"></a>八、代码导读</h2><table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作用</th>
+<th>重点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>internal/model/chat_model/chat_model.go</code></td>
+<td>会话&#x2F;成员&#x2F;消息模型</td>
+<td>单聊群聊共用、幂等唯一索引</td>
+</tr>
+<tr>
+<td><code>internal/service/chat_service/conversation_service.go</code></td>
+<td>会话创建&#x2F;列表&#x2F;已读</td>
+<td>会话去重、未读数</td>
+</tr>
+<tr>
+<td><code>internal/service/chat_service/message_service.go</code></td>
+<td>发消息&#x2F;历史</td>
+<td><strong>幂等、事务、游标分页</strong></td>
+</tr>
+<tr>
+<td><code>internal/ws/hub.go</code></td>
+<td>连接管理</td>
+<td>RWMutex、多端连接、慢消费者</td>
+</tr>
+<tr>
+<td><code>internal/ws/client.go</code></td>
+<td>读写泵</td>
+<td>心跳、读写下分离、消息处理</td>
+</tr>
+<tr>
+<td><code>internal/ws/handler.go</code></td>
+<td>握手鉴权</td>
+<td>token、Upgrade</td>
+</tr>
+<tr>
+<td><code>internal/ws/push.go</code></td>
+<td>统一推送</td>
+<td>HTTP&#x2F;WS 共用</td>
+</tr>
+<tr>
+<td><code>internal/router/chat_router/chat_api.go</code></td>
+<td>HTTP 接口</td>
+<td>会话&#x2F;消息&#x2F;在线状态</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="九、注意点清单"><a href="#九、注意点清单" class="headerlink" title="九、注意点清单"></a>九、注意点清单</h2><ol>
+<li><strong>gorilla&#x2F;websocket 不能并发写</strong> → 写操作只在 WritePump</li>
+<li><strong>WS 的 ctx 用 <code>context.Background()</code></strong>：连接生命周期远长于 HTTP 请求</li>
+<li><strong>Hub 持锁时不要做 IO&#x2F;channel 操作</strong> → 先复制连接列表再发</li>
+<li><strong>慢消费者要断开</strong>，不能阻塞推送方</li>
+<li><strong>WS 鉴权在 Upgrade 之前</strong>，别升级完再校验</li>
+<li><strong><code>CheckOrigin</code> 生产环境必须校验</strong>，否则有 CSWSH 跨站 WebSocket 劫持</li>
+<li><strong>消息 ID 用自增</strong>：单库单表够用；分库分表时要用雪花算法&#x2F;号段</li>
+<li><strong>未读数是 N 次 count</strong>，会话多时要优化（Redis 计数）</li>
+<li><strong>游标分页不要用 offset</strong></li>
+<li><strong>client_msg_id 必须由客户端生成</strong>，服务端不能自己造（否则重试无法幂等）</li>
+</ol>
+<hr>
+<h2 id="十、面试点（M2）"><a href="#十、面试点（M2）" class="headerlink" title="十、面试点（M2）"></a>十、面试点（M2）</h2><ol>
+<li>WebSocket 和 HTTP 长轮询&#x2F;SSE 有什么区别？为什么 IM 用 WebSocket？</li>
+<li>为什么 WebSocket 要读写分离？gorilla&#x2F;websocket 并发写会怎样？</li>
+<li>心跳机制解决什么问题？ping&#x2F;pong 怎么做？</li>
+<li>如何管理大量 WebSocket 连接？Hub 怎么设计？多实例怎么办？</li>
+<li>消息怎么保证不重复？（client_msg_id + 唯一索引）</li>
+<li>消息乱序怎么办？（服务端 ID 递增 + 客户端按 ID 排序）</li>
+<li>离线消息怎么实现？（持久化 + 上线拉取 + 未读数）</li>
+<li>游标分页 vs offset 分页？</li>
+<li>慢消费者怎么处理？（有界队列 + 断开）</li>
+<li>WS 怎么鉴权？（query token，因为浏览器 WS 不能带 header）</li>
+<li>未读数怎么高效计算？（last_read_message_id vs Redis 计数）</li>
+</ol>
+<hr>
+<h2 id="十一、下一步（M3-群聊）"><a href="#十一、下一步（M3-群聊）" class="headerlink" title="十一、下一步（M3 群聊）"></a>十一、下一步（M3 群聊）</h2><p>M3 会复用 M2 的「会话 + 消息 + 成员」模型，只需：</p>
+<ul>
+<li>建 <code>groups</code> 表（群信息）</li>
+<li>建群：创建 conversation(Type&#x3D;2) + 群主成员</li>
+<li>加群 &#x2F; 退群 &#x2F; 踢人</li>
+<li>群消息：发送时推送给所有成员（M2 的 <code>PushMessage</code> 已经支持！）</li>
+<li>群里成员多时要注意扇出性能（M4 并发专题）</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/92-M2-%E5%8D%95%E8%81%8A%E4%B8%8EWebSocket-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" data-id="cuid9qNiaNgS8970Swq40xNCd" data-title="M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2026/11/13/93-M3-%E7%BE%A4%E8%81%8A-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          M3 详细设计：群聊（建群事务 / 权限 / 人数统计）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2026/11/13/91-M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">M1 详细设计：认证与好友（双 token / 事务 / 软删除）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%BB%8E0%E5%88%B01/">从0到1</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D/">开始之前</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/">里程碑</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">面试准备</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Outbox/" rel="tag">Outbox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/main/" rel="tag">main</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/protobuf/" rel="tag">protobuf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%A5%E9%97%A8/" rel="tag">入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%AB%E8%82%A1/" rel="tag">八股</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E5%B1%82/" rel="tag">分层</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" rel="tag">场景题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A4%8D%E7%9B%98/" rel="tag">复盘</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A5%BD%E5%8F%8B/" rel="tag">好友</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" rel="tag">学习路线</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%8E%92%E9%94%99/" rel="tag">排错</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" rel="tag">目录结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1/" rel="tag">设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AF%9D%E6%9C%AF/" rel="tag">话术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%85%8D%E7%BD%AE/" rel="tag">配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" rel="tag">阅读方法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/GORM/" style="font-size: 16.67px;">GORM</a> <a href="/blog/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/IM/" style="font-size: 10px;">IM</a> <a href="/blog/tags/JWT/" style="font-size: 13.33px;">JWT</a> <a href="/blog/tags/Outbox/" style="font-size: 10px;">Outbox</a> <a href="/blog/tags/P2P/" style="font-size: 13.33px;">P2P</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 13.33px;">RabbitMQ</a> <a href="/blog/tags/Redis/" style="font-size: 13.33px;">Redis</a> <a href="/blog/tags/WebRTC/" style="font-size: 16.67px;">WebRTC</a> <a href="/blog/tags/WebSocket/" style="font-size: 16.67px;">WebSocket</a> <a href="/blog/tags/gRPC/" style="font-size: 13.33px;">gRPC</a> <a href="/blog/tags/goroutine/" style="font-size: 13.33px;">goroutine</a> <a href="/blog/tags/main/" style="font-size: 10px;">main</a> <a href="/blog/tags/protobuf/" style="font-size: 10px;">protobuf</a> <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 20px;">事务</a> <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" style="font-size: 13.33px;">优雅退出</a> <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" style="font-size: 13.33px;">信令</a> <a href="/blog/tags/%E5%85%A5%E9%97%A8/" style="font-size: 20px;">入门</a> <a href="/blog/tags/%E5%85%AB%E8%82%A1/" style="font-size: 10px;">八股</a> <a href="/blog/tags/%E5%88%86%E5%B1%82/" style="font-size: 10px;">分层</a> <a href="/blog/tags/%E5%88%86%E9%A1%B5/" style="font-size: 13.33px;">分页</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">前端</a> <a href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" style="font-size: 10px;">场景题</a> <a href="/blog/tags/%E5%A4%8D%E7%9B%98/" style="font-size: 10px;">复盘</a> <a href="/blog/tags/%E5%A5%BD%E5%8F%8B/" style="font-size: 10px;">好友</a> <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" style="font-size: 13.33px;">学习路线</a> <a href="/blog/tags/%E5%B9%82%E7%AD%89/" style="font-size: 13.33px;">幂等</a> <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" style="font-size: 20px;">并发</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%8E%92%E9%94%99/" style="font-size: 10px;">排错</a> <a href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 10px;">最佳实践</a> <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" style="font-size: 13.33px;">最终一致性</a> <a href="/blog/tags/%E6%9D%83%E9%99%90/" style="font-size: 13.33px;">权限</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 10px;">架构</a> <a href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" style="font-size: 10px;">目录结构</a> <a href="/blog/tags/%E7%BE%A4%E8%81%8A/" style="font-size: 13.33px;">群聊</a> <a href="/blog/tags/%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">设计</a> <a href="/blog/tags/%E8%AF%9D%E6%9C%AF/" style="font-size: 10px;">话术</a> <a href="/blog/tags/%E8%B8%A9%E5%9D%91/" style="font-size: 10px;">踩坑</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">配置</a> <a href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" style="font-size: 10px;">阅读方法</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 13.33px;">限流</a> <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 16.67px;">面试</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/11/">十一月 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/">课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/">环境准备与项目启动（逐行讲解）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/">一次 HTTP 请求的完整链路（逐行）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/">代码地图：每个文件是干什么的</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/">踩坑集：24 个真实坑（含原因与解法）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/">项目介绍：从零实现一个仿微信 IM 后端</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">认证与好友：双 token 与事务</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/">实时消息与 WebSocket</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        <span style="color:#9ca3af">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM </span>
+      
+      &copy; 2026 gochat<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">首页</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/blog/about/" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

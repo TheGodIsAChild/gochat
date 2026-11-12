@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 500" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">
+  <defs>
+    <marker id="a3" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#475569"/></marker>
+    <marker id="p3" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#7c3aed"/></marker>
+  </defs>
+  <rect width="860" height="500" fill="#ffffff"/>
+  <text x="30" y="38" font-size="22" font-weight="700" fill="#0f172a">分层架构与依赖方向</text>
+  <text x="30" y="62" font-size="13" fill="#64748b">依赖只能单向向下，不允许反向依赖</text>
+
+  <rect x="250" y="90" width="360" height="62" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="430" y="116" text-anchor="middle" font-size="15" font-weight="700" fill="#1e3a8a">router / handler</text>
+  <text x="430" y="138" text-anchor="middle" font-size="12" fill="#1d4ed8">解析请求 · 参数校验 · 写响应 · 不做业务</text>
+
+  <rect x="250" y="180" width="360" height="62" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="430" y="206" text-anchor="middle" font-size="15" font-weight="700" fill="#166534">service</text>
+  <text x="430" y="228" text-anchor="middle" font-size="12" fill="#15803d">业务逻辑 · 事务边界 · 调用 model</text>
+
+  <rect x="250" y="270" width="360" height="62" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="430" y="296" text-anchor="middle" font-size="15" font-weight="700" fill="#92400e">model / global.DB</text>
+  <text x="430" y="318" text-anchor="middle" font-size="12" fill="#b45309">GORM 模型 · 数据库读写</text>
+
+  <rect x="250" y="360" width="360" height="62" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="430" y="386" text-anchor="middle" font-size="15" font-weight="700" fill="#334155">MySQL / Redis</text>
+  <text x="430" y="408" text-anchor="middle" font-size="12" fill="#64748b">持久化与缓存</text>
+
+  <line x1="430" y1="152" x2="430" y2="175" stroke="#475569" stroke-width="2" marker-end="url(#a3)"/>
+  <line x1="430" y1="242" x2="430" y2="265" stroke="#475569" stroke-width="2" marker-end="url(#a3)"/>
+  <line x1="430" y1="332" x2="430" y2="355" stroke="#475569" stroke-width="2" marker-end="url(#a3)"/>
+
+  <!-- 旁注 -->
+  <text x="640" y="116" font-size="12" fill="#7c3aed">接收 *gin.Context</text>
+  <text x="640" y="136" font-size="12" fill="#7c3aed">c.Request.Context() 传给下层</text>
+  <text x="640" y="206" font-size="12" fill="#7c3aed">接收 context.Context</text>
+  <text x="640" y="226" font-size="12" fill="#7c3aed">不 import gin（M6 可换 gRPC）</text>
+  <text x="640" y="296" font-size="12" fill="#7c3aed">只描述表结构</text>
+  <text x="640" y="316" font-size="12" fill="#7c3aed">不掺业务逻辑</text>
+
+  <rect x="30" y="96" width="180" height="70" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="120" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#991b1b">为什么分层</text>
+  <text x="120" y="146" text-anchor="middle" font-size="11" fill="#b91c1c">换框架/拆服务时</text>
+  <text x="120" y="160" text-anchor="middle" font-size="11" fill="#b91c1c">只改最上层</text>
+</svg>

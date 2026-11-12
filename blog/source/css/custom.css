@@ -1,0 +1,171 @@
+/* =========================================================
+   gochat 学习博客 · 自定义美化样式
+   覆盖 landscape 主题的部分样式，提升中文阅读体验
+   ========================================================= */
+
+/* 全局字体与行高：中文阅读更舒适 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+               "Helvetica Neue", Arial, sans-serif;
+  color: #2c3e50;
+  font-size: 16px;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 文章正文排版 */
+.article-entry {
+  font-size: 16px;
+  line-height: 1.9;
+  color: #333;
+}
+.article-entry p { margin: 0.9em 0; }
+
+/* 标题层级：更明显的层次 */
+.article-entry h2 {
+  font-size: 1.5em;
+  margin: 1.8em 0 0.8em;
+  padding-bottom: 0.35em;
+  border-bottom: 2px solid #07c160;
+  color: #1a1a1a;
+}
+.article-entry h3 {
+  font-size: 1.22em;
+  margin: 1.5em 0 0.6em;
+  color: #1a1a1a;
+}
+.article-entry h3::before {
+  content: "▍";
+  color: #07c160;
+  margin-right: 6px;
+}
+.article-entry h4 { font-size: 1.08em; margin: 1.2em 0 0.5em; color: #333; }
+
+/* 行内代码 */
+.article-entry code {
+  background: #f2f4f5;
+  color: #c7254e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+/* 代码块：圆角 + 内边距 + 高亮头 */
+.article-entry pre {
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin: 1.2em 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+.article-entry .highlight {
+  border-radius: 8px;
+  margin: 1.2em 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* 引用块：做成「提示框」风格 */
+.article-entry blockquote {
+  border-left: 4px solid #07c160;
+  background: #f0fdf4;
+  padding: 12px 18px;
+  margin: 1.2em 0;
+  border-radius: 0 8px 8px 0;
+  color: #365314;
+}
+
+/* 表格：斑马纹 + 圆角 */
+.article-entry table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 14.5px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+.article-entry table th {
+  background: #07c160;
+  color: #fff;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+}
+.article-entry table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid #eee;
+}
+.article-entry table tr:nth-child(even) td { background: #fafafa; }
+
+/* 图片：圆角 + 居中 + 说明 */
+.article-entry img {
+  display: block;
+  max-width: 100%;
+  margin: 1.4em auto;
+  border-radius: 10px;
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.08);
+  background: #fff;
+}
+
+/* 链接 */
+.article-entry a {
+  color: #07c160;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(7, 193, 96, 0.5);
+}
+.article-entry a:hover { border-bottom-style: solid; }
+
+/* 列表 */
+.article-entry ul, .article-entry ol { padding-left: 1.6em; margin: 0.8em 0; }
+.article-entry li { margin: 0.35em 0; }
+
+/* 顶部 banner 上加深色渐变，让白色标题更清晰 */
+#banner {
+  box-shadow: inset 0 0 0 2000px rgba(15, 23, 42, 0.45);
+}
+#banner .inner { text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4); }
+
+/* 文章卡片 */
+.article {
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.article:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* 分类/标签徽标 */
+.article-meta .article-category a,
+.article-meta .article-tag a {
+  background: #eef7f1;
+  color: #07a152 !important;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-right: 4px;
+}
+.article-meta .article-category a:hover,
+.article-meta .article-tag a:hover { background: #d8f0e2; }
+
+/* 侧边栏 */
+#sidebar .widget { margin-bottom: 28px; }
+#sidebar .widget-title {
+  font-size: 14px;
+  border-left: 3px solid #07c160;
+  padding-left: 8px;
+  color: #1a1a1a;
+}
+
+/* 页脚 */
+#footer { background: #1f2937; color: #9ca3af; }
+#footer a { color: #d1d5db; }
+
+/* 移动端 */
+@media (max-width: 768px) {
+  body { font-size: 15px; }
+  .article-entry { font-size: 15px; }
+  .article-entry h2 { font-size: 1.3em; }
+}

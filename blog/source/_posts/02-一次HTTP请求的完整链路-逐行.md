@@ -1,0 +1,251 @@
+---
+title: 一次 HTTP 请求的完整链路（逐行）
+date: 2026-11-13 13:40:00
+categories:
+  - 从0到1
+tags:
+  - 入门
+  - Gin
+  - GORM
+  - 分层
+---
+
+> 以「用户注册」为例，从 URL 一路追到数据库，把分层彻底看懂。
+> 这是**最重要的一篇**——看懂这条链路，项目里 80% 的代码你都能读懂。
+
+## 一、请求长什么样
+
+```
+POST /api/v1/register
+Content-Type: application/json
+
+{"username":"alice","password":"123456","nickname":"爱丽丝"}
+```
+
+## 二、链路全图
+
+```
+main.go
+  └─ router.NewRouter()
+       ├─ userapi.UserRouter(r)          ← 注册所有用户路由
+       │    └─ pub.POST("/register", Register)
+       │
+HTTP 请求进来
+  └─ Register(c *gin.Context)            ← handler：解析 + 校验 + 响应
+       └─ userservice.UserRegister(...)  ← service：业务逻辑 + 事务
+            └─ global.DB.Create(&user)   ← model：落库
+```
+
+## 三、第 1 站：路由怎么注册的
+
+`internal/router/router.go`：
+
+```go
+func NewRouter() *gin.Engine {
+    r := gin.Default()
+    health.HealthRouter(r)
+    userapi.UserRouter(r)     // 用户相关路由
+    friendapi.FriendRouter(r)
+    chatapi.ChatRouter(r)
+    groupapi.GroupRouter(r)
+    callapi.CallRouter(r)
+    rpcapi.RPCRouter(r)
+    r.GET("/ws", ws.ServeWS)
+
+    // 静态资源：前端 + 博客
+    r.Static("/css", "./web/css")
+    r.StaticFile("/", "./web/index.html")
+    return r
+}
+```
+
+`internal/router/user_router/user_api.go` 里：
+
+```go
+func UserRouter(r *gin.Engine) {
+    // 公开组：不需要登录
+    pub := r.Group("/api/v1")
+    {
+        pub.POST("/token/refresh", Refresh)
+    }
+
+    // 登录/注册单独限流
+    authGroup := r.Group("/api/v1", middleware.RateLimit(20, time.Minute))
+    {
+        authGroup.POST("/register", Register)
+        authGroup.POST("/login", Login)
+    }
+
+    // 鉴权组：整组挂 Auth 中间件
+    priv := r.Group("/api/v1", middleware.Auth())
+    {
+        priv.GET("/users/me", GetUserProfile)
+        // ...
+    }
+}
+```
+
+**逐行理解**：
+
+- `r.Group("/api/v1")` 创建一个**路由组**，组内路径自动加前缀
+- `r.Group("/api/v1", middleware.Auth())` 第二个参数是**中间件**，组内所有路由都会先执行它
+- **为什么要分组？** 把「需要登录」和「不需要登录」的接口分开，避免漏挂鉴权（最常见的安全事故）
+
+## 四、第 2 站：handler 逐行
+
+```go
+func Register(c *gin.Context) {
+    // ① 绑定 + 校验请求体
+    var req registerReq
+    if err := c.ShouldBindJSON(&req); err != nil {
+        resp.Fail(c, http.StatusBadRequest, "参数错误: "+err.Error())
+        return
+    }
+
+    // ② 调 service
+    u, err := userservice.UserRegister(req.Username, req.Password, req.Nickname)
+    if err != nil {
+        resp.Fail(c, http.StatusBadRequest, err.Error())
+        return
+    }
+
+    // ③ 写响应
+    resp.OK(c, gin.H{"user_id": u.ID, "username": u.Username})
+}
+```
+
+请求体结构体：
+
+```go
+type registerReq struct {
+    Username string `json:"username" binding:"required,min=3,max=32"`
+    Password string `json:"password" binding:"required,min=6,max=64"`
+    Nickname string `json:"nickname" binding:"required,max=32"`
+}
+```
+
+**逐行理解**：
+
+- `json:"username"`：JSON 字段名
+- `binding:"required,min=3,max=32"`：**gin 内置的参数校验**
+  - `required` 必填
+  - `min/max` 长度范围
+  - 校验失败时 `ShouldBindJSON` 返回 error
+- `c.ShouldBindJSON(&req)`：把请求体 JSON 解析到结构体并校验
+- `return` 非常重要：出错必须 return，否则会继续往下执行
+
+### 响应为什么统一格式
+
+`internal/router/resp/resp.go`：
+
+```go
+func OK(c *gin.Context, data any) {
+    c.JSON(http.StatusOK, gin.H{"code": 0, "message": "ok", "data": data})
+}
+
+func Fail(c *gin.Context, status int, msg string) {
+    c.JSON(status, gin.H{"code": status, "message": msg})
+}
+```
+
+统一成 `{code, message, data}`，前端只需一套解析逻辑。
+
+## 五、第 3 站：service 逐行
+
+`internal/service/user_service/register_service.go`：
+
+```go
+func UserRegister(username, password, nickname string) (*usermodel.User, error) {
+    // ① 用户名查重
+    var count int64
+    if err := global.DB.Model(&usermodel.User{}).
+        Where("username = ?", username).
+        Count(&count).Error; err != nil {
+        return nil, fmt.Errorf("查询用户失败: %w", err)
+    }
+    if count > 0 {
+        return nil, errors.New("用户名已存在")
+    }
+
+    // ② 密码加密（绝不存明文）
+    hash, err := auth.Hash(password)
+    if err != nil {
+        return nil, fmt.Errorf("密码加密失败: %w", err)
+    }
+
+    // ③ 事务：创建用户 + 默认设置
+    user := &usermodel.User{
+        Username:     username,
+        PasswordHash: hash,
+        Nickname:     nickname,
+    }
+    err = global.DB.Transaction(func(tx *gorm.DB) error {
+        if err := tx.Create(user).Error; err != nil {
+            return err
+        }
+        settings := &usermodel.UserSettings{UserID: user.ID}
+        return tx.Create(settings).Error
+    })
+    if err != nil {
+        return nil, fmt.Errorf("创建用户失败: %w", err)
+    }
+    return user, nil
+}
+```
+
+**逐行理解**：
+
+- `Model(&User{})` 指定操作哪张表；`Where` 条件；`Count(&count)` 计数
+- `?` 是**占位符**，防 SQL 注入（千万不要字符串拼接）
+- `.Error` —— GORM 的链式调用返回 `*gorm.DB`，错误在 `.Error` 字段
+- `auth.Hash` 用 bcrypt 加密：**同一密码每次结果不同**（随机 salt）
+- `global.DB.Transaction(func(tx) error {...})`：函数返回 error 就自动回滚
+- **为什么用户和设置要同事务？** 它们 1:1 必须成对出现，否则出现「有用户没设置」的脏数据
+- `tx.Create(user)` 之后 `user.ID` 会被 GORM **回填**（自增主键）
+
+## 六、第 4 站：model
+
+`internal/model/user_model/user_model.go`：
+
+```go
+type User struct {
+    model.Model          // 嵌入：ID / CreatedAt / UpdatedAt / DeletedAt
+    Username     string  `gorm:"type:varchar(32);uniqueIndex;not null"`
+    PasswordHash string  `gorm:"type:varchar(255);not null" json:"-"`
+    Nickname     string  `gorm:"type:varchar(32);not null;default:''"`
+    // ...
+}
+
+func (User) TableName() string { return "users" }
+```
+
+**逐行理解**：
+
+- 嵌入 `model.Model`（内部是 `gorm.Model`）→ 自动获得 `ID/CreatedAt/UpdatedAt/DeletedAt`
+- `uniqueIndex`：建唯一索引（**并发注册的最后防线**）
+- `json:"-"`：序列化时忽略（密码哈希绝不出现在响应里）
+- `TableName()`：显式指定表名（否则默认是 `users` 单数化，容易猜错）
+
+## 七、为什么这样分层
+
+| 层 | 职责 | 不该做什么 |
+|---|---|---|
+| handler | 解析请求、参数校验、写响应 | 不写业务逻辑 |
+| service | 业务规则、事务、调 model | 不 import gin |
+| model | 描述表结构 | 不掺业务逻辑 |
+
+**好处**：
+
+1. **可测试**：service 是纯 Go 函数，单测不用起 HTTP 服务
+2. **可迁移**：M6 拆 gRPC 时，service 完全不用改（`*gin.Context` 只存在 handler 层）
+3. **可复用**：HTTP 接口和 gRPC 接口可以调同一个 service
+
+## 八、动手练习
+
+1. 给注册接口加一个「昵称不能全空格」的校验（提示：在 service 里 `strings.TrimSpace`）
+2. 把 `/register` 从公开组移到鉴权组，观察发生了什么
+3. 用 `curl` 发一个 `username` 只有 2 位的请求，看错误信息
+
+---
+
+下一篇 → [代码地图：每个文件是干什么的](/blog/2026/11/13/代码地图-每个文件是干什么的/)

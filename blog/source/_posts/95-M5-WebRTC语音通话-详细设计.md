@@ -1,0 +1,242 @@
+---
+title: M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）
+date: 2026-11-13 08:50:00
+categories:
+  - 里程碑
+tags:
+  - WebRTC
+  - 信令
+  - P2P
+---
+![WebRTC 通话信令时序](/blog/images/call-flow.svg)
+
+> 上图由项目手绘 SVG 说明，配合下文阅读效果更好。
+
+> 对应提交：`M5: call model + signaling state machine + WebSocket SDP/ICE relay + call history API`
+
+---
+
+## 一、里程碑目标
+
+在聊天基础上加「语音通话」：
+
+- 通话记录模型（call_records）
+- 通话状态机（呼叫中/已接通/已拒绝/已取消/已结束/未接）
+- **WebSocket 信令**：转发 SDP（offer/answer）和 ICE candidate
+- 通话记录查询接口
+
+> 注意：本项目**不含前端**，所以服务器实现的是「信令服务 + 状态管理」，
+> 真正的音视频采集/编解码/传输在浏览器里（用 `RTCPeerConnection`）。
+
+验收（已实测）：
+
+| 场景 | 结果 |
+|---|---|
+| u1 呼叫 u2 | u1 收到 `call_ack`，u2 收到 `call_incoming` |
+| u2 接听 | 双方收到 `call_accepted` |
+| u1 发 offer | u2 收到转发（带 from_user_id） |
+| u2 发 answer | u1 收到 |
+| u1 发 ice | u2 收到 |
+| u2 挂断 | 双方收到 `call_ended` |
+| 已结束再挂断 | error「通话状态不允许挂断」 |
+| 通话记录 | status=5（已结束）、duration 正确 |
+
+---
+
+## 二、WebRTC 基本原理（面试必问）
+
+### 2.1 WebRTC 是 P2P 的
+
+```
+浏览器 A ◄══════ 音视频流（P2P，UDP）══════► 浏览器 B
+     │                                          │
+     └────────► 信令服务器（WebSocket）◄────────┘
+               （只转发 SDP/ICE，不传音视频）
+```
+
+**服务器不传音视频**——这正是 WebRTC 相比「服务器混流」方案的最大优势：延迟低、服务器带宽成本低。
+
+### 2.2 建立连接的三步
+
+1. **交换 SDP**（Session Description Protocol）
+   - A 生成 `offer`（我支持什么编解码、我的网络信息）
+   - B 返回 `answer`
+2. **交换 ICE candidate**
+   - 双方各自收集「我可能的网络路径」（公网 IP、NAT 映射、中继地址）
+   - 通过信令服务器互相告知
+3. **P2P 打洞 / 中继**
+   - 能直连就直连
+   - 打洞失败就用 TURN 服务器中继
+
+### 2.3 STUN / TURN / ICE
+
+| 概念 | 作用 |
+|---|---|
+| **ICE** | 框架：收集候选地址 + 按优先级尝试连接 |
+| **STUN** | 帮客户端发现自己的公网 IP:Port（NAT 映射） |
+| **TURN** | 打洞失败时的中继服务器（要带宽成本） |
+
+> 面试可以答："WebRTC 用 ICE 收集候选，STUN 发现公网地址，打洞失败用 TURN 中继；
+> 服务器只做信令，不碰音视频。"
+
+---
+
+## 三、服务器职责：信令状态机
+
+### 3.1 通话状态机
+
+```
+1 呼叫中 ──接听──► 2 已接通 ──挂断──► 5 已结束
+   │
+   ├──被叫拒绝──► 3 已拒绝
+   ├──主叫取消──► 4 已取消
+   └──超时──► 6 未接
+```
+
+### 3.2 数据模型
+
+`call_records`：
+
+| 字段 | 说明 |
+|---|---|
+| caller_id / callee_id | 主叫/被叫 |
+| type | 1 音频 / 2 视频 |
+| status | 状态机 |
+| started_at / ended_at | 接通/结束时间 |
+| duration | 时长（秒） |
+
+### 3.3 并发安全：条件更新
+
+和「接受好友申请」同一个套路：
+
+```go
+// 只有「呼叫我、且仍在呼叫中」才能接通
+res := db.Model(&Call{}).
+    Where("id = ? AND callee_id = ? AND status = ?", callID, userID, CallStatusCalling).
+    Updates(map[string]any{"status": CallStatusAccepted, "started_at": now})
+if res.RowsAffected == 0 {
+    return errors.New("通话不存在或状态不允许接听")
+}
+```
+
+好处：连点接听、超时后再接、已挂断再挂断，都会被 `RowsAffected=0` 拦住。
+
+---
+
+## 四、信令协议（WebSocket 消息）
+
+### 客户端 → 服务端
+
+| type | 字段 | 说明 |
+|---|---|---|
+| `call_invite` | to_user_id, call_type | 发起通话 |
+| `call_accept` | call_id | 接听 |
+| `call_reject` | call_id | 拒绝 |
+| `call_cancel` | call_id | 主叫取消 |
+| `call_end` | call_id | 挂断 |
+| `webrtc_offer` | call_id, to_user_id, sdp | 转发 offer |
+| `webrtc_answer` | call_id, to_user_id, sdp | 转发 answer |
+| `webrtc_ice` | call_id, to_user_id, candidate | 转发 ICE |
+
+### 服务端 → 客户端
+
+| type | 说明 |
+|---|---|
+| `call_ack` | 主叫收到：通话已创建 |
+| `call_incoming` | 被叫收到：有来电 |
+| `call_accepted` | 双方：已接通 |
+| `call_rejected` | 被叫拒绝 |
+| `call_canceled` | 主叫取消 |
+| `call_ended` | 挂断（带 duration） |
+| `webrtc_offer/answer/ice` | 原样转发 + `from_user_id` |
+
+### 信令转发实现（很关键的一点）
+
+```go
+func (c *Client) handleRelay(raw []byte, in inMessage) {
+    var m map[string]any
+    json.Unmarshal(raw, &m)
+    m["from_user_id"] = c.UserID
+    c.hub.SendToUser(in.ToUserID, mustJSON(m))
+}
+```
+
+**服务器不解析 SDP 内容**，只加一个 `from_user_id` 后原样转发。
+这就是信令服务器的本质：**帮两端交换连接信息**。
+
+---
+
+## 五、完整呼叫流程（时序）
+
+```
+A                     服务器                      B
+│  call_invite ────────►│                         │
+│                       │ 创建 call(status=1)      │
+│◄──── call_ack ────────│                         │
+│                       │──── call_incoming ─────►│
+│                       │◄─── call_accept ─────────│
+│                       │ status=2, started_at     │
+│◄── call_accepted ─────│──── call_accepted ──────►│
+│                       │                         │
+│── webrtc_offer ──────►│──── webrtc_offer ───────►│
+│◄──── webrtc_answer ───│◄─── webrtc_answer ───────│
+│── webrtc_ice ────────►│──── webrtc_ice ─────────►│
+│◄──── webrtc_ice ──────│◄─── webrtc_ice ──────────│
+│                       │                         │
+│      ===== P2P 音视频直连（不经服务器）=====       │
+│                       │                         │
+│◄─── call_end ─────────│◄──── call_end ───────────│
+│                       │ status=5, duration       │
+│◄── call_ended ────────│──── call_ended ─────────►│
+```
+
+---
+
+## 六、代码导读
+
+| 文件 | 作用 | 重点 |
+|---|---|---|
+| `internal/model/call_model/call_model.go` | 通话记录 | 状态机定义 |
+| `internal/service/call_service/call_service.go` | 信令状态机 | **条件更新、时长计算、CallItem DTO** |
+| `internal/ws/client.go` | 信令处理 | `handleCallInvite/Accept/Reject/Cancel/End`、`handleRelay` |
+| `internal/router/call_router/call_api.go` | 通话记录接口 | `GET /calls`、`GET /calls/:id` |
+
+---
+
+## 七、注意点清单
+
+1. **服务器不传音视频**，只做信令——这是 WebRTC 的核心
+2. **状态迁移全部用条件更新**（防连点/重复操作）
+3. **信令转发不解析 SDP**，原样加 `from_user_id` 转发
+4. **挂断时计算时长**：`ended_at - started_at`
+5. **只有通话双方能查看记录**（越权校验）
+6. **不要直接返回 GORM 模型**（会输出 `ID`/`DeletedAt` 等大写字段）→ 用 DTO
+7. **WebSocket 是信令的天然载体**：M2 已建好长连接，M5 直接复用
+8. **超时无人接**（状态 6 未接）需要定时任务或客户端超时取消——M5 简化未做自动超时
+
+---
+
+## 八、面试点（M5）
+
+1. WebRTC 的原理？为什么说它是 P2P 的？
+2. 信令服务器的作用？为什么必须要有信令？
+3. SDP 里有什么？offer/answer 的作用？
+4. ICE / STUN / TURN 分别是什么？
+5. 为什么需要 TURN？成本和代价？
+6. 通话状态机怎么设计？如何防重复接听？
+7. 通话时长怎么算？谁负责记录？
+8. 视频通话和语音通话在服务端有什么区别？（信令一样，只是 media 不同）
+9. 群通话怎么实现？（SFU/MCU，M5 未做）
+10. 通话超时无人接怎么处理？
+
+---
+
+## 九、下一步（M6 微服务化）
+
+M6 会把单体按职责拆成多个服务：
+
+- 用户服务（user）：注册/登录/资料/好友
+- 聊天服务（chat）：会话/消息/WS
+- 用 **gRPC + protobuf** 定义服务间接口
+- 加一个 **gateway** 做 HTTP 入口，转发到内部 gRPC 服务
+- 体会「单体哪里会痛、为什么要拆」
