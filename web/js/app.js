@@ -782,10 +782,17 @@ const App = (() => {
   }
 
   function replaceOptimistic(clientMsgId, real) {
-    const idx = S.messages.findIndex(m => m.client_msg_id === clientMsgId && m.pending);
-    if (idx >= 0) {
-      S.messages[idx] = real;
-    } else if (!S.messages.some(m => m.id === real.id)) {
+    const optIdx = S.messages.findIndex(m => m.client_msg_id === clientMsgId && m.pending);
+    const existsIdx = S.messages.findIndex(m => m.id === real.id);
+
+    if (optIdx >= 0) {
+      if (existsIdx >= 0 && existsIdx !== optIdx) {
+        // MQ 推送可能先于 ack 到达，已经有一条真实消息了 → 删掉乐观占位
+        S.messages.splice(optIdx, 1);
+      } else {
+        S.messages[optIdx] = real;
+      }
+    } else if (existsIdx < 0) {
       S.messages.push(real);
     }
     renderMessages();

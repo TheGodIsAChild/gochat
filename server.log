@@ -1,0 +1,61 @@
+数据库连接成功[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /health                   --> gochat/internal/router/health.HealthRouter.func1 (3 handlers)
+[GIN-debug] POST   /api/v1/token/refresh     --> gochat/internal/router/user_router.Refresh (3 handlers)
+[GIN-debug] POST   /api/v1/register          --> gochat/internal/router/user_router.Register (4 handlers)
+[GIN-debug] POST   /api/v1/login             --> gochat/internal/router/user_router.Login (4 handlers)
+[GIN-debug] POST   /api/v1/logout            --> gochat/internal/router/user_router.Logout (4 handlers)
+[GIN-debug] GET    /api/v1/users/me          --> gochat/internal/router/user_router.GetUserProfile (4 handlers)
+[GIN-debug] PUT    /api/v1/users/me          --> gochat/internal/router/user_router.UpdateUserProfile (4 handlers)
+[GIN-debug] GET    /api/v1/users/search      --> gochat/internal/router/user_router.SearchUsers (5 handlers)
+[GIN-debug] GET    /api/v1/users/settings    --> gochat/internal/router/user_router.GetSettings (4 handlers)
+[GIN-debug] PUT    /api/v1/users/settings    --> gochat/internal/router/user_router.UpdateSettings (4 handlers)
+[GIN-debug] POST   /api/v1/friends/requests  --> gochat/internal/router/friend_router.SendRequest (4 handlers)
+[GIN-debug] GET    /api/v1/friends/requests  --> gochat/internal/router/friend_router.ListRequests (4 handlers)
+[GIN-debug] POST   /api/v1/friends/requests/:id/accept --> gochat/internal/router/friend_router.AcceptRequest (4 handlers)
+[GIN-debug] POST   /api/v1/friends/requests/:id/reject --> gochat/internal/router/friend_router.RejectRequest (4 handlers)
+[GIN-debug] GET    /api/v1/friends           --> gochat/internal/router/friend_router.ListFriends (4 handlers)
+[GIN-debug] DELETE /api/v1/friends/:id       --> gochat/internal/router/friend_router.DeleteFriend (4 handlers)
+[GIN-debug] PUT    /api/v1/friends/:id/remark --> gochat/internal/router/friend_router.SetRemark (4 handlers)
+[GIN-debug] POST   /api/v1/blacklist         --> gochat/internal/router/friend_router.AddBlacklist (4 handlers)
+[GIN-debug] DELETE /api/v1/blacklist/:id     --> gochat/internal/router/friend_router.RemoveBlacklist (4 handlers)
+[GIN-debug] GET    /api/v1/blacklist         --> gochat/internal/router/friend_router.ListBlacklist (4 handlers)
+[GIN-debug] POST   /api/v1/conversations     --> gochat/internal/router/chat_router.CreateConversation (4 handlers)
+[GIN-debug] GET    /api/v1/conversations     --> gochat/internal/router/chat_router.ListConversations (4 handlers)
+[GIN-debug] POST   /api/v1/conversations/:id/messages --> gochat/internal/router/chat_router.SendMessage (4 handlers)
+[GIN-debug] GET    /api/v1/conversations/:id/messages --> gochat/internal/router/chat_router.ListMessages (4 handlers)
+[GIN-debug] POST   /api/v1/conversations/:id/read --> gochat/internal/router/chat_router.MarkRead (4 handlers)
+[GIN-debug] GET    /api/v1/online            --> gochat/internal/router/chat_router.GetOnlineStatus (4 handlers)
+[GIN-debug] POST   /api/v1/groups            --> gochat/internal/router/group_router.CreateGroup (4 handlers)
+[GIN-debug] GET    /api/v1/groups            --> gochat/internal/router/group_router.ListGroups (4 handlers)
+[GIN-debug] GET    /api/v1/groups/:id        --> gochat/internal/router/group_router.GetGroup (4 handlers)
+[GIN-debug] PUT    /api/v1/groups/:id        --> gochat/internal/router/group_router.UpdateGroup (4 handlers)
+[GIN-debug] POST   /api/v1/groups/:id/members --> gochat/internal/router/group_router.AddMembers (4 handlers)
+[GIN-debug] GET    /api/v1/groups/:id/members --> gochat/internal/router/group_router.ListGroupMembers (4 handlers)
+[GIN-debug] DELETE /api/v1/groups/:id/members/:user_id --> gochat/internal/router/group_router.RemoveMember (4 handlers)
+[GIN-debug] POST   /api/v1/groups/:id/dissolve --> gochat/internal/router/group_router.DissolveGroup (4 handlers)
+[GIN-debug] GET    /api/v1/calls             --> gochat/internal/router/call_router.ListCalls (4 handlers)
+[GIN-debug] GET    /api/v1/calls/:id         --> gochat/internal/router/call_router.GetCall (4 handlers)
+[GIN-debug] GET    /api/v1/rpc/users/:id     --> gochat/internal/router/rpc_router.GetUserViaRPC (4 handlers)
+[GIN-debug] GET    /api/v1/rpc/users         --> gochat/internal/router/rpc_router.BatchGetUsersViaRPC (4 handlers)
+[GIN-debug] POST   /api/v1/rpc/messages      --> gochat/internal/router/rpc_router.SendMessageViaRPC (4 handlers)
+[GIN-debug] GET    /api/v1/rpc/conversations/:id/messages --> gochat/internal/router/rpc_router.ListMessagesViaRPC (4 handlers)
+[GIN-debug] GET    /ws                       --> gochat/internal/ws.ServeWS (3 handlers)
+[GIN-debug] GET    /css/*filepath            --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /css/*filepath            --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] GET    /js/*filepath             --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /js/*filepath             --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] GET    /                         --> github.com/gin-gonic/gin.(*RouterGroup).StaticFile.func1 (3 handlers)
+[GIN-debug] HEAD   /                         --> github.com/gin-gonic/gin.(*RouterGroup).StaticFile.func1 (3 handlers)
+[GIN-debug] GET    /blog/*filepath           --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /blog/*filepath           --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN] 2026/11/13 - 00:51:13 | 200 |       0s |       127.0.0.1 | GET      "/health"
+[GIN] 2026/11/13 - 00:51:13 | 200 |  99.08ms |       127.0.0.1 | GET      "/"
+[GIN] 2026/11/13 - 00:51:13 | 200 |  509.4µs |       127.0.0.1 | GET      "/blog/"
+[GIN] 2026/11/13 - 00:51:13 | 200 |       0s |       127.0.0.1 | GET      "/health"
+[GIN] 2026/11/13 - 00:51:13 | 200 |   1.14ms |       127.0.0.1 | GET      "/css/app.css"
+[GIN] 2026/11/13 - 00:51:13 | 200 |   2.48ms |       127.0.0.1 | GET      "/js/app.js"
