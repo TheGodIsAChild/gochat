@@ -1,18 +1,43 @@
 package middleware
 
 import (
-	"gochat/global"
-	"gochat/internal/auth"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
+	"gochat/global"
+	"gochat/internal/auth"
+)
+
+// gin.Context 里存放登录用户信息的 key。
+//
+// 【为什么要定义常量】
+// 中间件用 c.Set 写入，handler 用 c.Get 读取，两边必须用【同一个字符串】。
+// 如果各自手写字符串，写错一个字母不会报错，只会永远拿到零值——极难排查。
+// 定义成常量后，两边都引用 middleware.CtxUserID，编译器帮你检查。
+const (
+	CtxUserID   = "userId"
+	CtxUsername = "username"
 )
 
 func abortUnauthorized(c *gin.Context, msg string) {
 	c.AbortWithStatusJSON(401, gin.H{"code": 401, "message": msg})
 }
 
-// 校验access token 并将userid与username放入gin.context
+// Auth 鉴权中间件：解析 Authorization: Bearer <access_token>，
+// 校验通过后把 user_id / username 放进 gin.Context，供后续 handler 使用。
+//
+// 【执行流程】
+//  1. 取 Authorization header
+//  2. 按空格切成 ["Bearer", "<token>"]
+//  3. auth.Parse 验签 + 校验过期
+//  4. 校验 token 类型必须是 access（防止用 refresh token 调业务接口）
+//  5. c.Set 写入身份信息，c.Next() 继续
+//
+// 【注意点】
+//   - 每个失败分支都必须 return：c.Abort() 只是标记「后续别执行」，
+//     当前函数仍会继续往下跑，不 return 会继续执行后面的逻辑。
+//   - 只认 type=access：refresh token 签名也合法，但它是长期凭证，不能用来调业务接口。
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
@@ -21,23 +46,27 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
+		// 只切一刀，避免 token 里含有空格时被切碎
 		parts := strings.SplitN(header, " ", 2)
 		if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
-			abortUnauthorized(c, "Authorzation 格式错误")
+			abortUnauthorized(c, "Authorization 格式错误")
 			return
 		}
+
 		claims, err := auth.Parse(global.Config.JWT.Secret, parts[1])
 		if err != nil {
-			abortUnauthorized(c, "token已过期或token无效")
+			abortUnauthorized(c, "token 已过期或无效")
 			return
 		}
-		// 防止将refresh token当作 access token使用------ refresh token也能使用，但是因为它是长期有效的，不能使用它调用业务接口，校验防止漏洞
+
+		// 关键：只接受 access token
 		if claims.Type != auth.TypeAccess {
 			abortUnauthorized(c, "token 类型错误")
 			return
 		}
-		c.Set("userId", claims.UserID)
-		c.Set("username", claims.Username)
+
+		c.Set(CtxUserID, claims.UserID)
+		c.Set(CtxUsername, claims.Username)
 		c.Next()
 	}
 }
