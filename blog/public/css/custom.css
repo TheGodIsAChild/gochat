@@ -1,165 +1,187 @@
 /* =========================================================
-   gochat 学习博客 · 自定义样式（Fluid 主题）
-   在 Fluid 默认样式基础上做阅读体验与视觉优化
+   gochat 学习博客 · 阅读模式样式（Fluid 主题）
+   目标：长时间阅读不累 —— 白底、大字号、宽行距、低对比、少装饰
    ========================================================= */
 
-/* ---------- 全局字体与中文字距 ---------- */
+/* ---------- 全局排版 ---------- */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
-               "Helvetica Neue", Arial, sans-serif;
+               "Hiragino Sans GB", sans-serif;
+  background: #ffffff;
+  color: #2f3437;
+  font-size: 16px;
+  line-height: 1.9;
   letter-spacing: .01em;
   -webkit-font-smoothing: antialiased;
 }
 
-/* 导航栏标题更醒目 */
+/* ---------- 导航栏：白底细线，低对比 ---------- */
+.navbar {
+  background: #ffffff !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid #eef1f4 !important;
+  backdrop-filter: none !important;
+}
 .navbar .navbar-brand {
-  font-weight: 800;
-  letter-spacing: .5px;
-}
-.navbar .navbar-brand .hover-text { color: #07c160 !important; }
-
-/* ---------- 正文排版 ---------- */
-.markdown-body {
-  font-size: 16px;
-  line-height: 1.9;
-}
-.markdown-body p { margin: .85em 0; }
-
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
-.markdown-body h4 {
+  color: #1f2328 !important;
   font-weight: 700;
+  letter-spacing: .3px;
+}
+.navbar .navbar-brand .hover-text { color: #2b6cb0 !important; }
+.navbar .nav-item .nav-link { color: #4a5560 !important; font-size: 14.5px; }
+.navbar .nav-item .nav-link:hover { color: #2b6cb0 !important; }
+.navbar .dropdown-menu { border: 1px solid #eef1f4; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+
+/* ---------- 首页 banner：浅色，矮一点 ---------- */
+.banner { box-shadow: none !important; }
+.banner .banner-text { text-shadow: none !important; }
+.banner .banner-text h1 { color: #1f2328 !important; font-weight: 800; }
+.banner .banner-text h2 { color: #4b5563 !important; font-weight: 400; }
+
+/* ---------- 正文容器：限制宽度，行宽舒适 ---------- */
+.markdown-body {
+  font-size: 16.5px;
+  line-height: 2;
+  color: #2f3437;
+  max-width: 820px;
+}
+.markdown-body p { margin: 1em 0; }
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+  font-weight: 700;
+  color: #1f2328;
   scroll-margin-top: 80px;
 }
 .markdown-body h2 {
-  font-size: 1.5em;
-  margin: 1.9em 0 .8em;
-  padding-left: 12px;
-  border-left: 4px solid #07c160;
-  border-bottom: none;
+  font-size: 1.45em;
+  margin: 2.2em 0 .8em;
+  padding: 0 0 .4em 0;
+  border: none;
+  border-bottom: 1px solid #eceff2;
 }
 .markdown-body h3 {
-  font-size: 1.2em;
-  margin: 1.5em 0 .6em;
-  color: #0f172a;
+  font-size: 1.18em;
+  margin: 1.8em 0 .6em;
 }
-.markdown-body h3::before {
-  content: "▍";
-  color: #07c160;
-  margin-right: 6px;
-}
+.markdown-body h3::before { content: none; }   /* 去掉绿色竖条装饰 */
+.markdown-body h4 { font-size: 1.05em; margin: 1.4em 0 .5em; }
 
-/* ---------- 代码 ---------- */
+/* 链接：低饱和蓝 + 细下划线 */
+.markdown-body a {
+  color: #2b6cb0;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(43,108,176,.28);
+}
+.markdown-body a:hover { color: #1a4a85; border-bottom-color: #1a4a85; }
+
+/* 行内代码：浅灰底，不抢眼 */
 .markdown-body code {
-  background: #eef2f6;
-  color: #c7254e;
+  background: #f4f6f8;
+  color: #b83280;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: .9em;
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
 }
-.markdown-body pre {
-  border-radius: 10px;
-  box-shadow: 0 3px 14px rgba(15, 23, 42, .10);
-}
+
+/* 代码块：浅色主题 + 细边框 */
+.markdown-body pre,
 .markdown-body .highlight {
-  border-radius: 10px;
-  margin: 1.2em 0;
-  box-shadow: 0 3px 14px rgba(15, 23, 42, .10);
+  border-radius: 8px;
+  background: #f8f9fa !important;
+  font-size: 13.5px;
+  line-height: 1.75;
+  box-shadow: none !important;
+  border: 1px solid #eceff2;
 }
+.markdown-body pre code { background: transparent; color: #2f3437; }
 
-/* ---------- 引用块做成「提示框」 ---------- */
+/* 引用块：淡蓝提示 */
 .markdown-body blockquote {
-  border-left: 4px solid #07c160;
-  background: #f0fdf4;
-  color: #365314;
+  border-left: 3px solid #9fc5e8;
+  background: #f7fafd;
+  color: #43505c;
   padding: 12px 18px;
-  border-radius: 0 8px 8px 0;
-  margin: 1.2em 0;
+  margin: 1.3em 0;
+  border-radius: 0 6px 6px 0;
 }
 
-/* ---------- 表格 ---------- */
+/* 表格：清淡斑马纹 */
 .markdown-body table {
   border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, .06);
+  width: 100%;
+  margin: 1.4em 0;
   font-size: 14.5px;
+  box-shadow: none;
+  border: 1px solid #e7ebef;
+  border-radius: 6px;
+  overflow: hidden;
 }
 .markdown-body table th {
-  background: #07c160;
-  color: #fff;
-  padding: 10px 12px;
-  border: none;
+  background: #f5f7f9;
+  color: #1f2328;
+  font-weight: 600;
+  padding: 9px 12px;
+  border: 1px solid #e7ebef;
 }
 .markdown-body table td {
   padding: 9px 12px;
-  border-bottom: 1px solid #eef2f6;
+  border: 1px solid #eef1f4;
 }
-.markdown-body table tr:nth-child(even) td { background: #f8fafc; }
+.markdown-body table tr:nth-child(even) td { background: #fafbfc; }
 
-/* ---------- 图片（SVG 图） ---------- */
+/* 图片（SVG 示意图）：圆角 + 极轻阴影 */
 .markdown-body img {
   display: block;
   max-width: 100%;
-  margin: 1.4em auto;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, .10);
+  margin: 1.6em auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.05);
   background: #fff;
 }
 
-/* ---------- 列表 ---------- */
-.markdown-body ul,
-.markdown-body ol { padding-left: 1.6em; }
-.markdown-body li { margin: .3em 0; }
+/* 列表 */
+.markdown-body ul, .markdown-body ol { padding-left: 1.7em; }
+.markdown-body li { margin: .35em 0; }
 
-/* ---------- 文章卡片 ---------- */
+/* ---------- 首页文章卡片：去掉上浮动画和投影 ---------- */
 .index-card {
-  border-radius: 12px !important;
-  transition: transform .2s ease, box-shadow .2s ease;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, .06);
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  border: 1px solid #eef1f4 !important;
+  transition: none !important;
+  background: #fff !important;
 }
 .index-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, .12);
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: #dbe3ea !important;
 }
 .index-card .index-header .index-cate,
 .index-card .index-header .index-tag {
-  color: #07a152 !important;
-  border-color: #07a152 !important;
+  color: #6b7783 !important;
+  border-color: #e2e8ee !important;
+  background: #f8fafb !important;
 }
 
-/* ---------- 首页 banner 文字阴影 ---------- */
-.banner .banner-text {
-  text-shadow: 0 2px 18px rgba(0, 0, 0, .45);
-}
-.banner .banner-text h1 { font-weight: 800; letter-spacing: 2px; }
-
-/* ---------- TOC 目录 ---------- */
+/* ---------- 目录 TOC ---------- */
 .toc .toc-content { font-size: 13.5px; }
-.toc .toc-content .toc-link.active { color: #07c160 !important; }
+.toc .toc-content .toc-link { color: #4a5560 !important; }
+.toc .toc-content .toc-link.active { color: #2b6cb0 !important; }
 
 /* ---------- 页脚 ---------- */
 #footer {
-  background: #0f172a;
-  color: #94a3b8;
+  background: #fbfcfd;
+  color: #8a949e;
+  font-size: 13px;
+  border-top: 1px solid #eef1f4;
 }
-#footer a { color: #d1d5db; }
-
-/* ---------- 暗色模式微调 ---------- */
-[data-user-color-scheme="dark"] .markdown-body blockquote {
-  background: #10261c;
-  color: #a7f3d0;
-}
-[data-user-color-scheme="dark"] .markdown-body code {
-  background: #2a3444;
-  color: #f9a8b8;
-}
-[data-user-color-scheme="dark"] .markdown-body table td { border-bottom-color: #334155; }
-[data-user-color-scheme="dark"] .markdown-body table tr:nth-child(even) td { background: #1e293b; }
+#footer a { color: #6b7783; }
 
 /* ---------- 移动端 ---------- */
 @media (max-width: 768px) {
-  .markdown-body { font-size: 15px; line-height: 1.85; }
+  body { font-size: 15.5px; }
+  .markdown-body { font-size: 15.5px; line-height: 1.9; }
   .markdown-body h2 { font-size: 1.3em; }
+  .banner .banner-text h1 { font-size: 1.8rem !important; }
 }

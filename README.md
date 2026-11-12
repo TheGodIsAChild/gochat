@@ -152,7 +152,8 @@ npm run build      # hexo generate
 
 - **目录页**：`/blog/catalog/`（按分类列出全部文章，点击直达）
 - **配图**：10 张手绘 SVG 矢量图（系统架构 / 双 Token / 分层 / WebSocket / Outbox / 通话时序 / 数据库 ER / WSS 生命周期 / 首页 hero / 头像）
-- **主题**：Hexo + **Fluid**（现代风格，暗色模式、文章 TOC、毛玻璃导航、绿色主题色）
+- **主题**：Hexo + **Fluid（阅读模式定制）**——白底、细导航、浅色 banner、无动效、无强阴影，
+  正文 16.5px / 行高 2.0 / 限宽 820px，代码块用浅色主题；保留文章 TOC 与目录页
 
 ### 博客工具脚本（`blog/tools/`）
 
