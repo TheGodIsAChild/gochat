@@ -2,7 +2,7 @@
 title: 实时消息与 WebSocket
 date: 2026-11-13 12:50:00
 categories:
-  - M2 实时消息
+  - 里程碑
 tags:
   - WebSocket
   - 幂等
