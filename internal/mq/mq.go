@@ -1,0 +1,161 @@
+// Package mq 消息队列：本地消息表投递 worker + 事件消费者。
+//
+// 【整体流程（M7）】
+//
+//	业务事务 { 写业务数据 + 写 outbox 记录 }   ← 原子
+//	          ↓
+//	  OutboxWorker 轮询 status=0 的记录 → 发布到 RabbitMQ → 标记 status=1
+//	          ↓
+//	  Consumer 消费 → 解析事件 → WebSocket 推送给会话成员
+//
+// 【好处】
+//   - 发送消息的 HTTP 请求不再同步做「查成员 + 逐个推送」，响应更快（解耦 + 削峰）
+//   - MQ 挂了也不丢消息：outbox 记录还在，worker 会重试（至少一次）
+//   - 消费方可以独立扩缩容
+package mq
+
+import (
+	"context"
+	"encoding/json"
+	"log"
+	"time"
+
+	amqp "github.com/rabbitmq/amqp091-go"
+	"gorm.io/gorm"
+
+	"gochat/global"
+	"gochat/internal/model/mq_model"
+	"gochat/internal/ws"
+)
+
+// Enabled 是否启用了 MQ。
+func Enabled() bool {
+	return global.MQ != nil && global.MQ.Enabled
+}
+
+// StartOutboxWorker 启动本地消息表投递 worker。
+//
+// 【为什么用轮询而不是触发器】
+// 简单、可靠、不依赖数据库特性。生产环境可以缩短间隔或用 CDC（如 canal/debezium）。
+func StartOutboxWorker(ctx context.Context) {
+	go func() {
+		ticker := time.NewTicker(2 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				publishPending()
+			}
+		}
+	}()
+}
+
+// publishPending 取一批待发送的 outbox 记录发布到 MQ。
+func publishPending() {
+	if !Enabled() {
+		return
+	}
+
+	var rows []mqmodel.Outbox
+	if err := global.DB.
+		Where("status = ? AND next_retry <= ?", 0, time.Now()).
+		Order("id ASC").
+		Limit(100).
+		Find(&rows).Error; err != nil {
+		log.Printf("[outbox] 查询待发送记录失败: %v", err)
+		return
+	}
+
+	for _, r := range rows {
+		err := global.MQ.Channel.PublishWithContext(
+			context.Background(),
+			"",                 // 默认交换机
+			global.MQ.QueueName, // 路由到队列
+			false, false,
+			amqp.Publishing{
+				ContentType:  "application/json",
+				DeliveryMode: amqp.Persistent, // 消息持久化
+				Body:         []byte(r.Payload),
+				Headers: amqp.Table{
+					"event_type": r.EventType,
+					// 注意：amqp.Table 的 value 不支持 uint（只支持 int 系/uint8-64 里的部分类型），
+					// 用 int64 转换，否则会报 `table field "outbox_id" value uint not supported`
+					"outbox_id": int64(r.ID),
+				},
+			},
+		)
+		if err != nil {
+			// 发布失败：增加重试次数，5 秒后重试
+			global.DB.Model(&mqmodel.Outbox{}).Where("id = ?", r.ID).Updates(map[string]any{
+				"retry_count": gorm.Expr("retry_count + 1"),
+				"next_retry":  time.Now().Add(5 * time.Second),
+			})
+			log.Printf("[outbox] 发布记录 %d 失败: %v", r.ID, err)
+			continue
+		}
+
+		// 发布成功：标记已发送
+		global.DB.Model(&mqmodel.Outbox{}).Where("id = ?", r.ID).Update("status", 1)
+	}
+}
+
+// StartConsumer 启动消费者。
+func StartConsumer(ctx context.Context) error {
+	if !Enabled() {
+		return nil
+	}
+
+	msgs, err := global.MQ.Channel.Consume(
+		global.MQ.QueueName,
+		"",    // consumer tag 自动生成
+		false, // autoAck=false：处理成功后再手动 ack
+		false, false, false, nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case d, ok := <-msgs:
+				if !ok {
+					return
+				}
+				handleDelivery(d)
+			}
+		}
+	}()
+	return nil
+}
+
+// handleDelivery 处理一条 MQ 消息。
+func handleDelivery(d amqp.Delivery) {
+	eventType, _ := d.Headers["event_type"].(string)
+
+	switch eventType {
+	case mqmodel.EventMessageCreated:
+		var p mqmodel.MessageCreatedPayload
+		if err := json.Unmarshal(d.Body, &p); err != nil {
+			// 消息格式错误：不重试（nack 且 requeue=false），避免毒消息无限循环
+			log.Printf("[consumer] 解析消息失败: %v", err)
+			_ = d.Nack(false, false)
+			return
+		}
+
+		// 推送给会话所有在线成员
+		ws.PushToConversation(p.ConversationID, map[string]any{
+			"type": "message",
+			"data": p,
+		})
+		_ = d.Ack(false)
+
+	default:
+		// 未知事件：直接 ack，避免堆积
+		_ = d.Ack(false)
+	}
+}

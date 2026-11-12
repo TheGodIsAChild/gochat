@@ -13,6 +13,7 @@ import (
 	"gochat/core"
 	"gochat/global"
 	"gochat/internal/grpcx"
+	appmq "gochat/internal/mq"
 	"gochat/internal/router"
 	"gochat/internal/ws"
 )
@@ -50,6 +51,14 @@ func main() {
 	}
 	log.Printf("gRPC 服务启动: user=%s chat=%s", global.Config.GRPC.UserAddr, global.Config.GRPC.ChatAddr)
 
+	// M7：启动本地消息表 worker + MQ 消费者
+	mqCtx, mqCancel := context.WithCancel(context.Background())
+	defer mqCancel()
+	appmq.StartOutboxWorker(mqCtx)
+	if err := appmq.StartConsumer(mqCtx); err != nil {
+		log.Printf("启动 MQ 消费者失败（消息将使用同步推送）: %v", err)
+	}
+
 	srv := &http.Server{
 		Addr:    global.Config.Server.Addr,
 		Handler: router.NewRouter(),
@@ -79,11 +88,14 @@ func main() {
 	// 2. 主动断开所有 WebSocket 连接（让客户端立即感知，触发重连）
 	ws.DefaultHub.CloseAll()
 
-	// 3. 停止 gRPC 微服务并关闭客户端连接
+	// 3. 停止 MQ worker/consumer
+	mqCancel()
+
+	// 4. 停止 gRPC 微服务并关闭客户端连接
 	grpcServers.Stop()
 	grpcx.Close()
 
-	// 4. 释放 DB / Redis
+	// 5. 释放 DB / Redis / MQ
 	core.CloseBaseServices()
 
 	log.Println("已退出")

@@ -9,6 +9,8 @@ import (
 
 	"gochat/global"
 	chatmodel "gochat/internal/model/chat_model"
+	mqmodel "gochat/internal/model/mq_model"
+	"gochat/internal/outbox"
 )
 
 // MessageItem 消息响应 DTO。
@@ -115,12 +117,32 @@ func SendMessage(ctx context.Context, senderID, convID uint64, clientMsgID strin
 			return err
 		}
 		now := time.Now()
-		return tx.Model(&chatmodel.Conversation{}).
+		if err := tx.Model(&chatmodel.Conversation{}).
 			Where("id = ?", convID).
 			Updates(map[string]any{
 				"last_message_id": msg.ID,
 				"last_message_at": now,
-			}).Error
+			}).Error; err != nil {
+			return err
+		}
+
+		// M7：MQ 启用时，在同一个事务里写 outbox 记录。
+		// 这样「消息落库」和「待投递事件」要么都成功、要么都回滚，
+		// 后续由后台 worker 异步发 MQ（Outbox 模式 → 最终一致性）。
+		if global.MQ != nil && global.MQ.Enabled {
+			if err := outbox.Enqueue(tx, mqmodel.EventMessageCreated, mqmodel.MessageCreatedPayload{
+				ID:             uint64(msg.ID),
+				ConversationID: uint64(msg.ConversationID),
+				SenderID:       uint64(msg.SenderID),
+				ClientMsgID:    msg.ClientMsgID,
+				Type:           msg.Type,
+				Content:        msg.Content,
+				CreatedAt:      msg.CreatedAt.Unix(),
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 	if err != nil {
 		// 并发重复：唯一索引 uk_sender_client 拦住了第二个，重新查出来返回

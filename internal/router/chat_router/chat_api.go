@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"gochat/global"
 	"gochat/internal/middleware"
 	"gochat/internal/router/resp"
 	chatservice "gochat/internal/service/chat_service"
@@ -117,8 +118,10 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
-	// 通过 WebSocket 推送给在线的会话成员（HTTP 通道发的消息也要实时推送）
-	ws.PushMessage(convID, chatservice.ToItem(msg))
+	// M7：启用 MQ 时由异步消费者推送（解耦 + 削峰）；未启用则同步推送
+	if global.MQ == nil || !global.MQ.Enabled {
+		ws.PushMessage(convID, chatservice.ToItem(msg))
+	}
 
 	resp.OK(c, chatservice.ToItem(msg))
 }

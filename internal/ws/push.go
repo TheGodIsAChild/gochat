@@ -21,6 +21,21 @@ const pushConcurrency = 16
 // pushSem 信号量（容量 = pushConcurrency）。
 var pushSem = make(chan struct{}, pushConcurrency)
 
+// PushToConversation 把任意 JSON 对象推送给会话所有在线成员。
+// M7 的 MQ 消费者用它推送异步消息。
+func PushToConversation(convID uint64, payload any) {
+	frame, err := json.Marshal(payload)
+	if err != nil {
+		return
+	}
+	memberIDs, err := chatservice.ListMemberIDs(context.Background(), convID)
+	if err != nil {
+		log.Printf("推送消息时查询会话成员失败: %v", err)
+		return
+	}
+	fanout(memberIDs, frame)
+}
+
 // PushMessage 把一条消息推送给会话里的所有在线成员。
 //
 // 【为什么放在 ws 包】
@@ -35,20 +50,14 @@ var pushSem = make(chan struct{}, pushConcurrency)
 //   - 成员少（<= 10）：顺序推送，简单直接
 //   - 成员多：并发推送，但用信号量把并发数限制在 pushConcurrency
 func PushMessage(convID uint64, item chatservice.MessageItem) {
-	memberIDs, err := chatservice.ListMemberIDs(context.Background(), convID)
-	if err != nil {
-		log.Printf("推送消息时查询会话成员失败: %v", err)
-		return
-	}
-
-	frame, err := json.Marshal(map[string]any{
+	PushToConversation(convID, map[string]any{
 		"type": "message",
 		"data": item,
 	})
-	if err != nil {
-		return
-	}
+}
 
+// fanout 向一批用户推送同一帧数据。
+func fanout(memberIDs []uint64, frame []byte) {
 	// 小会话：顺序推送
 	if len(memberIDs) <= 10 {
 		for _, uid := range memberIDs {

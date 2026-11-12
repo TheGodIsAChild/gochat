@@ -7,6 +7,7 @@ import (
 	chat "gochat/internal/model/chat_model"
 	friend "gochat/internal/model/friend_model"
 	group "gochat/internal/model/group_model"
+	mq "gochat/internal/model/mq_model"
 	user "gochat/internal/model/user_model"
 	"time"
 
@@ -57,6 +58,8 @@ func InitMysqlTables() (bool, error) {
 		&group.Group{},
 		// M5 通话
 		&call.Call{},
+		// M7 本地消息表
+		&mq.Outbox{},
 	)
 	if err != nil {
 		return false, fmt.Errorf("初始化数据库表失败: %w", err)

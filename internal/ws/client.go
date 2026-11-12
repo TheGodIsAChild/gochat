@@ -8,8 +8,9 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	chatservice "gochat/internal/service/chat_service"
+	"gochat/global"
 	callservice "gochat/internal/service/call_service"
+	chatservice "gochat/internal/service/chat_service"
 )
 
 const (
@@ -216,7 +217,10 @@ func (c *Client) handleText(in inMessage) {
 	})
 
 	// 2. 推送给会话所有成员（包括自己，方便多端同步；客户端用 client_msg_id 去重）
-	PushMessage(uint64(msg.ConversationID), chatservice.ToItem(msg))
+	// M7：启用 MQ 时由异步消费者推送；未启用则同步推送
+	if global.MQ == nil || !global.MQ.Enabled {
+		PushMessage(uint64(msg.ConversationID), chatservice.ToItem(msg))
+	}
 }
 
 // ============================ 通话信令（M5）============================

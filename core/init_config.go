@@ -3,6 +3,7 @@ package core
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/goccy/go-yaml"
@@ -58,7 +59,10 @@ func InitBaseServices() error {
 	if _, err := db.LoadRedis(); err != nil {
 		return fmt.Errorf("初始化 Redis 失败: %w", err)
 	}
-	mq.LoadMq()
+	// RabbitMQ 是可选依赖：连不上时降级为同步推送，不影响应用启动
+	if err := mq.LoadMq(); err != nil {
+		log.Printf("RabbitMQ 连接失败，消息将使用同步推送: %v", err)
+	}
 	jwt.LoadJWT()
 	server.LoadServer()
 	return nil
@@ -74,4 +78,6 @@ func CloseBaseServices() {
 	if global.Redis != nil {
 		_ = global.Redis.Close()
 	}
+	// 关闭 MQ 连接
+	mq.CloseMq()
 }
