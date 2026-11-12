@@ -391,6 +391,402 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/blog/2026/11/13/26-%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F-Go%E5%90%8E%E7%AB%AF%E5%B8%B8%E7%94%A8%E7%9A%848%E7%A7%8D%E6%A8%A1%E5%BC%8F/" target="_self">
+          开发模式：Go 后端最常用的 8 种模式
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/26-%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F-Go%E5%90%8E%E7%AB%AF%E5%B8%B8%E7%94%A8%E7%9A%848%E7%A7%8D%E6%A8%A1%E5%BC%8F/" target="_self">
+        <div>
+          「模式」不是背概念，而是遇到某类问题时，前人验证过的解法。本文只讲本项目真正用到的 8 种，每种都给 Go 代码和「什么时候该用」。  一、分层模式（Layered Architecture）1handler → service → repository/model → db  规则：依赖只能单向向下。 1234567// handler 只做协议转换func Register(c *gin.C
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:13" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F/" class="category-chain-item">开发模式</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%88%86%E5%B1%82/">#分层</a>
+            
+              <a href="/blog/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">#设计模式</a>
+            
+              <a href="/blog/tags/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5/">#依赖注入</a>
+            
+              <a href="/blog/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/">#中间件</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/27-%E6%8E%A5%E5%88%B0%E9%9C%80%E6%B1%82%E6%80%8E%E4%B9%88%E5%8A%A8%E6%89%8B-%E6%A0%87%E5%87%86%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B/" target="_self">
+          接到需求怎么动手：标准开发流程 9 步
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/27-%E6%8E%A5%E5%88%B0%E9%9C%80%E6%B1%82%E6%80%8E%E4%B9%88%E5%8A%A8%E6%89%8B-%E6%A0%87%E5%87%86%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B/" target="_self">
+        <div>
+          新手最常问：「我知道语法，但拿到需求不知道从哪下手。」本文给一套可复用的 9 步流程，并用「消息撤回」这个真实需求完整走一遍。  一、9 步流程总览12341. 读懂需求 → 2. 拆功能点 → 3. 定数据模型（要不要加字段/表）→ 4. 定接口（URL/入参/出参/错误）→ 5. 写 service（业务+事务）→ 6. 写 handler（协议转换）→ 7. 接路由 + 权限→ 8. 自测
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:13" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F/" class="category-chain-item">开发模式</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%BC%80%E5%8F%91%E6%80%9D%E8%B7%AF/">#开发思路</a>
+            
+              <a href="/blog/tags/%E6%B5%81%E7%A8%8B/">#流程</a>
+            
+              <a href="/blog/tags/%E5%AE%9E%E6%88%98/">#实战</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/28-%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83%E4%B8%8E%E9%94%99%E8%AF%AF%E7%A0%81/" target="_self">
+          接口设计规范：URL、状态码、分页与错误码
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/28-%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83%E4%B8%8E%E9%94%99%E8%AF%AF%E7%A0%81/" target="_self">
+        <div>
+          接口设计是前后端协作的契约。设计得好，联调半小时；设计得烂，扯皮一星期。本文给一套能直接抄的规范，并对照本项目的真实接口。  一、URL 设计：名词 + 层级12345✅ /api/v1/conversations              列出会话✅ /api/v1/conversations/1/messages   会话 1 的消息✅ /api/v1/groups/1/members
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:12" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F/" class="category-chain-item">开发模式</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/API%E8%AE%BE%E8%AE%A1/">#API设计</a>
+            
+              <a href="/blog/tags/REST/">#REST</a>
+            
+              <a href="/blog/tags/%E9%94%99%E8%AF%AF%E7%A0%81/">#错误码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/29-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E4%B8%8E%E6%97%A5%E5%BF%97-Go%E5%B7%A5%E7%A8%8B%E5%8C%96%E5%AE%9E%E8%B7%B5/" target="_self">
+          错误处理与日志：Go 工程化实践
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/29-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E4%B8%8E%E6%97%A5%E5%BF%97-Go%E5%B7%A5%E7%A8%8B%E5%8C%96%E5%AE%9E%E8%B7%B5/" target="_self">
+        <div>
+          Go 的 error 是需要认真设计的。处理得好，线上问题 5 分钟定位；处理得差，只能靠猜。本文讲清 4 件事：错误怎么产生、怎么包装、怎么分层、怎么记日志。  一、Go 错误的三种类型123456789// ① 哨兵错误：预定义的、可比较的错误值var ErrUserNotFound = errors.New(&quot;用户不存在&quot;)// ② 自定义错误类型：带上下文字段type
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:12" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F/" class="category-chain-item">开发模式</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/">#错误处理</a>
+            
+              <a href="/blog/tags/%E6%97%A5%E5%BF%97/">#日志</a>
+            
+              <a href="/blog/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/">#工程化</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/30-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%E4%B8%8E%E4%BC%98%E9%9B%85%E9%99%8D%E7%BA%A7/" target="_self">
+          配置管理与优雅降级：让服务在各种环境下都能跑
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/30-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%E4%B8%8E%E4%BC%98%E9%9B%85%E9%99%8D%E7%BA%A7/" target="_self">
+        <div>
+          本地跑得好好的，换台机器就挂——这是配置没管好。本文讲两件事：配置怎么管、依赖挂了怎么办（降级）。  一、配置从哪来：三层优先级1默认值（代码里） &lt; 配置文件（config.yaml） &lt; 环境变量（生产）     来源 用途 例子    代码默认值 保证能跑 access_expire_minutes: 120   配置文件 本地&#x2F;测试环境 config.yaml
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:11" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F/" class="category-chain-item">开发模式</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E9%85%8D%E7%BD%AE/">#配置</a>
+            
+              <a href="/blog/tags/%E9%99%8D%E7%BA%A7/">#降级</a>
+            
+              <a href="/blog/tags/%E5%8F%AF%E7%94%A8%E6%80%A7/">#可用性</a>
+            
+              <a href="/blog/tags/12-factor/">#12-factor</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/31-%E6%B5%8B%E8%AF%95%E4%B8%8E%E8%B0%83%E8%AF%95-%E6%80%8E%E4%B9%88%E9%AA%8C%E8%AF%81%E4%BB%A3%E7%A0%81%E6%98%AF%E5%AF%B9%E7%9A%84/" target="_self">
+          测试与调试：怎么验证你的代码是对的
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/31-%E6%B5%8B%E8%AF%95%E4%B8%8E%E8%B0%83%E8%AF%95-%E6%80%8E%E4%B9%88%E9%AA%8C%E8%AF%81%E4%BB%A3%E7%A0%81%E6%98%AF%E5%AF%B9%E7%9A%84/" target="_self">
+        <div>
+          「我觉得没问题」不是验证。本文讲：怎么写测试、怎么跑、出 bug 怎么定位。目标：让你在没有 QA 的情况下也能对代码有信心。  一、测试金字塔12345    ▲  E2E（端到端）      少、慢、贵   ╱ ╲  ╱   ╲  集成测试        中 ╱     ╲╱───────╲ 单元测试       多、快、便宜     层 测什么 本项目    单元测试 纯函数、servic
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:11" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F/" class="category-chain-item">开发模式</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E6%B5%8B%E8%AF%95/">#测试</a>
+            
+              <a href="/blog/tags/%E8%B0%83%E8%AF%95/">#调试</a>
+            
+              <a href="/blog/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">#单元测试</a>
+            
+              <a href="/blog/tags/pprof/">#pprof</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" target="_self">
           项目介绍：从零实现一个仿微信 IM 后端
         </a>
@@ -503,13 +899,13 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/GORM/">#GORM</a>
-            
               <a href="/blog/tags/JWT/">#JWT</a>
             
               <a href="/blog/tags/Redis/">#Redis</a>
             
               <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+            
+              <a href="/blog/tags/GORM/">#GORM</a>
             
           </div>
         
@@ -577,402 +973,6 @@
               <a href="/blog/tags/%E5%88%86%E9%A1%B5/">#分页</a>
             
               <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" target="_self">
-          群聊设计与权限
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" target="_self">
-        <div>
-          一、复用会话抽象M2 已经把「会话 + 成员 + 消息」抽象好了，所以群聊几乎是免费的：  群聊 &#x3D; type=2 的会话 + groups 表（群元信息） 群消息发送&#x2F;推送完全复用 M2 的 SendMessage &#x2F; PushMessage  M3 新增的只是群的生命周期管理：建群、拉人、踢人、改资料、解散。  这就是好抽象的复利：M2 多花点心思，M3 直接受益
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 12:40" pubdate>
-              2026-11-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
-            
-              <a href="/blog/tags/%E7%BE%A4%E8%81%8A/">#群聊</a>
-            
-              <a href="/blog/tags/%E6%9D%83%E9%99%90/">#权限</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" target="_self">
-          并发加固与优雅退出
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" target="_self">
-        <div>
-          一、优雅退出以前 r.Run() 直接阻塞，进程被 kill 时：  处理中的请求被硬切断 WebSocket 没 Close 帧，客户端要等超时 DB&#x2F;Redis 连接没释放  现在的做法： 1234567891011srv := &amp;http.Server&#123;Addr: ..., Handler: router.NewRouter()&#125;go srv.Liste
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 12:30" pubdate>
-              2026-11-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
-            
-              <a href="/blog/tags/%E9%99%90%E6%B5%81/">#限流</a>
-            
-              <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">#优雅退出</a>
-            
-              <a href="/blog/tags/goroutine/">#goroutine</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/" target="_self">
-          WebRTC 语音通话实现
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/" target="_self">
-        <div>
-          一、WebRTC 是 P2P 的1234浏览器 A ◄══════ 音视频流（P2P，UDP）══════► 浏览器 B     │                                          │     └────────► 信令服务器（WebSocket）◄────────┘               （只转发 SDP/ICE，不传音视频）  服务器不传音视频——这是
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 12:20" pubdate>
-              2026-11-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/WebRTC/">#WebRTC</a>
-            
-              <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/">#信令</a>
-            
-              <a href="/blog/tags/P2P/">#P2P</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" target="_self">
-          微服务与消息队列
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" target="_self">
-        <div>
-          一、为什么要拆微服务单体的问题：    痛点 单体 微服务    扩缩容 整包一起扩 按服务扩   故障隔离 一个模块 OOM 全挂 只挂一个   团队协作 一个仓库 按服务划分   部署 改一行全量发布 只发布改动的   代价：分布式复杂度（网络失败、一致性、服务发现、追踪）。 本项目先单体（M0–M5）跑通，M6 再拆——先体会痛点才知道为什么拆。 二、怎么拆：按领域，不按技术12❌ cont
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 12:10" pubdate>
-              2026-11-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/gRPC/">#gRPC</a>
-            
-              <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">#微服务</a>
-            
-              <a href="/blog/tags/RabbitMQ/">#RabbitMQ</a>
-            
-              <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/">#最终一致性</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" target="_self">
-          仿微信前端与面试准备
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" target="_self">
-        <div>
-          一、前端技术选型为了演示所有后端功能，实现了一个仿微信三栏布局的单页应用： 1234┌────┬──────────┬──────────────────┐│导航│  会话列表 │     聊天区域      ││ 60 │   300px    │      自适应       │└────┴──────────┴──────────────────┘  选型：原生 HTML&#x2F;CSS&
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 12:00" pubdate>
-              2026-11-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/WebSocket/">#WebSocket</a>
-            
-              <a href="/blog/tags/WebRTC/">#WebRTC</a>
-            
-              <a href="/blog/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
-            
-              <a href="/blog/tags/%E5%89%8D%E7%AB%AF/">#前端</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/13/100-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/" target="_self">
-          项目总结与面试话术：怎么讲这个项目
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/100-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/" target="_self">
-        <div>
-          M0–M7 已全部完成。本文用于面试时讲这个项目，以及自己复盘。详细技术点见 learn/ 各里程碑文档，题目见 面试集.md，场景见 场景集.md。   一、一句话介绍 “我用 Go 从零实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，并且完整走过了『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进过程。”
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-13 09:40" pubdate>
-              2026-11-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" class="category-chain-item">面试准备</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
-            
-              <a href="/blog/tags/%E8%AF%9D%E6%9C%AF/">#话术</a>
-            
-              <a href="/blog/tags/%E5%A4%8D%E7%9B%98/">#复盘</a>
             
           </div>
         

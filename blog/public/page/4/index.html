@@ -324,6 +324,402 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/blog/2026/11/13/95-M5-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+          M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/95-M5-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+        <div>
+          上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M5: call model + signaling state machine + WebSocket SDP/ICE relay + call history API   一、里程碑目标在聊天基础上加「语音通话」：  通话记录模型（call_records） 通话状态机（呼叫中&#x2F;已接通&#x2F;已拒绝&#x2F
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 08:50" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/WebRTC/">#WebRTC</a>
+            
+              <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/">#信令</a>
+            
+              <a href="/blog/tags/P2P/">#P2P</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/94-M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+          M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/94-M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+        <div>
+          对应提交：M4: graceful shutdown + CloseBaseServices + sliding-window rate limit + WS CloseAll + bounded fan-out + hub concurrency tests   一、里程碑目标前面 M1–M3 功能跑通了，但还有几个「生产环境才会暴露」的问题：    问题 后果 本里程碑方案    进程被 k
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 08:40" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
+            
+              <a href="/blog/tags/%E9%99%90%E6%B5%81/">#限流</a>
+            
+              <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">#优雅退出</a>
+            
+              <a href="/blog/tags/goroutine/">#goroutine</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/93-M3-%E7%BE%A4%E8%81%8A-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+          M3 详细设计：群聊（建群事务 / 权限 / 人数统计）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/93-M3-%E7%BE%A4%E8%81%8A-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+        <div>
+          对应提交：M3: groups model + group service + group routes + conversation list group info   一、里程碑目标 群信息模型（groups） 建群（事务：会话 + 群 + 成员） 拉人进群 &#x2F; 踢人 &#x2F; 退群 改群名、群公告（群主权限） 解散群 群消息（复用 M2 的发送与推送）  验收（已实测）：
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 08:30" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+            
+              <a href="/blog/tags/%E7%BE%A4%E8%81%8A/">#群聊</a>
+            
+              <a href="/blog/tags/%E6%9D%83%E9%99%90/">#权限</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/92-M2-%E5%8D%95%E8%81%8A%E4%B8%8EWebSocket-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+          M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/92-M2-%E5%8D%95%E8%81%8A%E4%B8%8EWebSocket-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+        <div>
+          上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M2: conversations/messages models + idempotent send + history pagination + WebSocket hub/client + online status   一、里程碑目标 会话管理：创建&#x2F;获取单聊会话、会话列表（含未读数） 消息：发送、历史拉取（
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 08:20" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/WebSocket/">#WebSocket</a>
+            
+              <a href="/blog/tags/%E5%B9%82%E7%AD%89/">#幂等</a>
+            
+              <a href="/blog/tags/%E5%88%86%E9%A1%B5/">#分页</a>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/91-M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+          M1 详细设计：认证与好友（双 token / 事务 / 软删除）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/91-M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
+        <div>
+          上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应代码提交：95bebcf（认证闭环）→ cb456d4（users&#x2F;me）→ bb8c74d（好友完整）阅读方式：先看本文的「设计思路」，再对照「代码导读」读源码。   一、里程碑目标做一个「账号 + 好友」闭环：  注册 &#x2F; 登录（双 token 无感刷新） 资料查看 &#x2F; 修改 &#x2F; 用户搜索
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 08:10" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/JWT/">#JWT</a>
+            
+              <a href="/blog/tags/Redis/">#Redis</a>
+            
+              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+            
+              <a href="/blog/tags/GORM/">#GORM</a>
+            
+              <a href="/blog/tags/%E5%A5%BD%E5%8F%8B/">#好友</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/90-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE/" target="_self">
+          学习路线图：这个项目该怎么学
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/90-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE/" target="_self">
+        <div>
+          上图由项目手绘 SVG 说明，配合下文阅读效果更好。   本目录是 gochat 项目的学习文档中心。代码在 gochat/，文档在 gochat-study/。阅读顺序：本文 → 各里程碑文档 → 面试集 &#x2F; 场景集 → 对照代码。   一、项目定位gochat 是一个「仿微信」的即时通讯后端，用来练并发编程、微服务拆分、消息队列。 技术栈：    层 技术    Web 框架 G
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 08:00" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D/" class="category-chain-item">开始之前</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/">#学习路线</a>
+            
+              <a href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/">#阅读方法</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/blog/2026/11/12/S00-%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB%E6%80%BB%E7%B4%A2%E5%BC%95/" target="_self">
           源码走读总索引：核心文件全览
         </a>
@@ -526,372 +922,6 @@
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
             <time datetime="2026-11-12 17:58" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S04-%E6%BA%90%E7%A0%81-global/" target="_self">
-          源码走读 S04：global.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S04-%E6%BA%90%E7%A0%81-global/" target="_self">
-        <div>
-          文件路径：global/global.go　行数：29 行职责：全局状态：Config &#x2F; DB &#x2F; Redis &#x2F; MQ 的位置  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  1234567891011121314151617181920212223
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:57" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S05-%E6%BA%90%E7%A0%81-auth/" target="_self">
-          源码走读 S05：auth.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S05-%E6%BA%90%E7%A0%81-auth/" target="_self">
-        <div>
-          文件路径：internal/middleware/auth.go　行数：73 行职责：JWT 鉴权中间件：解析 Bearer、校验 type、写 context  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  1234567891011121314151617181920212223
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:56" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S06-%E6%BA%90%E7%A0%81-jwt/" target="_self">
-          源码走读 S06：jwt.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S06-%E6%BA%90%E7%A0%81-jwt/" target="_self">
-        <div>
-          文件路径：internal/auth/jwt.go　行数：140 行职责：双 Token 签发与解析：Claims、HS256、jti、算法校验  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  123456789101112131415161718192021222324252627
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:55" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S07-%E6%BA%90%E7%A0%81-token-store/" target="_self">
-          源码走读 S07：token_store.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S07-%E6%BA%90%E7%A0%81-token-store/" target="_self">
-        <div>
-          文件路径：internal/auth/token_store.go　行数：75 行职责：Refresh token 的 Redis 存储：GETDEL 原子消费、SCAN 批量删  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  1234567891011121314151617181
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:54" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S08-%E6%BA%90%E7%A0%81-register-service/" target="_self">
-          源码走读 S08：register_service.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S08-%E6%BA%90%E7%A0%81-register-service/" target="_self">
-        <div>
-          文件路径：internal/service/user_service/register_service.go　行数：47 行职责：注册：查重 + bcrypt + 事务（用户 + 默认设置）  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  1234567891011121314151
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:53" pubdate>
-              2026-11-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-chain-item">源码走读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E6%BA%90%E7%A0%81/">#源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/12/S09-%E6%BA%90%E7%A0%81-login-service/" target="_self">
-          源码走读 S09：login_service.go
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/12/S09-%E6%BA%90%E7%A0%81-login-service/" target="_self">
-        <div>
-          文件路径：internal/service/user_service/login_service.go　行数：65 行职责：登录：校验密码 → 签发双 token → 存 jti → 更新登录时间  本文是项目的完整源码（未删减）。项目源码里保留了【思路】【注意点】【面试点】 三类中文注释——建议边读边对照，遇到不理解的函数名，回看对应里程碑的设计文章。  1234567891011121314
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-12 17:52" pubdate>
               2026-11-12
             </time>
           </div>
