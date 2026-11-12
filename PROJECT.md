@@ -60,20 +60,19 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：✅ M0；✅ **M1 全部完成**；✅ **M2 完成**（单聊 + WebSocket）。
-  - M0：`internal/config`、`core.LoadConfig`、`global`、`internal/router`、`main.go`。
+- **项目状态**：✅ M0；✅ **M1**（认证+用户+好友）；✅ **M2**（单聊+WebSocket）；✅ **M3**（群聊）。
   - M1 认证：`internal/auth/`（bcrypt / 双 token HS256+jti+type / Redis jti 白名单+GETDEL）、`middleware/auth.go`、`user_service`（Register/Login/Refresh/Logout）、`user_router`。
   - M1 用户：`GET/PUT /users/me`、`GET /users/search`、`GET/PUT /users/settings`。
   - M1 好友：`friend_service`（6 条规则发申请 / **接受事务+条件更新** / 列表 / 备注 / 删除 / 黑名单）、`friend_router`。
-  - **M2 模型**：`chat_model`（conversations / conversation_members / messages，单聊群聊共用；`UNIQUE(sender_id,client_msg_id)` 幂等）。
-  - **M2 服务**：`chat_service`（会话创建去重 / 会话列表含未读 / **消息幂等发送 + 事务** / 游标分页历史 / 已读）。
-  - **M2 WebSocket**：`internal/ws/`（Hub 连接管理 RWMutex / Client 读写双泵 / 心跳 ping-pong / 慢消费者断开 / 握手前 token 鉴权 / 统一 PushMessage）。
-  - **M2 接口**：`POST/GET /conversations`、`POST/GET /conversations/:id/messages`、`POST /conversations/:id/read`、`GET /online`、`GET /ws`。
-  - **✅ 端到端实测全过**：会话复用、消息幂等（同 client_msg_id 返回同 id）、未读数 1→0、HTTP→WS 推送、WS 发消息→ack+广播、ping/pong、历史落库。
-- **下一步**：**M3 群聊** —— groups/group_members 模型、建群/加群/退群/踢人、群消息扇出。
-- **文档**：`gochat-study/learn/00-学习总览.md`、`m1-认证与好友.md`、`m2-单聊与WebSocket.md`、`面试集.md`、`场景集.md`。
-- **数据库状态**：9 张表（M1 六张 + M2 三张）
-- **git**：M1 `95bebcf`/`cb456d4`/`bb8c74d`；M2 见最新 commit
+  - M2 模型：`chat_model`（conversations / conversation_members / messages；`UNIQUE(sender_id,client_msg_id)` 幂等）。
+  - M2 服务：`chat_service`（会话去重 / 会话列表含未读 / **消息幂等发送 + 事务** / 游标分页 / 已读）。
+  - M2 WebSocket：`internal/ws/`（Hub RWMutex / 读写双泵 / 心跳 / 慢消费者断开 / token 鉴权 / 统一 PushMessage）。
+  - **M3 群聊**：`group_model`（groups：conversation_id/owner_id/name/member_count/status）、`group_service`（**建群事务** / 拉人 / 踢人 / 退群 / 改资料 / 解散，含群主权限校验、`gorm.Expr` 原子计数）、`group_router`（7 个接口）；会话列表富化群信息。
+  - **✅ 端到端实测全过**：M2 会话/幂等/未读/WS 推送/ping-pong；M3 建群/群列表/群详情/群消息/踢人/非群主改资料被拒/改群名/会话列表带群信息/解散群/查解散群失败。
+- **下一步**：**M4 并发加固** —— `-race` 并发测试、goroutine 泄漏排查、优雅退出、限流、消息扇出优化、压测。
+- **文档**：`gochat-study/learn/00-学习总览.md`、`m1-认证与好友.md`、`m2-单聊与WebSocket.md`、`m3-群聊.md`、`面试集.md`、`场景集.md`。
+- **数据库状态**：10 张表（M1 6 + M2 3 + M3 1）
+- **git**：M1 `95bebcf`/`cb456d4`/`bb8c74d`；M2 `8ba89ae`；M3 `40a67ed`
 
 ## 六、关键决策记录（追加式）
 
