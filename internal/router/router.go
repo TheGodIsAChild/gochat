@@ -31,5 +31,10 @@ func NewRouter() *gin.Engine {
 	// WebSocket：鉴权在 handler 内部做（浏览器 WS 不能带 Authorization 头，用 query 传 token）
 	r.GET("/ws", ws.ServeWS)
 
+	// 前端演示页面（仿微信）：静态资源由 Go 直接托管，无需额外前端服务
+	r.Static("/css", "./web/css")
+	r.Static("/js", "./web/js")
+	r.StaticFile("/", "./web/index.html")
+
 	return r
 }

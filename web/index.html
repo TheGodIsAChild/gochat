@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>gochat · 仿微信 IM 演示</title>
+<link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+
+<!-- ==================== 登录 / 注册 ==================== -->
+<div id="login-view" class="login-view">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-logo">gochat</div>
+      <div class="brand-sub">Go + WebSocket + WebRTC 仿微信 IM</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="login">登录</button>
+      <button class="tab" data-tab="register">注册</button>
+    </div>
+
+    <form id="login-form" class="form">
+      <input id="login-username" placeholder="用户名" autocomplete="username" required />
+      <input id="login-password" type="password" placeholder="密码" autocomplete="current-password" required />
+      <button type="submit" class="btn-primary">登录</button>
+    </form>
+
+    <form id="register-form" class="form" hidden>
+      <input id="reg-username" placeholder="用户名（3-32 位）" required />
+      <input id="reg-nickname" placeholder="昵称" required />
+      <input id="reg-password" type="password" placeholder="密码（6-64 位）" required />
+      <button type="submit" class="btn-primary">注册并登录</button>
+    </form>
+
+    <div class="login-tip">提示：可注册多个账号，在另一个浏览器窗口登录，体验单聊/群聊/通话</div>
+  </div>
+</div>
+
+<!-- ==================== 主应用 ==================== -->
+<div id="app-view" class="app" hidden>
+  <!-- 左侧导航 -->
+  <aside class="sidebar">
+    <div class="me-avatar" id="me-avatar" title="我">?</div>
+    <nav class="nav">
+      <button class="nav-btn active" data-panel="chats" title="聊天">💬</button>
+      <button class="nav-btn" data-panel="contacts" title="通讯录">👥</button>
+      <button class="nav-btn" data-panel="calls" title="通话">📞</button>
+      <button class="nav-btn" data-panel="settings" title="设置">⚙️</button>
+    </nav>
+    <div class="conn-dot" id="conn-dot" title="连接状态"></div>
+  </aside>
+
+  <!-- 中间列表 -->
+  <section class="list-panel">
+    <div class="list-head" id="list-head"></div>
+    <div class="list-body" id="list-body"></div>
+  </section>
+
+  <!-- 右侧内容区 -->
+  <main class="main-panel" id="main-panel">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">💬</div>
+      <p>选择一个会话开始聊天</p>
+    </div>
+  </main>
+</div>
+
+<!-- 弹窗容器 -->
+<div id="modal-root"></div>
+<!-- 通话浮层 -->
+<div id="call-overlay" class="call-overlay" hidden></div>
+<!-- Toast -->
+<div id="toast-root" class="toast-root"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/ws.js"></script>
+<script src="/js/webrtc.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

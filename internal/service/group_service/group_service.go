@@ -342,6 +342,67 @@ func RemoveMember(ctx context.Context, operatorID, groupID, targetID uint64) err
 	})
 }
 
+// MemberItem 群成员列表项。
+type MemberItem struct {
+	UserID   uint64 `json:"user_id"`
+	Username string `json:"username"`
+	Nickname string `json:"nickname"`
+	Avatar   string `json:"avatar"`
+	Role     int8   `json:"role"` // 0成员 1群主
+}
+
+// ListMembers 查询群成员列表（必须是群成员才能看）。
+func ListMembers(ctx context.Context, groupID, userID uint64) ([]MemberItem, error) {
+	g, err := getGroupByID(ctx, groupID)
+	if err != nil {
+		return nil, err
+	}
+	ok, err := isMember(ctx, uint64(g.ConversationID), userID)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, errors.New("你不是该群成员")
+	}
+
+	var members []chatmodel.ConversationMember
+	if err := global.DB.WithContext(ctx).
+		Where("conversation_id = ?", g.ConversationID).
+		Order("role DESC, id ASC").
+		Find(&members).Error; err != nil {
+		return nil, err
+	}
+	if len(members) == 0 {
+		return []MemberItem{}, nil
+	}
+
+	ids := make([]uint, 0, len(members))
+	for _, m := range members {
+		ids = append(ids, m.UserID)
+	}
+	var users []usermodel.User
+	if err := global.DB.WithContext(ctx).Where("id IN ?", ids).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	userMap := make(map[uint]usermodel.User, len(users))
+	for _, u := range users {
+		userMap[u.ID] = u
+	}
+
+	items := make([]MemberItem, 0, len(members))
+	for _, m := range members {
+		u := userMap[m.UserID]
+		items = append(items, MemberItem{
+			UserID:   uint64(m.UserID),
+			Username: u.Username,
+			Nickname: u.Nickname,
+			Avatar:   u.Avatar,
+			Role:     m.Role,
+		})
+	}
+	return items, nil
+}
+
 // ============================ 群资料 ============================
 
 // UpdateGroup 改群名/公告（只有群主）。

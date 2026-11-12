@@ -104,6 +104,27 @@ func ListGroups(c *gin.Context) {
 	resp.OK(c, gin.H{"groups": items})
 }
 
+// ListGroupMembers 群成员列表
+// GET /api/v1/groups/:id/members
+func ListGroupMembers(c *gin.Context) {
+	groupID, ok := parseID(c)
+	if !ok {
+		return
+	}
+	userID := currentUserID(c)
+	if userID == 0 {
+		resp.Fail(c, http.StatusUnauthorized, "未登录")
+		return
+	}
+
+	items, err := groupservice.ListMembers(c.Request.Context(), groupID, userID)
+	if err != nil {
+		resp.Fail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	resp.OK(c, gin.H{"members": items})
+}
+
 // AddMembers 拉人进群
 // POST /api/v1/groups/:id/members
 func AddMembers(c *gin.Context) {
@@ -210,6 +231,7 @@ func GroupRouter(r *gin.Engine) {
 		priv.GET("/groups/:id", GetGroup)
 		priv.PUT("/groups/:id", UpdateGroup)
 		priv.POST("/groups/:id/members", AddMembers)
+		priv.GET("/groups/:id/members", ListGroupMembers)
 		priv.DELETE("/groups/:id/members/:user_id", RemoveMember)
 		priv.POST("/groups/:id/dissolve", DissolveGroup)
 	}
