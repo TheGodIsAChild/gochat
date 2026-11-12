@@ -27,7 +27,7 @@
 <meta property="og:description" content="这是整套文章里最重要的一篇。我们以「用户注册」为例，从一条 curl 命令开始，一路追到 MySQL 的 INSERT 语句，把中间经过的 9 个环节全部拆开，每段代码都来自项目真实源码。  看完这篇，项目里 80% 的代码你都能读懂。 一、先看请求长什么样123curl -X POST http:&#x2F;&#x2F;127.0.0.1:8080&#x2F;api&#x2F;v1&#x2F;register \  -H &quot;Cont">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-11-14T15:56:00.000Z">
-<meta property="article:modified_time" content="2026-11-12T17:35:08.713Z">
+<meta property="article:modified_time" content="2026-11-12T17:38:36.299Z">
 <meta property="article:author" content="gochat">
 <meta property="article:tag" content="GORM">
 <meta property="article:tag" content="Gin">
@@ -324,7 +324,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          10k 字
+          11k 字
         
       </span>
     
@@ -335,7 +335,7 @@
         
         
         
-          88 分钟
+          91 分钟
         
       </span>
     
@@ -631,6 +631,18 @@
 <li>用 <code>curl</code> 发一个 <code>username</code> 只有 2 位的请求，看错误信息长什么样</li>
 <li>打开 GORM 的 Debug 日志，观察注册时到底执行了哪几条 SQL</li>
 </ol>
+<h2 id="十五、面试怎么答（背这-3-句）"><a href="#十五、面试怎么答（背这-3-句）" class="headerlink" title="十五、面试怎么答（背这 3 句）"></a>十五、面试怎么答（背这 3 句）</h2><p><strong>问：一次请求在你们项目里经过哪几层？</strong></p>
+<blockquote>
+<p>handler 只做协议转换（解析请求、参数校验、写响应）；service 放业务逻辑和事务；model 只描述表结构。<br>service 层不依赖 gin，所以 M6 拆 gRPC 时能直接复用。</p>
+</blockquote>
+<p><strong>问：为什么参数校验要分两层？</strong></p>
+<blockquote>
+<p>handler 校验<strong>格式</strong>（必填、长度、类型），service 校验<strong>业务规则</strong>（用户名是否重复、是否好友、是否群主）。<br>因为 service 可能被 gRPC、定时任务、CLI 调用，它不应该依赖 HTTP 的校验规则。</p>
+</blockquote>
+<p><strong>问：注册为什么要开事务？</strong></p>
+<blockquote>
+<p>要同时写 <code>users</code> 和 <code>user_settings</code>，它们 1:1 必须成对；不开事务可能只成功一半，产生「有用户没设置」的脏数据。<br>事务回调里必须用 <code>tx</code>，不能用 <code>global.DB</code>——那是独立事务，回滚管不到。</p>
+</blockquote>
 <hr>
 <p>下一篇 → <a href="/blog/2026/11/14/01-05-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE/">代码地图：每个文件是干什么的</a></p>
 

@@ -1,6 +1,6 @@
 ---
 title: WebSocket 全解：握手、心跳、重连与 wss
-date: 2026-11-14 23:50:00
+date: 2026-11-14 23:49:00
 categories:
   - 02-设计
 tags:
@@ -368,6 +368,24 @@ A 发消息给 B → 实例 1 的 Hub 里找不到 B 的连接 → 推不到
 8. 多实例下怎么给「不在本机的用户」推消息？
 9. 慢消费者怎么处理？为什么选择断开？
 10. WebSocket 怎么测试？（.NET ClientWebSocket / wscat / 浏览器 DevTools）
+
+## 十二、面试怎么答（背这 3 句）
+
+**问：WebSocket 握手是怎么完成的？**
+
+> 客户端先发一个普通 HTTP 请求，带 `Upgrade: websocket`、`Connection: Upgrade`、`Sec-WebSocket-Key`；
+> 服务端返回 `101 Switching Protocols` 和由 Key 算出的 `Sec-WebSocket-Accept`。
+> 之后同一条 TCP 连接上开始传 WebSocket 帧，不再走 HTTP。
+
+**问：为什么必须读写分离？心跳怎么做？**
+
+> `gorilla/websocket` 不允许并发写，两个 goroutine 同时写会 panic，所以 ReadPump 唯一读、WritePump 唯一写，其他 goroutine 只能往 send channel 塞。
+> 心跳：服务端每 54 秒发 ping，60 秒收不到 pong 就断开（ping 间隔 < 超时，留网络抖动余量），用来清理「假死」连接。
+
+**问：多实例部署怎么给不在本机的用户推消息？**
+
+> 单机 Hub 只管本进程连接，跨实例要：Redis Pub/Sub 广播，或 MQ 扇出让每个实例推自己的在线用户（本项目 M7 用了这个思路）。
+> 在线状态也要从内存改成 Redis + TTL。
 
 ---
 

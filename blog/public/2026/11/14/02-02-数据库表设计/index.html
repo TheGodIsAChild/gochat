@@ -27,8 +27,8 @@
 <meta property="og:description" content="表设计不是「把字段列出来」，而是用数据库的约束表达业务规则。本文逐张表讲：为什么有这张表、每个字段干嘛、索引为什么这么建，并附上项目真实的 GORM 模型代码。  一、设计表之前先想清楚 3 件事1. 这张表描述的是什么「东西」一个表 &#x3D; 一类实体。如果你想不出「它描述什么」，大概率是表拆错了。 2. 哪些规则必须由数据库保证   规则 用数据库保证（强） 只用代码保证（弱）    用">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://127.0.0.1:8080/blog/blog/images/db-er.svg">
-<meta property="article:published_time" content="2026-11-14T15:52:00.000Z">
-<meta property="article:modified_time" content="2026-11-12T17:35:08.726Z">
+<meta property="article:published_time" content="2026-11-14T15:51:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:38:36.321Z">
 <meta property="article:author" content="gochat">
 <meta property="article:tag" content="MySQL">
 <meta property="article:tag" content="索引">
@@ -313,7 +313,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-11-14 23:52" pubdate>
+        <time datetime="2026-11-14 23:51" pubdate>
           2026年11月14日 晚上
         </time>
       </span>
@@ -325,7 +325,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          8.3k 字
+          8.8k 字
         
       </span>
     
@@ -336,7 +336,7 @@
         
         
         
-          70 分钟
+          73 分钟
         
       </span>
     
@@ -910,6 +910,18 @@
 <li>索引是不是越多越好？什么情况下不该建索引？</li>
 <li>群人数怎么统计？并发加人怎么防超员？</li>
 </ol>
+<h2 id="十三、面试怎么答（背这-3-句）"><a href="#十三、面试怎么答（背这-3-句）" class="headerlink" title="十三、面试怎么答（背这 3 句）"></a>十三、面试怎么答（背这 3 句）</h2><p><strong>问：好友关系为什么存两行？</strong></p>
+<blockquote>
+<p>因为查「我的好友」要能走索引。存两行后 <code>WHERE user_id = ?</code> 直接命中 <code>idx_user</code>；<br>只存一行就得 <code>WHERE user_id = ? OR friend_id = ?</code>，<code>OR</code> 用不上索引，数据量大就全表扫。<br>代价是写两条，所以必须用事务保证成对。</p>
+</blockquote>
+<p><strong>问：未读数怎么算？为什么不用已读表？</strong></p>
+<blockquote>
+<p>在 <code>conversation_members</code> 存 <code>last_read_message_id</code>，未读数 &#x3D; <code>id &gt; last_read_message_id AND sender != 我</code> 的消息数。<br>建已读表是「消息数 × 成员数」的量级（200 人 × 10 万条 &#x3D; 2000 万行），当前方案只要 200 行。</p>
+</blockquote>
+<p><strong>问：软删除和唯一索引冲突怎么解？</strong></p>
+<blockquote>
+<p>软删只是改标记、行还在，唯一索引仍占位。解法两种：<br>① 用 <code>Unscoped()</code> 查旧行，存在就恢复（重置 status）；<br>② 不需要历史的数据（如黑名单）直接物理删除。</p>
+</blockquote>
 <hr>
 <p>相关：<a href="/blog/2026/11/14/01-04-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF/">一次 HTTP 请求的完整链路</a>、<a href="/blog/2026/11/14/02-06-MySQL%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96/">MySQL 索引与查询优化</a></p>
 

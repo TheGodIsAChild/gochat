@@ -19,15 +19,15 @@
   <meta name="author" content="gochat">
   <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
   
-    <meta name="description" content="第一次来？按下面 4 步走，2 周能读懂这个项目。     步骤 做什么 看哪篇    第 1 步 先把项目跑起来，亲手发一条消息 环境准备与项目启动   第 2 步 搞懂一条请求怎么走完全程 一次 HTTP 请求的完整链路   第 3 步 按 M1–M7 逐个理解模块 里程碑篇   第 4 步 练面试表达 面试篇    ① 入门篇难度：⭐ 入门　单篇时长：15–40 分钟　适合：第一次接触本项">
+    <meta name="description" content="第一次来？按下面 4 步走，2 周能读懂这个项目。     步骤 做什么 看哪篇    第 0 步 遇到不懂的术语随时回来查 术语表：45 个必懂概念   第 1 步 先把项目跑起来，亲手发一条消息 环境准备与项目启动   第 2 步 搞懂一条请求怎么走完全程 一次 HTTP 请求的完整链路   第 3 步 按 M1–M7 逐个理解模块 里程碑篇   第 4 步 用 30 题自测，再练面试表达">
 <meta property="og:type" content="website">
 <meta property="og:title" content="文章目录">
 <meta property="og:url" content="http://127.0.0.1:8080/blog/catalog/index.html">
 <meta property="og:site_name" content="gochat 项目学习博客">
-<meta property="og:description" content="第一次来？按下面 4 步走，2 周能读懂这个项目。     步骤 做什么 看哪篇    第 1 步 先把项目跑起来，亲手发一条消息 环境准备与项目启动   第 2 步 搞懂一条请求怎么走完全程 一次 HTTP 请求的完整链路   第 3 步 按 M1–M7 逐个理解模块 里程碑篇   第 4 步 练面试表达 面试篇    ① 入门篇难度：⭐ 入门　单篇时长：15–40 分钟　适合：第一次接触本项">
+<meta property="og:description" content="第一次来？按下面 4 步走，2 周能读懂这个项目。     步骤 做什么 看哪篇    第 0 步 遇到不懂的术语随时回来查 术语表：45 个必懂概念   第 1 步 先把项目跑起来，亲手发一条消息 环境准备与项目启动   第 2 步 搞懂一条请求怎么走完全程 一次 HTTP 请求的完整链路   第 3 步 按 M1–M7 逐个理解模块 里程碑篇   第 4 步 用 30 题自测，再练面试表达">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-11-14T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-11-12T17:35:08.899Z">
+<meta property="article:modified_time" content="2026-11-12T17:38:36.572Z">
 <meta property="article:author" content="gochat">
 <meta property="article:tag" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
 <meta name="twitter:card" content="summary_large_image">
@@ -334,6 +334,11 @@
 </tr>
 </thead>
 <tbody><tr>
+<td>第 0 步</td>
+<td>遇到不懂的术语随时回来查</td>
+<td><a href="/blog/2026/11/14/01-07-%E6%9C%AF%E8%AF%AD%E8%A1%A8-45%E4%B8%AA%E5%BF%85%E6%87%82%E6%A6%82%E5%BF%B5/">术语表：45 个必懂概念</a></td>
+</tr>
+<tr>
 <td>第 1 步</td>
 <td>先把项目跑起来，亲手发一条消息</td>
 <td><a href="/blog/2026/11/14/01-03-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/">环境准备与项目启动</a></td>
@@ -350,8 +355,8 @@
 </tr>
 <tr>
 <td>第 4 步</td>
-<td>练面试表达</td>
-<td><a href="#6-%E9%9D%A2%E8%AF%95%E7%AF%87">面试篇</a></td>
+<td>用 30 题自测，再练面试表达</td>
+<td><a href="/blog/2026/11/14/06-04-%E9%9D%A2%E8%AF%95%E8%87%AA%E6%B5%8B30%E9%A2%98%E5%90%AB%E7%AD%94%E6%A1%88/">面试自测 30 题（含答案）</a></td>
 </tr>
 </tbody></table>
 <hr>
@@ -392,6 +397,11 @@
 <tr>
 <td>06</td>
 <td><a href="/blog/2026/11/14/01-06-%E8%B8%A9%E5%9D%91%E9%9B%86/">踩坑集：24 个真实坑（含原因与解法）</a></td>
+<td></td>
+</tr>
+<tr>
+<td>07</td>
+<td><a href="/blog/2026/11/14/01-07-%E6%9C%AF%E8%AF%AD%E8%A1%A8-45%E4%B8%AA%E5%BF%85%E6%87%82%E6%A6%82%E5%BF%B5/">术语表：45 个必懂概念（小白友好）</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -705,6 +715,16 @@
 <tr>
 <td>03</td>
 <td><a href="/blog/2026/11/14/06-03-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/">项目总结与面试话术：怎么讲这个项目</a></td>
+<td></td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="/blog/2026/11/14/06-04-%E9%9D%A2%E8%AF%95%E8%87%AA%E6%B5%8B30%E9%A2%98%E5%90%AB%E7%AD%94%E6%A1%88/">面试自测 30 题（含参考答案）</a></td>
+<td></td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="/blog/2026/11/14/06-05-%E7%AE%80%E5%8E%86%E6%80%8E%E4%B9%88%E5%86%99%E8%BF%99%E4%B8%AA%E9%A1%B9%E7%9B%AE/">简历怎么写这个项目（含 3 个版本模板）</a></td>
 <td></td>
 </tr>
 </tbody></table>
