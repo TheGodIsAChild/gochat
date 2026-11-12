@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"gochat/global"
+	chat "gochat/internal/model/chat_model"
 	friend "gochat/internal/model/friend_model"
 	user "gochat/internal/model/user_model"
 	"time"
@@ -14,7 +15,11 @@ import (
 func LoadMysql() (*gorm.DB, error) {
 	dsn := global.Config.Mysql.DB_DSN()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true, //不生成实体外键
+		DisableForeignKeyConstraintWhenMigrating: true, // 不生成物理外键，约束交给应用层
+		// TranslateError: 把「驱动层错误」翻译成 GORM 的哨兵错误，
+		// 例如 MySQL 的 Duplicate entry → gorm.ErrDuplicatedKey。
+		// 这样业务代码可以用 errors.Is(err, gorm.ErrDuplicatedKey) 判断，而不用匹配错误字符串。
+		TranslateError: true,
 	})
 	if err != nil {
 		return db, fmt.Errorf("数据库连接Open失败，请检查数据库状态：%w", err)
@@ -32,17 +37,23 @@ func LoadMysql() (*gorm.DB, error) {
 }
 
 func InitMysqlTables() (bool, error) {
+	// AutoMigrate 会：建表 / 加缺失的列 / 加索引（不会删列，所以改字段类型要小心）
+	// 开发阶段用它很方便，生产环境一般用专门的迁移工具（golang-migrate 等）。
 	err := global.DB.AutoMigrate(
+		// M1 用户 + 好友
 		&friend.Blacklist{},
 		&friend.FriendGroup{},
 		&friend.FriendRequest{},
 		&friend.Friendship{},
 		&user.User{},
 		&user.UserSettings{},
+		// M2 单聊
+		&chat.Conversation{},
+		&chat.ConversationMember{},
+		&chat.Message{},
 	)
 	if err != nil {
-		fmt.Print("初始化数据库表失败")
-		return false, err
+		return false, fmt.Errorf("初始化数据库表失败: %w", err)
 	}
 	return true, nil
 }
