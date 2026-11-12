@@ -1,0 +1,995 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="本地跑得好好的，换台机器就挂——这是配置没管好。本文讲两件事：配置怎么管、依赖挂了怎么办（降级）。  一、配置从哪来：三层优先级1默认值（代码里） &lt; 配置文件（config.yaml） &lt; 环境变量（生产）     来源 用途 例子    代码默认值 保证能跑 access_expire_minutes: 120   配置文件 本地&#x2F;测试环境 config.yaml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="配置管理与优雅降级：让服务在各种环境下都能跑">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/14/03-05-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%E4%B8%8E%E9%99%8D%E7%BA%A7/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="本地跑得好好的，换台机器就挂——这是配置没管好。本文讲两件事：配置怎么管、依赖挂了怎么办（降级）。  一、配置从哪来：三层优先级1默认值（代码里） &lt; 配置文件（config.yaml） &lt; 环境变量（生产）     来源 用途 例子    代码默认值 保证能跑 access_expire_minutes: 120   配置文件 本地&#x2F;测试环境 config.yaml">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-14T15:43:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:23:22.847Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="12-factor">
+<meta property="article:tag" content="可用性">
+<meta property="article:tag" content="配置">
+<meta property="article:tag" content="降级">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>配置管理与优雅降级：让服务在各种环境下都能跑 - gochat 项目学习博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 50vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/catalog/" target="_self">
+                <i class="iconfont icon-books"></i>
+                <span>目录</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/catalog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-books"></i>
+                  <span>目录</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.55)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="配置管理与优雅降级：让服务在各种环境下都能跑"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-14 23:43" pubdate>
+          2026年11月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          34 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">配置管理与优雅降级：让服务在各种环境下都能跑</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本地跑得好好的，换台机器就挂——这是配置没管好。<br>本文讲两件事：<strong>配置怎么管</strong>、<strong>依赖挂了怎么办（降级）</strong>。</p>
+</blockquote>
+<h2 id="一、配置从哪来：三层优先级"><a href="#一、配置从哪来：三层优先级" class="headerlink" title="一、配置从哪来：三层优先级"></a>一、配置从哪来：三层优先级</h2><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs arduino">默认值（代码里） &lt; 配置文件（config.yaml） &lt; 环境变量（生产）<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>用途</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>代码默认值</td>
+<td>保证能跑</td>
+<td><code>access_expire_minutes: 120</code></td>
+</tr>
+<tr>
+<td>配置文件</td>
+<td>本地&#x2F;测试环境</td>
+<td><code>config.yaml</code></td>
+</tr>
+<tr>
+<td>环境变量</td>
+<td>生产（不进 git）</td>
+<td><code>JWT_SECRET</code>、<code>MYSQL_PASSWORD</code></td>
+</tr>
+<tr>
+<td>配置中心</td>
+<td>动态调整</td>
+<td>Nacos &#x2F; Apollo &#x2F; Etcd</td>
+</tr>
+</tbody></table>
+<p><strong>为什么生产用环境变量</strong>：配置文件要进代码仓库，密码&#x2F;密钥一旦提交就泄露了。</p>
+<h2 id="二、本项目的配置实现"><a href="#二、本项目的配置实现" class="headerlink" title="二、本项目的配置实现"></a>二、本项目的配置实现</h2><h3 id="结构体定义（internal-config-）"><a href="#结构体定义（internal-config-）" class="headerlink" title="结构体定义（internal&#x2F;config&#x2F;）"></a>结构体定义（internal&#x2F;config&#x2F;）</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Config <span class="hljs-keyword">struct</span> &#123;<br>    Mysql    Mysql<br>    Redis    Redis<br>    Rabbitmq Rabbitmq<br>    JWT      JWT<br>    Server   Server<br>    GRPC     GRPC<br>&#125;<br><br><span class="hljs-keyword">type</span> JWT <span class="hljs-keyword">struct</span> &#123;<br>    Secret             <span class="hljs-type">string</span> <span class="hljs-string">`yaml:&quot;secret&quot;`</span><br>    AccessExpireMinutes <span class="hljs-type">int</span>    <span class="hljs-string">`yaml:&quot;access_expire_minutes&quot;`</span>   <span class="hljs-comment">// 120</span><br>    RefreshExpireHours  <span class="hljs-type">int</span>    <span class="hljs-string">`yaml:&quot;refresh_expire_hours&quot;`</span>    <span class="hljs-comment">// 720</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="加载三步"><a href="#加载三步" class="headerlink" title="加载三步"></a>加载三步</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs go">core.LoadConfigFile()   <span class="hljs-comment">// 1. 解析 -config ./config.yaml / -db</span><br>core.LoadConfig()       <span class="hljs-comment">// 2. os.ReadFile + yaml.Unmarshal 到 global.Config</span><br>core.InitBaseServices() <span class="hljs-comment">// 3. 用配置连接 DB/Redis/MQ</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>踩过的坑</strong>：<code>yaml.Unmarshal</code> 第二个参数必须传指针，否则解析结果写不进去。</p>
+<h2 id="三、启动校验：宁可起不来，也不要带病运行"><a href="#三、启动校验：宁可起不来，也不要带病运行" class="headerlink" title="三、启动校验：宁可起不来，也不要带病运行"></a>三、启动校验：宁可起不来，也不要带病运行</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">LoadConfig</span><span class="hljs-params">()</span></span> (<span class="hljs-type">bool</span>, <span class="hljs-type">error</span>) &#123;<br>    <span class="hljs-comment">// ... 读文件解析 ...</span><br>    <span class="hljs-keyword">if</span> global.Config.JWT.Secret == <span class="hljs-string">&quot;&quot;</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>, errors.New(<span class="hljs-string">&quot;jwt.secret 不能为空&quot;</span>)<br>    &#125;<br>    <span class="hljs-keyword">if</span> global.Config.Mysql.Host == <span class="hljs-string">&quot;&quot;</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>, errors.New(<span class="hljs-string">&quot;mysql.host 不能为空&quot;</span>)<br>    &#125;<br>    <span class="hljs-keyword">if</span> global.Config.JWT.AccessExpireMinutes &lt;= <span class="hljs-number">0</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>, errors.New(<span class="hljs-string">&quot;access_expire_minutes 必须 &gt; 0&quot;</span>)<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>原则</strong>：<strong>fail fast</strong>。配置错误应该在启动时立刻报错，而不是等第一个请求进来才发现。</p>
+<h2 id="四、依赖分级：必选-fail-fast，可选-fail-soft"><a href="#四、依赖分级：必选-fail-fast，可选-fail-soft" class="headerlink" title="四、依赖分级：必选 fail-fast，可选 fail-soft"></a>四、依赖分级：必选 fail-fast，可选 fail-soft</h2><table>
+<thead>
+<tr>
+<th>依赖</th>
+<th>级别</th>
+<th>挂了怎么办</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MySQL</td>
+<td><strong>必需</strong></td>
+<td>启动失败，<code>log.Fatalf</code></td>
+</tr>
+<tr>
+<td>Redis</td>
+<td><strong>必需</strong>（认证依赖）</td>
+<td>启动失败</td>
+</tr>
+<tr>
+<td>RabbitMQ</td>
+<td><strong>可选</strong></td>
+<td>打日志 + 降级为同步推送</td>
+</tr>
+</tbody></table>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">InitBaseServices</span><span class="hljs-params">()</span></span> <span class="hljs-type">error</span> &#123;<br>    <span class="hljs-keyword">if</span> _, err := db.LoadMysql(); err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;数据库连接失败: %w&quot;</span>, err)     <span class="hljs-comment">// 必需 → 返回 error</span><br>    &#125;<br>    <span class="hljs-keyword">if</span> _, err := db.LoadRedis(); err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;初始化 Redis 失败: %w&quot;</span>, err)  <span class="hljs-comment">// 必需</span><br>    &#125;<br>    <span class="hljs-keyword">if</span> err := mq.LoadMq(); err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-comment">// 【注意点】可选依赖：失败只告警，应用继续运行</span><br>        log.Printf(<span class="hljs-string">&quot;RabbitMQ 连接失败，消息将使用同步推送: %v&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>面试点</strong>：为什么要区分必需&#x2F;可选？→ 核心链路必须可用，非核心能力可以降级。</p>
+<h2 id="五、降级：可用性的最后一道防线"><a href="#五、降级：可用性的最后一道防线" class="headerlink" title="五、降级：可用性的最后一道防线"></a>五、降级：可用性的最后一道防线</h2><h3 id="本项目的降级实例：MQ-不可用"><a href="#本项目的降级实例：MQ-不可用" class="headerlink" title="本项目的降级实例：MQ 不可用"></a>本项目的降级实例：MQ 不可用</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 发消息 handler 里</span><br><span class="hljs-keyword">if</span> global.MQ != <span class="hljs-literal">nil</span> &amp;&amp; global.MQ.Enabled &#123;<br>    <span class="hljs-comment">// 正常：写 outbox，worker 异步推送</span><br>    outbox.Enqueue(tx, ...)<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// 降级：事务提交后直接同步推送</span><br>    ws.PushMessage(conversationID, item)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>行为</th>
+<th>用户感受</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MQ 正常</td>
+<td>异步推送，秒级延迟</td>
+<td>正常</td>
+</tr>
+<tr>
+<td>MQ 挂了</td>
+<td>同步推送，请求稍慢</td>
+<td><strong>功能不受影响</strong></td>
+</tr>
+</tbody></table>
+<p><strong>设计原则</strong>：降级不是「报错」，而是「用更差但可用的方式继续服务」。</p>
+<h3 id="常见降级策略"><a href="#常见降级策略" class="headerlink" title="常见降级策略"></a>常见降级策略</h3><table>
+<thead>
+<tr>
+<th>故障</th>
+<th>降级方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>缓存挂了</td>
+<td>直接查数据库（慢但可用）</td>
+</tr>
+<tr>
+<td>推荐服务挂了</td>
+<td>返回热门&#x2F;默认内容</td>
+</tr>
+<tr>
+<td>第三方接口超时</td>
+<td>返回兜底数据</td>
+</tr>
+<tr>
+<td>写操作失败</td>
+<td>转异步重试（MQ）</td>
+</tr>
+<tr>
+<td>限流触发</td>
+<td>返回 429 + 提示稍后再试</td>
+</tr>
+</tbody></table>
+<h2 id="六、超时、重试、熔断"><a href="#六、超时、重试、熔断" class="headerlink" title="六、超时、重试、熔断"></a>六、超时、重试、熔断</h2><h3 id="超时（必须有）"><a href="#超时（必须有）" class="headerlink" title="超时（必须有）"></a>超时（必须有）</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs go">ctx, cancel := context.WithTimeout(c.Request.Context(), <span class="hljs-number">3</span>*time.Second)<br><span class="hljs-keyword">defer</span> cancel()<br><br>err := global.DB.WithContext(ctx).Create(&amp;msg).Error<br></code></pre></td></tr></table></figure>
+
+<p><strong>为什么必须</strong>：没有超时的调用可能永远挂住 → goroutine 泄漏 → 服务雪崩。</p>
+<h3 id="重试（要谨慎）"><a href="#重试（要谨慎）" class="headerlink" title="重试（要谨慎）"></a>重试（要谨慎）</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 只对「可重试」的错误重试：网络超时、5xx</span><br><span class="hljs-comment">// 不要对「业务错误」重试：参数错误、余额不足</span><br><span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">3</span>; i++ &#123;<br>    err := call()<br>    <span class="hljs-keyword">if</span> err == <span class="hljs-literal">nil</span> &#123; <span class="hljs-keyword">break</span> &#125;<br>    <span class="hljs-keyword">if</span> !isRetryable(err) &#123; <span class="hljs-keyword">break</span> &#125;<br>    time.Sleep(backoff(i))   <span class="hljs-comment">// 指数退避 + 抖动</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>前提</strong>：被重试的操作必须<strong>幂等</strong>（否则重复下单&#x2F;重复发消息）。</p>
+<h3 id="熔断（防雪崩）"><a href="#熔断（防雪崩）" class="headerlink" title="熔断（防雪崩）"></a>熔断（防雪崩）</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">正常 → 失败率超阈值 → 打开（快速失败）→ 半开（试探）→ 恢复<br></code></pre></td></tr></table></figure>
+
+<p>本项目未实现，生产可用 Sentinel &#x2F; gobreaker。</p>
+<h2 id="七、特性开关（Feature-Flag）"><a href="#七、特性开关（Feature-Flag）" class="headerlink" title="七、特性开关（Feature Flag）"></a>七、特性开关（Feature Flag）</h2><p><strong>场景</strong>：新功能上线要灰度、要能一键关闭。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Features <span class="hljs-keyword">struct</span> &#123;<br>    EnableRecall    <span class="hljs-type">bool</span> <span class="hljs-string">`yaml:&quot;enable_recall&quot;`</span><br>    EnableVoiceCall <span class="hljs-type">bool</span> <span class="hljs-string">`yaml:&quot;enable_voice_call&quot;`</span><br>&#125;<br><br><span class="hljs-keyword">if</span> !global.Config.Features.EnableRecall &#123;<br>    resp.Fail(c, <span class="hljs-number">403</span>, <span class="hljs-string">&quot;功能未开放&quot;</span>)<br>    <span class="hljs-keyword">return</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>好处</strong>：出问题改配置重启即可关闭，不用回滚代码。</p>
+<h2 id="八、敏感信息管理"><a href="#八、敏感信息管理" class="headerlink" title="八、敏感信息管理"></a>八、敏感信息管理</h2><table>
+<thead>
+<tr>
+<th>做法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>❌ 把密码写进代码</td>
+<td>泄露风险最高</td>
+</tr>
+<tr>
+<td>❌ 把 config.yaml 提交到公开仓库</td>
+<td>同样泄露</td>
+</tr>
+<tr>
+<td>✅ 本地 config.yaml + .gitignore</td>
+<td>仓库只提交 <code>config.example.yaml</code></td>
+</tr>
+<tr>
+<td>✅ 生产用环境变量&#x2F;K8s Secret</td>
+<td>不落盘</td>
+</tr>
+<tr>
+<td>❌ 启动日志打印完整配置</td>
+<td>密码进日志</td>
+</tr>
+</tbody></table>
+<p><strong>本项目注意点</strong>：启动日志里曾打印过完整 <code>Config</code>，会泄露 DB 密码和 JWT secret。</p>
+<h2 id="九、配置热更新（进阶）"><a href="#九、配置热更新（进阶）" class="headerlink" title="九、配置热更新（进阶）"></a>九、配置热更新（进阶）</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 方案 1：监听文件变化（fsnotify）</span><br>watcher, _ := fsnotify.NewWatcher()<br>watcher.Add(<span class="hljs-string">&quot;./config.yaml&quot;</span>)<br><br><span class="hljs-comment">// 方案 2：配置中心长轮询（Nacos/Apollo）</span><br><span class="hljs-comment">// 方案 3：SIGHUP 信号重新加载</span><br>signal.Notify(sighup, syscall.SIGHUP)<br></code></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>：热更新只适合「可动态调整」的配置（日志级别、开关、阈值）；<br>数据库地址、JWT secret 这类改了需要重建连接&#x2F;会让旧 token 失效，不建议热更。</p>
+<h2 id="十、一份生产级配置模板"><a href="#十、一份生产级配置模板" class="headerlink" title="十、一份生产级配置模板"></a>十、一份生产级配置模板</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">server:</span><br>  <span class="hljs-attr">addr:</span> <span class="hljs-string">&quot;:8080&quot;</span><br>  <span class="hljs-attr">read_timeout:</span> <span class="hljs-string">15s</span><br>  <span class="hljs-attr">write_timeout:</span> <span class="hljs-string">15s</span><br><br><span class="hljs-attr">mysql:</span><br>  <span class="hljs-attr">host:</span> <span class="hljs-string">$&#123;MYSQL_HOST&#125;</span>          <span class="hljs-comment"># 从环境变量注入</span><br>  <span class="hljs-attr">port:</span> <span class="hljs-number">3306</span><br>  <span class="hljs-attr">user:</span> <span class="hljs-string">$&#123;MYSQL_USER&#125;</span><br>  <span class="hljs-attr">password:</span> <span class="hljs-string">$&#123;MYSQL_PASSWORD&#125;</span><br>  <span class="hljs-attr">database:</span> <span class="hljs-string">gochat</span><br>  <span class="hljs-attr">max_open_conns:</span> <span class="hljs-number">50</span><br>  <span class="hljs-attr">max_idle_conns:</span> <span class="hljs-number">10</span><br><br><span class="hljs-attr">jwt:</span><br>  <span class="hljs-attr">secret:</span> <span class="hljs-string">$&#123;JWT_SECRET&#125;</span><br>  <span class="hljs-attr">access_expire_minutes:</span> <span class="hljs-number">120</span><br>  <span class="hljs-attr">refresh_expire_hours:</span> <span class="hljs-number">720</span><br><br><span class="hljs-attr">features:</span><br>  <span class="hljs-attr">enable_recall:</span> <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="十一、面试问法"><a href="#十一、面试问法" class="headerlink" title="十一、面试问法"></a>十一、面试问法</h2><ol>
+<li>配置怎么管理？本地&#x2F;测试&#x2F;生产怎么隔离？</li>
+<li>为什么生产用环境变量而不是配置文件？</li>
+<li>哪些依赖必须 fail-fast，哪些可以降级？</li>
+<li>什么是优雅降级？举例说明。</li>
+<li>超时、重试、熔断分别解决什么问题？</li>
+<li>重试的前提是什么？（幂等）</li>
+<li>什么是特性开关？有什么好处？</li>
+<li>敏感配置怎么保护？</li>
+<li>配置热更新有什么风险？</li>
+</ol>
+<hr>
+<p>相关：<a href="/blog/2026/11/14/03-04-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E4%B8%8E%E6%97%A5%E5%BF%97/">错误处理与日志</a>、<a href="/blog/2026/11/14/03-06-%E6%B5%8B%E8%AF%95%E4%B8%8E%E8%B0%83%E8%AF%95/">测试与调试</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/03-%E5%B7%A5%E7%A8%8B/" class="category-chain-item">03-工程</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/%E9%85%8D%E7%BD%AE/" class="print-no-link">#配置</a>
+      
+        <a href="/blog/tags/%E9%99%8D%E7%BA%A7/" class="print-no-link">#降级</a>
+      
+        <a href="/blog/tags/%E5%8F%AF%E7%94%A8%E6%80%A7/" class="print-no-link">#可用性</a>
+      
+        <a href="/blog/tags/12-factor/" class="print-no-link">#12-factor</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>配置管理与优雅降级：让服务在各种环境下都能跑</div>
+      <div>http://127.0.0.1:8080/blog/2026/11/14/03-05-配置管理与降级/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gochat</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/03-04-%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E4%B8%8E%E6%97%A5%E5%BF%97/" title="错误处理与日志：Go 工程化实践">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">错误处理与日志：Go 工程化实践</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/03-06-%E6%B5%8B%E8%AF%95%E4%B8%8E%E8%B0%83%E8%AF%95/" title="测试与调试：怎么验证你的代码是对的">
+                        <span class="hidden-mobile">测试与调试：怎么验证你的代码是对的</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

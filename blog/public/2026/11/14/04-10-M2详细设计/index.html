@@ -1,0 +1,1050 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M2: conversations&#x2F;messages models + idempotent send + history pagination + WebSocket hub&#x2F;client + online status   一、里程碑目标 会话管理：创建&#x2F;获取单聊会话、会话列表（含未读数） 消息：发送、历史拉取（">
+<meta property="og:type" content="article">
+<meta property="og:title" content="M2 详细设计：单聊与 WebSocket（幂等 &#x2F; 分页 &#x2F; 读写泵）">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/14/04-10-M2%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M2: conversations&#x2F;messages models + idempotent send + history pagination + WebSocket hub&#x2F;client + online status   一、里程碑目标 会话管理：创建&#x2F;获取单聊会话、会话列表（含未读数） 消息：发送、历史拉取（">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://127.0.0.1:8080/blog/blog/images/websocket.svg">
+<meta property="article:published_time" content="2026-11-14T15:32:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:23:27.080Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="WebSocket">
+<meta property="article:tag" content="分页">
+<meta property="article:tag" content="幂等">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://127.0.0.1:8080/blog/blog/images/websocket.svg">
+  
+  
+  
+  <title>M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵） - gochat 项目学习博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 50vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/catalog/" target="_self">
+                <i class="iconfont icon-books"></i>
+                <span>目录</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/catalog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-books"></i>
+                  <span>目录</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.55)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-14 23:32" pubdate>
+          2026年11月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          38 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><img src="/blog/blog/images/websocket.svg" srcset="/blog/img/loading.gif" lazyload alt="WebSocket 连接管理架构"></p>
+<blockquote>
+<p>上图由项目手绘 SVG 说明，配合下文阅读效果更好。</p>
+</blockquote>
+<blockquote>
+<p>对应提交：<code>M2: conversations/messages models + idempotent send + history pagination + WebSocket hub/client + online status</code></p>
+</blockquote>
+<hr>
+<h2 id="一、里程碑目标"><a href="#一、里程碑目标" class="headerlink" title="一、里程碑目标"></a>一、里程碑目标</h2><ul>
+<li>会话管理：创建&#x2F;获取单聊会话、会话列表（含未读数）</li>
+<li>消息：发送、历史拉取（游标分页）、已读</li>
+<li><strong>WebSocket 长连接</strong>：实时收发消息</li>
+<li>在线状态</li>
+<li>离线消息（靠 DB 持久化 + 未读数）</li>
+</ul>
+<p>验收（已实测）：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>创建单聊会话</td>
+<td>200</td>
+</tr>
+<tr>
+<td>重复创建 → 同一会话</td>
+<td>200（conversation_id 相同）</td>
+</tr>
+<tr>
+<td>发消息</td>
+<td>200</td>
+</tr>
+<tr>
+<td>同一 client_msg_id 重发 → 同一条消息</td>
+<td>200（幂等）</td>
+</tr>
+<tr>
+<td>会话列表未读数</td>
+<td>unread&#x3D;1</td>
+</tr>
+<tr>
+<td>标记已读</td>
+<td>unread&#x3D;0</td>
+</tr>
+<tr>
+<td>HTTP 发消息 → 对方 WS 收到推送</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>WS 发消息 → 收到 ack + 广播</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>ping&#x2F;pong</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="二、数据模型：会话-消息-成员"><a href="#二、数据模型：会话-消息-成员" class="headerlink" title="二、数据模型：会话 + 消息 + 成员"></a>二、数据模型：会话 + 消息 + 成员</h2><h3 id="2-1-为什么单聊和群聊共用一张会话表"><a href="#2-1-为什么单聊和群聊共用一张会话表" class="headerlink" title="2.1 为什么单聊和群聊共用一张会话表"></a>2.1 为什么单聊和群聊共用一张会话表</h3><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs dns">conversations        <span class="hljs-punctuation">(</span>会话：单聊/群聊<span class="hljs-punctuation">)</span><br>conversation_members <span class="hljs-punctuation">(</span>成员：谁在会话里、读到哪<span class="hljs-punctuation">)</span><br>messages             <span class="hljs-punctuation">(</span>消息：conversation_id + sender_id + content<span class="hljs-punctuation">)</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>单聊：<code>Type=1</code>，两个成员</li>
+<li>群聊：<code>Type=2</code>，多个成员（M3 复用同一套表）</li>
+</ul>
+<p><strong>好处</strong>：消息表不需要区分单聊&#x2F;群聊，统一按 <code>conversation_id</code> 查。</p>
+<h3 id="2-2-为什么会话冗余最后消息"><a href="#2-2-为什么会话冗余最后消息" class="headerlink" title="2.2 为什么会话冗余最后消息"></a>2.2 为什么会话冗余最后消息</h3><p><code>conversations.last_message_id / last_message_at</code></p>
+<p>如果会话列表要展示”最后一条消息”，每次都去 <code>messages</code> 按 <code>conversation_id</code> 查最新一条，数据量大时很慢。<br>把最后消息信息冗余到会话行 → 列表查询变成一次简单查询（空间换时间）。</p>
+<h3 id="2-3-未读数怎么算"><a href="#2-3-未读数怎么算" class="headerlink" title="2.3 未读数怎么算"></a>2.3 未读数怎么算</h3><p><code>conversation_members.last_read_message_id</code> 记录”我读到哪了”。</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs armasm">未读数 = messages WHERE conversation_id=? <span class="hljs-keyword">AND</span> id &gt; last_read_message_id <span class="hljs-keyword">AND</span> sender_id != 我<br></code></pre></td></tr></table></figure>
+
+<p>标记已读 &#x3D; 更新 <code>last_read_message_id</code>（只前进不后退）。</p>
+<blockquote>
+<p>比单独建 <code>message_reads</code> 表简单，M2 先用这个方案。</p>
+</blockquote>
+<hr>
+<h2 id="三、消息幂等（重点）"><a href="#三、消息幂等（重点）" class="headerlink" title="三、消息幂等（重点）"></a>三、消息幂等（重点）</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>网络重试、用户连点、WS 重发都会导致<strong>同一条逻辑消息被发送多次</strong>。</p>
+<h3 id="方案：客户端生成唯一-client-msg-id"><a href="#方案：客户端生成唯一-client-msg-id" class="headerlink" title="方案：客户端生成唯一 client_msg_id"></a>方案：客户端生成唯一 <code>client_msg_id</code></h3><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dns">messages: UNIQUE<span class="hljs-punctuation">(</span>sender_id, client_msg_id<span class="hljs-punctuation">)</span><br></code></pre></td></tr></table></figure>
+
+<p>服务端处理：</p>
+<ol>
+<li>先查 <code>(sender_id, client_msg_id)</code> 是否已存在 → 存在直接返回（重复请求返回同一条）</li>
+<li>不存在 → 插入</li>
+<li>并发下两个请求同时插入 → 唯一索引让第二个报 Duplicate</li>
+<li>捕获 <code>gorm.ErrDuplicatedKey</code> → 再查一次返回已有消息</li>
+</ol>
+<p><strong>结果</strong>：无论客户端重试多少次，数据库里只有一条消息。</p>
+<h3 id="配套：TranslateError-true"><a href="#配套：TranslateError-true" class="headerlink" title="配套：TranslateError: true"></a>配套：<code>TranslateError: true</code></h3><p>GORM 配置里开启 <code>TranslateError</code>，把 MySQL 的 <code>Duplicate entry</code> 错误翻译成 <code>gorm.ErrDuplicatedKey</code>，<br>这样业务代码用 <code>errors.Is(err, gorm.ErrDuplicatedKey)</code> 判断，不用匹配错误字符串。</p>
+<hr>
+<h2 id="四、分页：为什么用游标不用-offset"><a href="#四、分页：为什么用游标不用-offset" class="headerlink" title="四、分页：为什么用游标不用 offset"></a>四、分页：为什么用游标不用 offset</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- offset 分页</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> messages <span class="hljs-keyword">WHERE</span> conversation_id<span class="hljs-operator">=</span>? <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id <span class="hljs-keyword">DESC</span> LIMIT <span class="hljs-number">20</span> <span class="hljs-keyword">OFFSET</span> <span class="hljs-number">1000</span>;<br><span class="hljs-comment">-- 越翻越慢：数据库要扫描并跳过前 1000 行；新消息插入还会导致翻页错位/重复</span><br><br><span class="hljs-comment">-- 游标分页</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> messages <span class="hljs-keyword">WHERE</span> conversation_id<span class="hljs-operator">=</span>? <span class="hljs-keyword">AND</span> id <span class="hljs-operator">&lt;</span> ? <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id <span class="hljs-keyword">DESC</span> LIMIT <span class="hljs-number">20</span>;<br><span class="hljs-comment">-- 用上一页最后一条 id 作锚点，性能稳定、不会错位</span><br></code></pre></td></tr></table></figure>
+
+<p>返回时把倒序结果翻转成正序，前端直接渲染。</p>
+<hr>
+<h2 id="五、WebSocket-架构（M2-最核心）"><a href="#五、WebSocket-架构（M2-最核心）" class="headerlink" title="五、WebSocket 架构（M2 最核心）"></a>五、WebSocket 架构（M2 最核心）</h2><h3 id="5-1-三个角色"><a href="#5-1-三个角色" class="headerlink" title="5.1 三个角色"></a>5.1 三个角色</h3><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs dart"><span class="hljs-title class_">Hub</span>      ：管理所有连接（userID → 多个连接），并发安全<br><span class="hljs-title class_">Client</span>   ：一个连接，含读 goroutine + 写 goroutine<br><span class="hljs-title class_">ServeWS</span>  ：HTTP 握手升级 + token 校验<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-2-为什么读写分离"><a href="#5-2-为什么读写分离" class="headerlink" title="5.2 为什么读写分离"></a>5.2 为什么读写分离</h3><p>gorilla&#x2F;websocket <strong>不允许并发写</strong>。如果多个 goroutine 同时写同一个连接会 panic。<br>所以：</p>
+<ul>
+<li><code>ReadPump</code>：唯一从 socket 读的 goroutine</li>
+<li><code>WritePump</code>：唯一往 socket 写的 goroutine</li>
+<li>其他 goroutine 想发消息 &#x3D; 往 <code>Client.send</code> channel 里塞数据</li>
+</ul>
+<h3 id="5-3-Hub-的并发安全"><a href="#5-3-Hub-的并发安全" class="headerlink" title="5.3 Hub 的并发安全"></a>5.3 Hub 的并发安全</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Hub <span class="hljs-keyword">struct</span> &#123;<br>    mu      sync.RWMutex<br>    clients <span class="hljs-keyword">map</span>[<span class="hljs-type">uint64</span>]<span class="hljs-keyword">map</span>[*Client]<span class="hljs-keyword">struct</span>&#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>Hub 被「连接建立&#x2F;断开」和「消息推送」多个 goroutine 同时访问 → 必须加锁</li>
+<li>读写锁：读多写少，比 Mutex 性能好</li>
+<li><code>SendToUser</code> 里先把连接列表<strong>复制</strong>出来，再释放锁发送，避免持锁做 IO</li>
+</ul>
+<h3 id="5-4-心跳机制"><a href="#5-4-心跳机制" class="headerlink" title="5.4 心跳机制"></a>5.4 心跳机制</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go">conn.SetReadDeadline(time.Now().Add(pongWait))       <span class="hljs-comment">// 60s 没收到 pong 就断开</span><br>conn.SetPongHandler(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(<span class="hljs-type">string</span>)</span></span> <span class="hljs-type">error</span> &#123;<br>    <span class="hljs-keyword">return</span> conn.SetReadDeadline(time.Now().Add(pongWait))  <span class="hljs-comment">// 收到 pong 续期</span><br>&#125;)<br><span class="hljs-comment">// WritePump 每 54s 发一次 ping</span><br></code></pre></td></tr></table></figure>
+
+<p>作用：清理「网线拔了但 TCP 没断」的僵尸连接。</p>
+<h3 id="5-5-慢消费者隔离"><a href="#5-5-慢消费者隔离" class="headerlink" title="5.5 慢消费者隔离"></a>5.5 慢消费者隔离</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">select</span> &#123;<br><span class="hljs-keyword">case</span> c.send &lt;- payload:<br><span class="hljs-keyword">default</span>:<br>    c.Close()   <span class="hljs-comment">// 队列满了 → 断开这个慢连接</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>如果客户端很慢，<code>send</code> channel 满了，直接阻塞会拖垮推送方（可能是给其他用户推消息的 goroutine）。<br>用 non-blocking 写 + 断开慢连接，保证一个慢客户端不影响其他人。</p>
+<blockquote>
+<p>这是消息系统「慢消费者」问题的通用解法（Kafka&#x2F;RabbitMQ 里也有类似思路）。</p>
+</blockquote>
+<h3 id="5-6-推送路径统一"><a href="#5-6-推送路径统一" class="headerlink" title="5.6 推送路径统一"></a>5.6 推送路径统一</h3><p>HTTP 发消息 和 WS 发消息，最终都要「推送给会话所有在线成员」。<br>所以抽出 <code>ws.PushMessage(convID, item)</code>：</p>
+<ul>
+<li>HTTP handler 发完消息调用</li>
+<li>WS 的 <code>handleText</code> 发完消息也调用</li>
+</ul>
+<blockquote>
+<p>为什么放 ws 包而不是 service：service 不应该依赖 WebSocket（M6 拆 gRPC 时没有 WS）。</p>
+</blockquote>
+<hr>
+<h2 id="六、鉴权：WS-怎么带-token"><a href="#六、鉴权：WS-怎么带-token" class="headerlink" title="六、鉴权：WS 怎么带 token"></a>六、鉴权：WS 怎么带 token</h2><p>浏览器 WebSocket API <strong>不能自定义请求头</strong>（不能带 <code>Authorization</code>）。<br>所以：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim"><span class="hljs-keyword">ws</span>://<span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span>:<span class="hljs-number">8080</span>/<span class="hljs-keyword">ws</span>?token=<span class="hljs-symbol">&lt;access_token&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>服务端在<strong>升级连接之前</strong>先校验 token，非法直接 401，不浪费连接资源。<br>（同时兼容非浏览器客户端的 <code>Authorization: Bearer</code>。）</p>
+<hr>
+<h2 id="七、在线状态与离线消息"><a href="#七、在线状态与离线消息" class="headerlink" title="七、在线状态与离线消息"></a>七、在线状态与离线消息</h2><h3 id="在线状态"><a href="#在线状态" class="headerlink" title="在线状态"></a>在线状态</h3><ul>
+<li>Hub 里 <code>IsOnline(userID)</code> 判断是否在线</li>
+<li>接口：<code>GET /api/v1/online?ids=1,2,3</code> → <code>{&quot;online_ids&quot;:[1]}</code></li>
+</ul>
+<blockquote>
+<p>M2 是单机内存；M4&#x2F;M6 多实例要改成 Redis（每个实例写入在线用户 + TTL 续期）。</p>
+</blockquote>
+<h3 id="离线消息"><a href="#离线消息" class="headerlink" title="离线消息"></a>离线消息</h3><p><strong>不需要单独的表</strong>：</p>
+<ul>
+<li>消息已经落库到 <code>messages</code></li>
+<li>用户上线后通过 <code>GET /conversations/:id/messages</code> 拉历史</li>
+<li>通过 <code>unread</code> 计数知道有多少没读</li>
+</ul>
+<p>这就是”离线消息”的标准做法：<strong>持久化 + 上线拉取 + 未读数</strong>。</p>
+<hr>
+<h2 id="八、代码导读"><a href="#八、代码导读" class="headerlink" title="八、代码导读"></a>八、代码导读</h2><table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作用</th>
+<th>重点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>internal/model/chat_model/chat_model.go</code></td>
+<td>会话&#x2F;成员&#x2F;消息模型</td>
+<td>单聊群聊共用、幂等唯一索引</td>
+</tr>
+<tr>
+<td><code>internal/service/chat_service/conversation_service.go</code></td>
+<td>会话创建&#x2F;列表&#x2F;已读</td>
+<td>会话去重、未读数</td>
+</tr>
+<tr>
+<td><code>internal/service/chat_service/message_service.go</code></td>
+<td>发消息&#x2F;历史</td>
+<td><strong>幂等、事务、游标分页</strong></td>
+</tr>
+<tr>
+<td><code>internal/ws/hub.go</code></td>
+<td>连接管理</td>
+<td>RWMutex、多端连接、慢消费者</td>
+</tr>
+<tr>
+<td><code>internal/ws/client.go</code></td>
+<td>读写泵</td>
+<td>心跳、读写下分离、消息处理</td>
+</tr>
+<tr>
+<td><code>internal/ws/handler.go</code></td>
+<td>握手鉴权</td>
+<td>token、Upgrade</td>
+</tr>
+<tr>
+<td><code>internal/ws/push.go</code></td>
+<td>统一推送</td>
+<td>HTTP&#x2F;WS 共用</td>
+</tr>
+<tr>
+<td><code>internal/router/chat_router/chat_api.go</code></td>
+<td>HTTP 接口</td>
+<td>会话&#x2F;消息&#x2F;在线状态</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="九、注意点清单"><a href="#九、注意点清单" class="headerlink" title="九、注意点清单"></a>九、注意点清单</h2><ol>
+<li><strong>gorilla&#x2F;websocket 不能并发写</strong> → 写操作只在 WritePump</li>
+<li><strong>WS 的 ctx 用 <code>context.Background()</code></strong>：连接生命周期远长于 HTTP 请求</li>
+<li><strong>Hub 持锁时不要做 IO&#x2F;channel 操作</strong> → 先复制连接列表再发</li>
+<li><strong>慢消费者要断开</strong>，不能阻塞推送方</li>
+<li><strong>WS 鉴权在 Upgrade 之前</strong>，别升级完再校验</li>
+<li><strong><code>CheckOrigin</code> 生产环境必须校验</strong>，否则有 CSWSH 跨站 WebSocket 劫持</li>
+<li><strong>消息 ID 用自增</strong>：单库单表够用；分库分表时要用雪花算法&#x2F;号段</li>
+<li><strong>未读数是 N 次 count</strong>，会话多时要优化（Redis 计数）</li>
+<li><strong>游标分页不要用 offset</strong></li>
+<li><strong>client_msg_id 必须由客户端生成</strong>，服务端不能自己造（否则重试无法幂等）</li>
+</ol>
+<hr>
+<h2 id="十、面试点（M2）"><a href="#十、面试点（M2）" class="headerlink" title="十、面试点（M2）"></a>十、面试点（M2）</h2><ol>
+<li>WebSocket 和 HTTP 长轮询&#x2F;SSE 有什么区别？为什么 IM 用 WebSocket？</li>
+<li>为什么 WebSocket 要读写分离？gorilla&#x2F;websocket 并发写会怎样？</li>
+<li>心跳机制解决什么问题？ping&#x2F;pong 怎么做？</li>
+<li>如何管理大量 WebSocket 连接？Hub 怎么设计？多实例怎么办？</li>
+<li>消息怎么保证不重复？（client_msg_id + 唯一索引）</li>
+<li>消息乱序怎么办？（服务端 ID 递增 + 客户端按 ID 排序）</li>
+<li>离线消息怎么实现？（持久化 + 上线拉取 + 未读数）</li>
+<li>游标分页 vs offset 分页？</li>
+<li>慢消费者怎么处理？（有界队列 + 断开）</li>
+<li>WS 怎么鉴权？（query token，因为浏览器 WS 不能带 header）</li>
+<li>未读数怎么高效计算？（last_read_message_id vs Redis 计数）</li>
+</ol>
+<hr>
+<h2 id="十一、下一步（M3-群聊）"><a href="#十一、下一步（M3-群聊）" class="headerlink" title="十一、下一步（M3 群聊）"></a>十一、下一步（M3 群聊）</h2><p>M3 会复用 M2 的「会话 + 消息 + 成员」模型，只需：</p>
+<ul>
+<li>建 <code>groups</code> 表（群信息）</li>
+<li>建群：创建 conversation(Type&#x3D;2) + 群主成员</li>
+<li>加群 &#x2F; 退群 &#x2F; 踢人</li>
+<li>群消息：发送时推送给所有成员（M2 的 <code>PushMessage</code> 已经支持！）</li>
+<li>群里成员多时要注意扇出性能（M4 并发专题）</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/04-%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">04-里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" class="print-no-link">#并发</a>
+      
+        <a href="/blog/tags/WebSocket/" class="print-no-link">#WebSocket</a>
+      
+        <a href="/blog/tags/%E5%B9%82%E7%AD%89/" class="print-no-link">#幂等</a>
+      
+        <a href="/blog/tags/%E5%88%86%E9%A1%B5/" class="print-no-link">#分页</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵）</div>
+      <div>http://127.0.0.1:8080/blog/2026/11/14/04-10-M2详细设计/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gochat</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/04-09-M1%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M1 详细设计：认证与好友（双 token / 事务 / 软删除）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">M1 详细设计：认证与好友（双 token / 事务 / 软删除）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/04-11-M3%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M3 详细设计：群聊（建群事务 / 权限 / 人数统计）">
+                        <span class="hidden-mobile">M3 详细设计：群聊（建群事务 / 权限 / 人数统计）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

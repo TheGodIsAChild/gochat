@@ -1,0 +1,1062 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="M0–M7 已全部完成。本文用于面试时讲这个项目，以及自己复盘。详细技术点见 learn&#x2F; 各里程碑文档，题目见 面试集.md，场景见 场景集.md。   一、一句话介绍 “我用 Go 从零实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，并且完整走过了『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进过程。”">
+<meta property="og:type" content="article">
+<meta property="og:title" content="项目总结与面试话术：怎么讲这个项目">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/14/06-03-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="M0–M7 已全部完成。本文用于面试时讲这个项目，以及自己复盘。详细技术点见 learn&#x2F; 各里程碑文档，题目见 面试集.md，场景见 场景集.md。   一、一句话介绍 “我用 Go 从零实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，并且完整走过了『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进过程。”">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-14T15:24:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:23:27.100Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="复盘">
+<meta property="article:tag" content="话术">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>项目总结与面试话术：怎么讲这个项目 - gochat 项目学习博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 50vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/catalog/" target="_self">
+                <i class="iconfont icon-books"></i>
+                <span>目录</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/catalog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-books"></i>
+                  <span>目录</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.55)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="项目总结与面试话术：怎么讲这个项目"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-14 23:24" pubdate>
+          2026年11月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          24 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">项目总结与面试话术：怎么讲这个项目</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>M0–M7 已全部完成。本文用于<strong>面试时讲这个项目</strong>，以及自己复盘。<br>详细技术点见 <code>learn/</code> 各里程碑文档，题目见 <code>面试集.md</code>，场景见 <code>场景集.md</code>。</p>
+</blockquote>
+<hr>
+<h2 id="一、一句话介绍"><a href="#一、一句话介绍" class="headerlink" title="一、一句话介绍"></a>一、一句话介绍</h2><blockquote>
+<p>“我用 Go 从零实现了一个仿微信的 IM 后端，支持单聊&#x2F;群聊、WebSocket 实时消息、WebRTC 语音通话，<br>并且完整走过了『单体 → gRPC 微服务 → RabbitMQ 最终一致性』的演进过程。”</p>
+</blockquote>
+<hr>
+<h2 id="二、技术栈"><a href="#二、技术栈" class="headerlink" title="二、技术栈"></a>二、技术栈</h2><table>
+<thead>
+<tr>
+<th>层</th>
+<th>技术</th>
+<th>用来解决什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Web</td>
+<td>Gin</td>
+<td>HTTP 路由、中间件</td>
+</tr>
+<tr>
+<td>ORM</td>
+<td>GORM + MySQL 8</td>
+<td>数据持久化</td>
+</tr>
+<tr>
+<td>缓存</td>
+<td>Redis</td>
+<td>refresh token 白名单、原子操作</td>
+</tr>
+<tr>
+<td>鉴权</td>
+<td>JWT 双 token</td>
+<td>无感刷新 + 可撤销</td>
+</tr>
+<tr>
+<td>实时</td>
+<td>gorilla&#x2F;websocket</td>
+<td>消息推送、通话信令</td>
+</tr>
+<tr>
+<td>语音</td>
+<td>WebRTC 信令</td>
+<td>P2P 通话协商</td>
+</tr>
+<tr>
+<td>微服务</td>
+<td>gRPC</td>
+<td>服务间通信</td>
+</tr>
+<tr>
+<td>消息队列</td>
+<td>RabbitMQ</td>
+<td>异步投递、最终一致性</td>
+</tr>
+<tr>
+<td>并发</td>
+<td>goroutine&#x2F;channel&#x2F;RWMutex&#x2F;信号量</td>
+<td>WebSocket 管理、扇出控制</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、架构图"><a href="#三、架构图" class="headerlink" title="三、架构图"></a>三、架构图</h2><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs dart">                     ┌──────────────┐<br>客户端 ──HTTP──────► │   gateway    │  :<span class="hljs-number">8080</span>（鉴权/限流/协议转换）<br>                     └──────┬───────┘<br>                            │ gRPC<br>              ┌─────────────┴─────────────┐<br>              ▼                           ▼<br>       ┌────────────┐              ┌────────────┐<br>       │ user :<span class="hljs-number">9001</span> │              │ chat :<span class="hljs-number">9002</span> │<br>       └─────┬──────┘              └─────┬──────┘<br>             │                           │<br>             └──────────┬────────────────┘<br>                        ▼<br>              ┌──────────────────┐<br>              │ <span class="hljs-title class_">MySQL</span> / <span class="hljs-title class_">Redis</span>    │<br>              └──────────────────┘<br>                        │<br>客户端 ◄──<span class="hljs-title class_">WebSocket</span>──── │ ──► <span class="hljs-title class_">RabbitMQ</span>（outbox worker + consumer）<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、里程碑回顾（每个都能独立讲）"><a href="#四、里程碑回顾（每个都能独立讲）" class="headerlink" title="四、里程碑回顾（每个都能独立讲）"></a>四、里程碑回顾（每个都能独立讲）</h2><table>
+<thead>
+<tr>
+<th>里程碑</th>
+<th>做了什么</th>
+<th>亮点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M0</td>
+<td>脚手架、配置、health</td>
+<td>分层：core&#x2F;global&#x2F;internal</td>
+</tr>
+<tr>
+<td>M1</td>
+<td>认证 + 用户 + 好友</td>
+<td><strong>双 token 无感刷新</strong>、<strong>接受好友申请事务</strong></td>
+</tr>
+<tr>
+<td>M2</td>
+<td>单聊 + WebSocket</td>
+<td><strong>消息幂等</strong>、<strong>游标分页</strong>、<strong>读写双泵</strong></td>
+</tr>
+<tr>
+<td>M3</td>
+<td>群聊</td>
+<td><strong>建群事务</strong>、群主权限、复用会话抽象</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>并发加固</td>
+<td><strong>优雅退出</strong>、<strong>滑动窗口限流</strong>、扇出限并发</td>
+</tr>
+<tr>
+<td>M5</td>
+<td>WebRTC 语音</td>
+<td><strong>信令转发</strong>、通话状态机</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>微服务</td>
+<td><strong>gRPC 拆分</strong>、gateway 模式</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>RabbitMQ</td>
+<td><strong>Outbox 模式</strong>、异步投递、降级</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、面试话术（按这个顺序讲）"><a href="#五、面试话术（按这个顺序讲）" class="headerlink" title="五、面试话术（按这个顺序讲）"></a>五、面试话术（按这个顺序讲）</h2><h3 id="1-开场（30-秒）"><a href="#1-开场（30-秒）" class="headerlink" title="1. 开场（30 秒）"></a>1. 开场（30 秒）</h3><blockquote>
+<p>“这个项目是一个仿微信的 IM 后端，Go + Gin + GORM + Redis + RabbitMQ + gRPC。<br>我按 8 个里程碑推进：先做认证和好友，再做单聊和 WebSocket，然后群聊、并发加固、WebRTC 语音，<br>最后拆微服务和接消息队列。每个里程碑都有完整的接口和测试。”</p>
+</blockquote>
+<h3 id="2-挑-2–3-个亮点深入（不要全讲）"><a href="#2-挑-2–3-个亮点深入（不要全讲）" class="headerlink" title="2. 挑 2–3 个亮点深入（不要全讲）"></a>2. 挑 2–3 个亮点深入（不要全讲）</h3><p><strong>亮点 A：双 token 无感刷新（M1）</strong></p>
+<blockquote>
+<p>“access token 2 小时、refresh token 30 天。refresh 的 jti 存 Redis 白名单，登出就能撤销。<br>刷新时用 <code>GETDEL</code> 原子消费旧 jti，配合 rotation 防止 refresh 被重复使用。<br>如果旧 jti 不存在，判定为盗用，撤销该用户所有 refresh——这就是复用检测。”</p>
+</blockquote>
+<p><strong>亮点 B：消息幂等（M2）</strong></p>
+<blockquote>
+<p>“客户端为每条消息生成 client_msg_id，数据库有 <code>UNIQUE(sender_id, client_msg_id)</code>。<br>先查后插，并发插入撞唯一索引时捕获 <code>gorm.ErrDuplicatedKey</code> 再查一次返回。<br>这样无论重试多少次，库里只有一条消息。”</p>
+</blockquote>
+<p><strong>亮点 C：WebSocket 架构（M2）</strong></p>
+<blockquote>
+<p>“每个连接一个读 goroutine + 一个写 goroutine，因为 gorilla&#x2F;websocket 不允许并发写。<br>Hub 用 RWMutex 管理 userID → 多连接（支持多端登录）。<br>心跳 ping&#x2F;pong 清理僵尸连接，慢消费者有界队列满了就断开，避免拖垮推送方。”</p>
+</blockquote>
+<p><strong>亮点 D：接受好友申请事务（M1）</strong></p>
+<blockquote>
+<p>“接受申请要改状态 + 插两条好友关系，必须在一个事务里。<br>用条件更新 <code>WHERE status=0</code> + RowsAffected 判断，天然抗并发重复接受。<br>还踩过软删除+唯一索引的坑：删除后再加好友会撞索引，所以用 Unscoped 查旧行然后恢复。”</p>
+</blockquote>
+<p><strong>亮点 E：Outbox 模式（M7）</strong></p>
+<blockquote>
+<p>“落库和发 MQ 无法原子。我在业务事务里同时写一条 outbox 记录，后台 worker 轮询发 MQ、标记已发送。<br>这样 MQ 挂了也不丢消息，消费方做幂等即可。MQ 不可用时降级为同步推送。”</p>
+</blockquote>
+<h3 id="3-被问「难点」怎么答"><a href="#3-被问「难点」怎么答" class="headerlink" title="3. 被问「难点」怎么答"></a>3. 被问「难点」怎么答</h3><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>答法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最难的部分</td>
+<td>WebSocket 并发管理（读写分离、慢消费者、心跳）+ 双 token 并发刷新</td>
+</tr>
+<tr>
+<td>踩过的坑</td>
+<td>软删除+唯一索引冲突、GORM 零值陷阱、事务里误用 global.DB、amqp.Table 不支持 uint</td>
+</tr>
+<tr>
+<td>怎么验证的</td>
+<td>每个接口都写了 curl 端到端脚本，WS 用 .NET ClientWebSocket 实测</td>
+</tr>
+<tr>
+<td>如果重做</td>
+<td>会话创建加唯一键防并发重复、未读数用 Redis 计数、WebSocket 多实例用 Redis 广播</td>
+</tr>
+</tbody></table>
+<h3 id="4-主动补充「可改进方向」（体现深度）"><a href="#4-主动补充「可改进方向」（体现深度）" class="headerlink" title="4. 主动补充「可改进方向」（体现深度）"></a>4. 主动补充「可改进方向」（体现深度）</h3><ul>
+<li>会话创建并发去重（唯一键 <code>single_key</code>）</li>
+<li>未读数用 Redis 计数器替代 N 次 count</li>
+<li>WebSocket 多实例：Redis Pub&#x2F;Sub 或 MQ 广播</li>
+<li>消息已读回执、消息撤回</li>
+<li>群通话（SFU&#x2F;MCU）</li>
+<li>链路追踪（trace_id）、监控指标</li>
+<li>测试覆盖率（目前主要是端到端脚本）</li>
+</ul>
+<hr>
+<h2 id="六、数据库表（12-张）"><a href="#六、数据库表（12-张）" class="headerlink" title="六、数据库表（12 张）"></a>六、数据库表（12 张）</h2><table>
+<thead>
+<tr>
+<th>域</th>
+<th>表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户</td>
+<td><code>users</code>、<code>user_settings</code></td>
+</tr>
+<tr>
+<td>好友</td>
+<td><code>friend_requests</code>、<code>friendships</code>、<code>friend_groups</code>、<code>blacklist</code></td>
+</tr>
+<tr>
+<td>聊天</td>
+<td><code>conversations</code>、<code>conversation_members</code>、<code>messages</code></td>
+</tr>
+<tr>
+<td>群聊</td>
+<td><code>groups</code></td>
+</tr>
+<tr>
+<td>通话</td>
+<td><code>call_records</code></td>
+</tr>
+<tr>
+<td>MQ</td>
+<td><code>outbox_messages</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、怎么读这个项目（学习路径）"><a href="#七、怎么读这个项目（学习路径）" class="headerlink" title="七、怎么读这个项目（学习路径）"></a>七、怎么读这个项目（学习路径）</h2><ol>
+<li><strong>先看本文</strong>（了解全貌）</li>
+<li><strong>读 <code>learn/00-学习总览.md</code></strong>（路线图 + 阅读方法）</li>
+<li><strong>按里程碑读</strong>：<code>m1</code> → <code>m7</code>，每篇都是「目标 → 设计思路 → 代码导读 → 注意点 → 面试点」</li>
+<li><strong>对照代码</strong>：每篇的「代码导读」表里有文件路径</li>
+<li><strong>用 <code>面试集.md</code> 自测</strong>：72 题，能讲出来才算会</li>
+<li><strong>用 <code>场景集.md</code> 练表达</strong>：30 个场景，按「问题→方案→关键点」讲</li>
+</ol>
+<h3 id="建议的动手练习"><a href="#建议的动手练习" class="headerlink" title="建议的动手练习"></a>建议的动手练习</h3><table>
+<thead>
+<tr>
+<th>练习</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>把 access token 改成 1 分钟</td>
+<td>观察无感刷新</td>
+</tr>
+<tr>
+<td>给群拉人加行锁</td>
+<td>理解并发控制</td>
+</tr>
+<tr>
+<td>把未读数改成 Redis 计数</td>
+<td>理解读扩散</td>
+</tr>
+<tr>
+<td>加消息撤回功能</td>
+<td>练习软删除&#x2F;事件</td>
+</tr>
+<tr>
+<td>用 protoc 替换 JSON codec</td>
+<td>体验标准 gRPC</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="八、项目状态"><a href="#八、项目状态" class="headerlink" title="八、项目状态"></a>八、项目状态</h2><ul>
+<li>✅ M0–M7 全部完成</li>
+<li>✅ 每个里程碑都有 git 提交</li>
+<li>✅ 每个里程碑都有学习文档</li>
+<li>✅ 所有关键接口都做过端到端实测</li>
+<li>✅ 面试集 72 题、场景集 30 个</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/06-%E9%9D%A2%E8%AF%95/" class="category-chain-item">06-面试</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" class="print-no-link">#面试</a>
+      
+        <a href="/blog/tags/%E8%AF%9D%E6%9C%AF/" class="print-no-link">#话术</a>
+      
+        <a href="/blog/tags/%E5%A4%8D%E7%9B%98/" class="print-no-link">#复盘</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>项目总结与面试话术：怎么讲这个项目</div>
+      <div>http://127.0.0.1:8080/blog/2026/11/14/06-03-项目总结与面试话术/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gochat</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/06-02-%E5%9C%BA%E6%99%AF%E9%9B%8630%E4%B8%AA/" title="场景集：30 个业务场景怎么实现">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">场景集：30 个业务场景怎么实现</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/05-00-%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB%E6%80%BB%E7%B4%A2%E5%BC%95/" title="源码走读总索引：核心文件全览">
+                        <span class="hidden-mobile">源码走读总索引：核心文件全览</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,1108 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M5: call model + signaling state machine + WebSocket SDP&#x2F;ICE relay + call history API   一、里程碑目标在聊天基础上加「语音通话」：  通话记录模型（call_records） 通话状态机（呼叫中&#x2F;已接通&#x2F;已拒绝&amp;#x2F">
+<meta property="og:type" content="article">
+<meta property="og:title" content="M5 详细设计：WebRTC 语音通话（信令 &#x2F; SDP &#x2F; ICE）">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/14/04-13-M5%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M5: call model + signaling state machine + WebSocket SDP&#x2F;ICE relay + call history API   一、里程碑目标在聊天基础上加「语音通话」：  通话记录模型（call_records） 通话状态机（呼叫中&#x2F;已接通&#x2F;已拒绝&amp;#x2F">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://127.0.0.1:8080/blog/blog/images/call-flow.svg">
+<meta property="article:published_time" content="2026-11-14T15:29:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:23:27.093Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="P2P">
+<meta property="article:tag" content="WebRTC">
+<meta property="article:tag" content="信令">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://127.0.0.1:8080/blog/blog/images/call-flow.svg">
+  
+  
+  
+  <title>M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE） - gochat 项目学习博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 50vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/catalog/" target="_self">
+                <i class="iconfont icon-books"></i>
+                <span>目录</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/catalog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-books"></i>
+                  <span>目录</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.55)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-14 23:29" pubdate>
+          2026年11月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          33 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><img src="/blog/blog/images/call-flow.svg" srcset="/blog/img/loading.gif" lazyload alt="WebRTC 通话信令时序"></p>
+<blockquote>
+<p>上图由项目手绘 SVG 说明，配合下文阅读效果更好。</p>
+</blockquote>
+<blockquote>
+<p>对应提交：<code>M5: call model + signaling state machine + WebSocket SDP/ICE relay + call history API</code></p>
+</blockquote>
+<hr>
+<h2 id="一、里程碑目标"><a href="#一、里程碑目标" class="headerlink" title="一、里程碑目标"></a>一、里程碑目标</h2><p>在聊天基础上加「语音通话」：</p>
+<ul>
+<li>通话记录模型（call_records）</li>
+<li>通话状态机（呼叫中&#x2F;已接通&#x2F;已拒绝&#x2F;已取消&#x2F;已结束&#x2F;未接）</li>
+<li><strong>WebSocket 信令</strong>：转发 SDP（offer&#x2F;answer）和 ICE candidate</li>
+<li>通话记录查询接口</li>
+</ul>
+<blockquote>
+<p>注意：本项目<strong>不含前端</strong>，所以服务器实现的是「信令服务 + 状态管理」，<br>真正的音视频采集&#x2F;编解码&#x2F;传输在浏览器里（用 <code>RTCPeerConnection</code>）。</p>
+</blockquote>
+<p>验收（已实测）：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>u1 呼叫 u2</td>
+<td>u1 收到 <code>call_ack</code>，u2 收到 <code>call_incoming</code></td>
+</tr>
+<tr>
+<td>u2 接听</td>
+<td>双方收到 <code>call_accepted</code></td>
+</tr>
+<tr>
+<td>u1 发 offer</td>
+<td>u2 收到转发（带 from_user_id）</td>
+</tr>
+<tr>
+<td>u2 发 answer</td>
+<td>u1 收到</td>
+</tr>
+<tr>
+<td>u1 发 ice</td>
+<td>u2 收到</td>
+</tr>
+<tr>
+<td>u2 挂断</td>
+<td>双方收到 <code>call_ended</code></td>
+</tr>
+<tr>
+<td>已结束再挂断</td>
+<td>error「通话状态不允许挂断」</td>
+</tr>
+<tr>
+<td>通话记录</td>
+<td>status&#x3D;5（已结束）、duration 正确</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="二、WebRTC-基本原理（面试必问）"><a href="#二、WebRTC-基本原理（面试必问）" class="headerlink" title="二、WebRTC 基本原理（面试必问）"></a>二、WebRTC 基本原理（面试必问）</h2><h3 id="2-1-WebRTC-是-P2P-的"><a href="#2-1-WebRTC-是-P2P-的" class="headerlink" title="2.1 WebRTC 是 P2P 的"></a>2.1 WebRTC 是 P2P 的</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs css">浏览器 <span class="hljs-selector-tag">A</span> ◄══════ 音视频流（P2P，UDP）══════► 浏览器 <span class="hljs-selector-tag">B</span><br>     │                                          │<br>     └────────► 信令服务器（WebSocket）◄────────┘<br>               （只转发 SDP/ICE，不传音视频）<br></code></pre></td></tr></table></figure>
+
+<p><strong>服务器不传音视频</strong>——这正是 WebRTC 相比「服务器混流」方案的最大优势：延迟低、服务器带宽成本低。</p>
+<h3 id="2-2-建立连接的三步"><a href="#2-2-建立连接的三步" class="headerlink" title="2.2 建立连接的三步"></a>2.2 建立连接的三步</h3><ol>
+<li><strong>交换 SDP</strong>（Session Description Protocol）<ul>
+<li>A 生成 <code>offer</code>（我支持什么编解码、我的网络信息）</li>
+<li>B 返回 <code>answer</code></li>
+</ul>
+</li>
+<li><strong>交换 ICE candidate</strong><ul>
+<li>双方各自收集「我可能的网络路径」（公网 IP、NAT 映射、中继地址）</li>
+<li>通过信令服务器互相告知</li>
+</ul>
+</li>
+<li><strong>P2P 打洞 &#x2F; 中继</strong><ul>
+<li>能直连就直连</li>
+<li>打洞失败就用 TURN 服务器中继</li>
+</ul>
+</li>
+</ol>
+<h3 id="2-3-STUN-TURN-ICE"><a href="#2-3-STUN-TURN-ICE" class="headerlink" title="2.3 STUN &#x2F; TURN &#x2F; ICE"></a>2.3 STUN &#x2F; TURN &#x2F; ICE</h3><table>
+<thead>
+<tr>
+<th>概念</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ICE</strong></td>
+<td>框架：收集候选地址 + 按优先级尝试连接</td>
+</tr>
+<tr>
+<td><strong>STUN</strong></td>
+<td>帮客户端发现自己的公网 IP:Port（NAT 映射）</td>
+</tr>
+<tr>
+<td><strong>TURN</strong></td>
+<td>打洞失败时的中继服务器（要带宽成本）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>面试可以答：”WebRTC 用 ICE 收集候选，STUN 发现公网地址，打洞失败用 TURN 中继；<br>服务器只做信令，不碰音视频。”</p>
+</blockquote>
+<hr>
+<h2 id="三、服务器职责：信令状态机"><a href="#三、服务器职责：信令状态机" class="headerlink" title="三、服务器职责：信令状态机"></a>三、服务器职责：信令状态机</h2><h3 id="3-1-通话状态机"><a href="#3-1-通话状态机" class="headerlink" title="3.1 通话状态机"></a>3.1 通话状态机</h3><figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs tap">1 呼叫中 ──接听──►<span class="hljs-number"> 2 </span>已接通 ──挂断──►<span class="hljs-number"> 5 </span>已结束<br>   │<br>   ├──被叫拒绝──►<span class="hljs-number"> 3 </span>已拒绝<br>   ├──主叫取消──►<span class="hljs-number"> 4 </span>已取消<br>   └──超时──►<span class="hljs-number"> 6 </span>未接<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-2-数据模型"><a href="#3-2-数据模型" class="headerlink" title="3.2 数据模型"></a>3.2 数据模型</h3><p><code>call_records</code>：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>caller_id &#x2F; callee_id</td>
+<td>主叫&#x2F;被叫</td>
+</tr>
+<tr>
+<td>type</td>
+<td>1 音频 &#x2F; 2 视频</td>
+</tr>
+<tr>
+<td>status</td>
+<td>状态机</td>
+</tr>
+<tr>
+<td>started_at &#x2F; ended_at</td>
+<td>接通&#x2F;结束时间</td>
+</tr>
+<tr>
+<td>duration</td>
+<td>时长（秒）</td>
+</tr>
+</tbody></table>
+<h3 id="3-3-并发安全：条件更新"><a href="#3-3-并发安全：条件更新" class="headerlink" title="3.3 并发安全：条件更新"></a>3.3 并发安全：条件更新</h3><p>和「接受好友申请」同一个套路：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 只有「呼叫我、且仍在呼叫中」才能接通</span><br>res := db.Model(&amp;Call&#123;&#125;).<br>    Where(<span class="hljs-string">&quot;id = ? AND callee_id = ? AND status = ?&quot;</span>, callID, userID, CallStatusCalling).<br>    Updates(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]any&#123;<span class="hljs-string">&quot;status&quot;</span>: CallStatusAccepted, <span class="hljs-string">&quot;started_at&quot;</span>: now&#125;)<br><span class="hljs-keyword">if</span> res.RowsAffected == <span class="hljs-number">0</span> &#123;<br>    <span class="hljs-keyword">return</span> errors.New(<span class="hljs-string">&quot;通话不存在或状态不允许接听&quot;</span>)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>好处：连点接听、超时后再接、已挂断再挂断，都会被 <code>RowsAffected=0</code> 拦住。</p>
+<hr>
+<h2 id="四、信令协议（WebSocket-消息）"><a href="#四、信令协议（WebSocket-消息）" class="headerlink" title="四、信令协议（WebSocket 消息）"></a>四、信令协议（WebSocket 消息）</h2><h3 id="客户端-→-服务端"><a href="#客户端-→-服务端" class="headerlink" title="客户端 → 服务端"></a>客户端 → 服务端</h3><table>
+<thead>
+<tr>
+<th>type</th>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>call_invite</code></td>
+<td>to_user_id, call_type</td>
+<td>发起通话</td>
+</tr>
+<tr>
+<td><code>call_accept</code></td>
+<td>call_id</td>
+<td>接听</td>
+</tr>
+<tr>
+<td><code>call_reject</code></td>
+<td>call_id</td>
+<td>拒绝</td>
+</tr>
+<tr>
+<td><code>call_cancel</code></td>
+<td>call_id</td>
+<td>主叫取消</td>
+</tr>
+<tr>
+<td><code>call_end</code></td>
+<td>call_id</td>
+<td>挂断</td>
+</tr>
+<tr>
+<td><code>webrtc_offer</code></td>
+<td>call_id, to_user_id, sdp</td>
+<td>转发 offer</td>
+</tr>
+<tr>
+<td><code>webrtc_answer</code></td>
+<td>call_id, to_user_id, sdp</td>
+<td>转发 answer</td>
+</tr>
+<tr>
+<td><code>webrtc_ice</code></td>
+<td>call_id, to_user_id, candidate</td>
+<td>转发 ICE</td>
+</tr>
+</tbody></table>
+<h3 id="服务端-→-客户端"><a href="#服务端-→-客户端" class="headerlink" title="服务端 → 客户端"></a>服务端 → 客户端</h3><table>
+<thead>
+<tr>
+<th>type</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>call_ack</code></td>
+<td>主叫收到：通话已创建</td>
+</tr>
+<tr>
+<td><code>call_incoming</code></td>
+<td>被叫收到：有来电</td>
+</tr>
+<tr>
+<td><code>call_accepted</code></td>
+<td>双方：已接通</td>
+</tr>
+<tr>
+<td><code>call_rejected</code></td>
+<td>被叫拒绝</td>
+</tr>
+<tr>
+<td><code>call_canceled</code></td>
+<td>主叫取消</td>
+</tr>
+<tr>
+<td><code>call_ended</code></td>
+<td>挂断（带 duration）</td>
+</tr>
+<tr>
+<td><code>webrtc_offer/answer/ice</code></td>
+<td>原样转发 + <code>from_user_id</code></td>
+</tr>
+</tbody></table>
+<h3 id="信令转发实现（很关键的一点）"><a href="#信令转发实现（很关键的一点）" class="headerlink" title="信令转发实现（很关键的一点）"></a>信令转发实现（很关键的一点）</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *Client)</span></span> handleRelay(raw []<span class="hljs-type">byte</span>, in inMessage) &#123;<br>    <span class="hljs-keyword">var</span> m <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]any<br>    json.Unmarshal(raw, &amp;m)<br>    m[<span class="hljs-string">&quot;from_user_id&quot;</span>] = c.UserID<br>    c.hub.SendToUser(in.ToUserID, mustJSON(m))<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>服务器不解析 SDP 内容</strong>，只加一个 <code>from_user_id</code> 后原样转发。<br>这就是信令服务器的本质：<strong>帮两端交换连接信息</strong>。</p>
+<hr>
+<h2 id="五、完整呼叫流程（时序）"><a href="#五、完整呼叫流程（时序）" class="headerlink" title="五、完整呼叫流程（时序）"></a>五、完整呼叫流程（时序）</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs routeros">A                     服务器                      B<br>│  call_invite ────────►│                         │<br>│                       │ 创建 call(<span class="hljs-attribute">status</span>=1)      │<br>│◄──── call_ack ────────│                         │<br>│                       │──── call_incoming ─────►│<br>│                       │◄─── call_accept ─────────│<br>│                       │ <span class="hljs-attribute">status</span>=2, started_at     │<br>│◄── call_accepted ─────│──── call_accepted ──────►│<br>│                       │                         │<br>│── webrtc_offer ──────►│──── webrtc_offer ───────►│<br>│◄──── webrtc_answer ───│◄─── webrtc_answer ───────│<br>│── webrtc_ice ────────►│──── webrtc_ice ─────────►│<br>│◄──── webrtc_ice ──────│◄─── webrtc_ice ──────────│<br>│                       │                         │<br>│      ===== P2P 音视频直连（不经服务器）=====       │<br>│                       │                         │<br>│◄─── call_end ─────────│◄──── call_end ───────────│<br>│                       │ <span class="hljs-attribute">status</span>=5, duration       │<br>│◄── call_ended ────────│──── call_ended ─────────►│<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、代码导读"><a href="#六、代码导读" class="headerlink" title="六、代码导读"></a>六、代码导读</h2><table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作用</th>
+<th>重点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>internal/model/call_model/call_model.go</code></td>
+<td>通话记录</td>
+<td>状态机定义</td>
+</tr>
+<tr>
+<td><code>internal/service/call_service/call_service.go</code></td>
+<td>信令状态机</td>
+<td><strong>条件更新、时长计算、CallItem DTO</strong></td>
+</tr>
+<tr>
+<td><code>internal/ws/client.go</code></td>
+<td>信令处理</td>
+<td><code>handleCallInvite/Accept/Reject/Cancel/End</code>、<code>handleRelay</code></td>
+</tr>
+<tr>
+<td><code>internal/router/call_router/call_api.go</code></td>
+<td>通话记录接口</td>
+<td><code>GET /calls</code>、<code>GET /calls/:id</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、注意点清单"><a href="#七、注意点清单" class="headerlink" title="七、注意点清单"></a>七、注意点清单</h2><ol>
+<li><strong>服务器不传音视频</strong>，只做信令——这是 WebRTC 的核心</li>
+<li><strong>状态迁移全部用条件更新</strong>（防连点&#x2F;重复操作）</li>
+<li><strong>信令转发不解析 SDP</strong>，原样加 <code>from_user_id</code> 转发</li>
+<li><strong>挂断时计算时长</strong>：<code>ended_at - started_at</code></li>
+<li><strong>只有通话双方能查看记录</strong>（越权校验）</li>
+<li><strong>不要直接返回 GORM 模型</strong>（会输出 <code>ID</code>&#x2F;<code>DeletedAt</code> 等大写字段）→ 用 DTO</li>
+<li><strong>WebSocket 是信令的天然载体</strong>：M2 已建好长连接，M5 直接复用</li>
+<li><strong>超时无人接</strong>（状态 6 未接）需要定时任务或客户端超时取消——M5 简化未做自动超时</li>
+</ol>
+<hr>
+<h2 id="八、面试点（M5）"><a href="#八、面试点（M5）" class="headerlink" title="八、面试点（M5）"></a>八、面试点（M5）</h2><ol>
+<li>WebRTC 的原理？为什么说它是 P2P 的？</li>
+<li>信令服务器的作用？为什么必须要有信令？</li>
+<li>SDP 里有什么？offer&#x2F;answer 的作用？</li>
+<li>ICE &#x2F; STUN &#x2F; TURN 分别是什么？</li>
+<li>为什么需要 TURN？成本和代价？</li>
+<li>通话状态机怎么设计？如何防重复接听？</li>
+<li>通话时长怎么算？谁负责记录？</li>
+<li>视频通话和语音通话在服务端有什么区别？（信令一样，只是 media 不同）</li>
+<li>群通话怎么实现？（SFU&#x2F;MCU，M5 未做）</li>
+<li>通话超时无人接怎么处理？</li>
+</ol>
+<hr>
+<h2 id="九、下一步（M6-微服务化）"><a href="#九、下一步（M6-微服务化）" class="headerlink" title="九、下一步（M6 微服务化）"></a>九、下一步（M6 微服务化）</h2><p>M6 会把单体按职责拆成多个服务：</p>
+<ul>
+<li>用户服务（user）：注册&#x2F;登录&#x2F;资料&#x2F;好友</li>
+<li>聊天服务（chat）：会话&#x2F;消息&#x2F;WS</li>
+<li>用 <strong>gRPC + protobuf</strong> 定义服务间接口</li>
+<li>加一个 <strong>gateway</strong> 做 HTTP 入口，转发到内部 gRPC 服务</li>
+<li>体会「单体哪里会痛、为什么要拆」</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/04-%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">04-里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/WebRTC/" class="print-no-link">#WebRTC</a>
+      
+        <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" class="print-no-link">#信令</a>
+      
+        <a href="/blog/tags/P2P/" class="print-no-link">#P2P</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）</div>
+      <div>http://127.0.0.1:8080/blog/2026/11/14/04-13-M5详细设计/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gochat</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/04-12-M4%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/04-14-M6%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M6 详细设计：微服务化与 gRPC">
+                        <span class="hidden-mobile">M6 详细设计：微服务化与 gRPC</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

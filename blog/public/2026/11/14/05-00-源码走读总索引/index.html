@@ -1,0 +1,957 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="本页汇总了项目的全部核心源码（每个文件都是完整未删减的版本）。  项目源码里保留了 【思路】【注意点】【面试点】 三类中文注释。建议阅读顺序：先看 一次 HTTP 请求的完整链路，再按下面的顺序读源码。    序号 文件 规模 职责    S01 main.go 103 行 程序入口：加载配置 → 初始化服务 → 启动 HTTP&#x2F;gRPC&#x2F;MQ → 优雅退出   S02 co">
+<meta property="og:type" content="article">
+<meta property="og:title" content="源码走读总索引：核心文件全览">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/14/05-00-%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB%E6%80%BB%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="本页汇总了项目的全部核心源码（每个文件都是完整未删减的版本）。  项目源码里保留了 【思路】【注意点】【面试点】 三类中文注释。建议阅读顺序：先看 一次 HTTP 请求的完整链路，再按下面的顺序读源码。    序号 文件 规模 职责    S01 main.go 103 行 程序入口：加载配置 → 初始化服务 → 启动 HTTP&#x2F;gRPC&#x2F;MQ → 优雅退出   S02 co">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-14T15:23:00.000Z">
+<meta property="article:modified_time" content="2026-11-12T17:23:27.330Z">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="源码">
+<meta property="article:tag" content="索引">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>源码走读总索引：核心文件全览 - gochat 项目学习博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 50vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/catalog/" target="_self">
+                <i class="iconfont icon-books"></i>
+                <span>目录</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/catalog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-books"></i>
+                  <span>目录</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.55)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="源码走读总索引：核心文件全览"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-14 23:23" pubdate>
+          2026年11月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">源码走读总索引：核心文件全览</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本页汇总了项目的<strong>全部核心源码</strong>（每个文件都是完整未删减的版本）。</p>
+</blockquote>
+<p>项目源码里保留了 <strong>【思路】【注意点】【面试点】</strong> 三类中文注释。<br>建议阅读顺序：先看 <a href="/blog/2026/11/14/01-04-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF/">一次 HTTP 请求的完整链路</a>，<br>再按下面的顺序读源码。</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>文件</th>
+<th>规模</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S01</td>
+<td><a href="/blog/2026/11/14/05-01-%E6%BA%90%E7%A0%81-main/">main.go</a></td>
+<td>103 行</td>
+<td>程序入口：加载配置 → 初始化服务 → 启动 HTTP&#x2F;gRPC&#x2F;MQ → 优雅退出</td>
+</tr>
+<tr>
+<td>S02</td>
+<td><a href="/blog/2026/11/14/05-02-%E6%BA%90%E7%A0%81-init-config/">core&#x2F;init_config.go</a></td>
+<td>84 行</td>
+<td>配置加载：命令行参数、读 YAML、初始化&#x2F;关闭所有基础服务</td>
+</tr>
+<tr>
+<td>S03</td>
+<td><a href="/blog/2026/11/14/05-03-%E6%BA%90%E7%A0%81-init-mysql/">core&#x2F;db&#x2F;init_mysql.go</a></td>
+<td>69 行</td>
+<td>GORM 连接 MySQL：DSN、连接池、AutoMigrate 建表</td>
+</tr>
+<tr>
+<td>S04</td>
+<td><a href="/blog/2026/11/14/05-04-%E6%BA%90%E7%A0%81-global/">global&#x2F;global.go</a></td>
+<td>29 行</td>
+<td>全局状态：Config &#x2F; DB &#x2F; Redis &#x2F; MQ 的位置</td>
+</tr>
+<tr>
+<td>S05</td>
+<td><a href="/blog/2026/11/14/05-05-%E6%BA%90%E7%A0%81-auth/">internal&#x2F;middleware&#x2F;auth.go</a></td>
+<td>73 行</td>
+<td>JWT 鉴权中间件：解析 Bearer、校验 type、写 context</td>
+</tr>
+<tr>
+<td>S06</td>
+<td><a href="/blog/2026/11/14/05-06-%E6%BA%90%E7%A0%81-jwt/">internal&#x2F;auth&#x2F;jwt.go</a></td>
+<td>140 行</td>
+<td>双 Token 签发与解析：Claims、HS256、jti、算法校验</td>
+</tr>
+<tr>
+<td>S07</td>
+<td><a href="/blog/2026/11/14/05-07-%E6%BA%90%E7%A0%81-token-store/">internal&#x2F;auth&#x2F;token_store.go</a></td>
+<td>75 行</td>
+<td>Refresh token 的 Redis 存储：GETDEL 原子消费、SCAN 批量删</td>
+</tr>
+<tr>
+<td>S08</td>
+<td><a href="/blog/2026/11/14/05-08-%E6%BA%90%E7%A0%81-register-service/">internal&#x2F;service&#x2F;user_service&#x2F;register_service.go</a></td>
+<td>47 行</td>
+<td>注册：查重 + bcrypt + 事务（用户 + 默认设置）</td>
+</tr>
+<tr>
+<td>S09</td>
+<td><a href="/blog/2026/11/14/05-09-%E6%BA%90%E7%A0%81-login-service/">internal&#x2F;service&#x2F;user_service&#x2F;login_service.go</a></td>
+<td>65 行</td>
+<td>登录：校验密码 → 签发双 token → 存 jti → 更新登录时间</td>
+</tr>
+<tr>
+<td>S10</td>
+<td><a href="/blog/2026/11/14/05-10-%E6%BA%90%E7%A0%81-refresh-service/">internal&#x2F;service&#x2F;user_service&#x2F;refresh_service.go</a></td>
+<td>62 行</td>
+<td>刷新：解析 refresh → GETDEL 消费 → rotation → 复用检测</td>
+</tr>
+<tr>
+<td>S11</td>
+<td><a href="/blog/2026/11/14/05-11-%E6%BA%90%E7%A0%81-friend-service/">internal&#x2F;service&#x2F;friend_service&#x2F;friend_service.go</a></td>
+<td>479 行</td>
+<td>好友全业务：申请、接受（事务+条件更新）、列表、删除、黑名单</td>
+</tr>
+<tr>
+<td>S12</td>
+<td><a href="/blog/2026/11/14/05-12-%E6%BA%90%E7%A0%81-message-service/">internal&#x2F;service&#x2F;chat_service&#x2F;message_service.go</a></td>
+<td>209 行</td>
+<td>消息：幂等发送（client_msg_id）、事务、游标分页</td>
+</tr>
+<tr>
+<td>S13</td>
+<td><a href="/blog/2026/11/14/05-13-%E6%BA%90%E7%A0%81-group-service/">internal&#x2F;service&#x2F;group_service&#x2F;group_service.go</a></td>
+<td>461 行</td>
+<td>群聊：建群事务、成员管理、群主权限、解散</td>
+</tr>
+<tr>
+<td>S14</td>
+<td><a href="/blog/2026/11/14/05-14-%E6%BA%90%E7%A0%81-call-service/">internal&#x2F;service&#x2F;call_service&#x2F;call_service.go</a></td>
+<td>247 行</td>
+<td>通话状态机：invite&#x2F;accept&#x2F;reject&#x2F;cancel&#x2F;end + 时长计算</td>
+</tr>
+<tr>
+<td>S15</td>
+<td><a href="/blog/2026/11/14/05-15-%E6%BA%90%E7%A0%81-hub/">internal&#x2F;ws&#x2F;hub.go</a></td>
+<td>115 行</td>
+<td>WebSocket 连接管理：userID → 多连接、RWMutex、优雅关闭</td>
+</tr>
+<tr>
+<td>S16</td>
+<td><a href="/blog/2026/11/14/05-16-%E6%BA%90%E7%A0%81-client/">internal&#x2F;ws&#x2F;client.go</a></td>
+<td>339 行</td>
+<td>单个连接：读泵&#x2F;写泵&#x2F;心跳&#x2F;慢消费者隔离&#x2F;通话信令处理</td>
+</tr>
+<tr>
+<td>S17</td>
+<td><a href="/blog/2026/11/14/05-17-%E6%BA%90%E7%A0%81-handler/">internal&#x2F;ws&#x2F;handler.go</a></td>
+<td>67 行</td>
+<td>WebSocket 握手：token 鉴权 → 升级连接 → 启动读写 goroutine</td>
+</tr>
+<tr>
+<td>S18</td>
+<td><a href="/blog/2026/11/14/05-18-%E6%BA%90%E7%A0%81-push/">internal&#x2F;ws&#x2F;push.go</a></td>
+<td>83 行</td>
+<td>消息扇出：给会话成员推送（信号量限制并发）</td>
+</tr>
+<tr>
+<td>S19</td>
+<td><a href="/blog/2026/11/14/05-19-%E6%BA%90%E7%A0%81-server/">internal&#x2F;grpcx&#x2F;server.go</a></td>
+<td>265 行</td>
+<td>gRPC 微服务：服务端分发、客户端 Invoke、生命周期</td>
+</tr>
+<tr>
+<td>S20</td>
+<td><a href="/blog/2026/11/14/05-20-%E6%BA%90%E7%A0%81-mq/">internal&#x2F;mq&#x2F;mq.go</a></td>
+<td>162 行</td>
+<td>MQ：Outbox worker 轮询发布 + Consumer 消费推送</td>
+</tr>
+<tr>
+<td>S21</td>
+<td><a href="/blog/2026/11/14/05-21-%E6%BA%90%E7%A0%81-outbox/">internal&#x2F;outbox&#x2F;outbox.go</a></td>
+<td>47 行</td>
+<td>本地消息表写入：在业务事务里写事件记录</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="怎么读源码"><a href="#怎么读源码" class="headerlink" title="怎么读源码"></a>怎么读源码</h2><ol>
+<li><strong>先读函数签名</strong>：这个函数接收什么、返回什么</li>
+<li><strong>再读注释</strong>：<code>//</code> 后面的【思路】【注意点】【面试点】</li>
+<li><strong>最后读实现</strong>：一行一行看它怎么做</li>
+<li><strong>带着问题读</strong>：比如「这里为什么要用事务？」「这里为什么要加锁？」</li>
+</ol>
+<p>遇到不熟的语言特性（goroutine、defer、channel、interface），<br>回看 <a href="/blog/2026/11/14/01-02-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE/">Go 语法速查</a> 或直接问。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/05-%E6%BA%90%E7%A0%81/" class="category-chain-item">05-源码</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/%E7%B4%A2%E5%BC%95/" class="print-no-link">#索引</a>
+      
+        <a href="/blog/tags/%E6%BA%90%E7%A0%81/" class="print-no-link">#源码</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>源码走读总索引：核心文件全览</div>
+      <div>http://127.0.0.1:8080/blog/2026/11/14/05-00-源码走读总索引/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gochat</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/06-03-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/" title="项目总结与面试话术：怎么讲这个项目">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">项目总结与面试话术：怎么讲这个项目</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2026/11/14/05-01-%E6%BA%90%E7%A0%81-main/" title="源码走读 S01：main.go">
+                        <span class="hidden-mobile">源码走读 S01：main.go</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

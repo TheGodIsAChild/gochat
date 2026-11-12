@@ -53,6 +53,7 @@ navbar:
     alpha: 0.72
   menu:
     - { key: "home", link: "/", name: "首页", icon: "iconfont icon-home-fill" }
+    - { key: "catalog", link: "/catalog/", name: "目录", icon: "iconfont icon-books" }
     - { key: "archive", link: "/archives/", name: "归档", icon: "iconfont icon-archive-fill" }
     - { key: "category", link: "/categories/", name: "分类", icon: "iconfont icon-category-fill" }
     - { key: "tag", link: "/tags/", name: "标签", icon: "iconfont icon-tags-fill" }
