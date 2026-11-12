@@ -1,0 +1,124 @@
+# =========================================================
+# gochat 学习博客 —— Fluid 主题自定义配置
+# 只覆盖需要的项，其余使用主题默认值（Fluid 会合并）
+# =========================================================
+
+# 代码块
+code:
+  copy_btn: true
+  highlight:
+    enable: true
+    line_number: true
+    lib: "highlightjs"
+    highlightjs:
+      style: "Atom One Dark"
+      bg_color: "#1e2330"
+
+# 暗色模式（跟随系统，也可手动切换）
+dark_mode:
+  enable: true
+  default: auto
+
+# 配色：把主题从默认蓝调成 gochat 的绿色
+color:
+  body_bg_color: "#f3f6f9"
+  navbar_bg_color: "#0f172a"
+  navbar_text_color: "#e2e8f0"
+  subtitle_color: "#f1f5f9"
+  text_color: "#334155"
+  sec_text_color: "#64748b"
+  post_text_color: "#2f3a45"
+  post_heading_color: "#0f172a"
+  post_link_color: "#07a152"
+  post_link_color_dark: "#34d399"
+  link_hover_color: "#07c160"
+  link_hover_bg_color: "#eefaf3"
+  line_color: "#e5eaf0"
+  board_color: "#ffffff"
+
+# 字体
+font:
+  font_size: "16px"
+  font_family: "-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif"
+
+# 自定义样式（source/css/custom.css）
+custom_css: /css/custom.css
+
+# 导航栏
+navbar:
+  blog_title: "gochat 学习博客"
+  ground_glass:
+    enable: true
+    px: 4
+    alpha: 0.72
+  menu:
+    - { key: "home", link: "/", name: "首页", icon: "iconfont icon-home-fill" }
+    - { key: "archive", link: "/archives/", name: "归档", icon: "iconfont icon-archive-fill" }
+    - { key: "category", link: "/categories/", name: "分类", icon: "iconfont icon-category-fill" }
+    - { key: "tag", link: "/tags/", name: "标签", icon: "iconfont icon-tags-fill" }
+    - { key: "about", link: "/about/", name: "关于", icon: "iconfont icon-user-fill" }
+
+# 搜索（未安装 hexo-generator-search，关闭）
+search:
+  enable: false
+
+# 首页
+index:
+  banner_img: /images/hero.svg
+  banner_img_height: 88
+  banner_mask_alpha: 0.25
+  slogan:
+    enable: true
+    text: "从 0 到 1，逐行读懂一个 Go 后端项目"
+  post_url: /archives/
+  excerpt_link: "阅读全文"
+
+# 文章页
+post:
+  banner_img: /images/hero.svg
+  banner_img_height: 50
+  banner_mask_alpha: 0.55
+  toc:
+    enable: true
+    max_depth: 3
+    min_depth: 0
+    expand: true
+  comments:
+    enable: false
+  math:
+    enable: false
+    specific: false
+
+# 归档页
+archive:
+  banner_img: /images/hero.svg
+  banner_img_height: 40
+  banner_mask_alpha: 0.6
+
+# 分类页
+category:
+  banner_img: /images/hero.svg
+  banner_img_height: 40
+  banner_mask_alpha: 0.6
+
+# 标签页
+tag:
+  banner_img: /images/hero.svg
+  banner_img_height: 40
+  banner_mask_alpha: 0.6
+
+# 关于页
+about:
+  enable: false
+
+# 页脚
+footer:
+  content: '
+    <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span>
+    <span style="color:#64748b"> · Powered by </span>
+    <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a>
+    <span style="color:#64748b"> & </span>
+    <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a>
+  '
+  statistics:
+    enable: false

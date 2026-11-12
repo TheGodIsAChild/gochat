@@ -1,12 +1,25 @@
+
+
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
   
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <title>gochat 项目学习博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Go + Gin + GORM + Redis + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="Go + Gin + GORM + Redis + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记">
 <meta property="og:type" content="website">
 <meta property="og:title" content="gochat 项目学习博客">
 <meta property="og:url" content="http://127.0.0.1:8080/blog/index.html">
@@ -15,1878 +28,1049 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="gochat">
 <meta property="article:tag" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
-<meta name="twitter:card" content="summary">
-  
-    <link rel="alternate" href="/blog/atom.xml" title="gochat 项目学习博客" type="application/atom+xml">
+<meta name="twitter:card" content="summary_large_image">
   
   
-    <link rel="shortcut icon" href="/blog/favicon.png">
   
-  
-    
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+  <title>gochat 项目学习博客</title>
 
-  
-  
-<link rel="stylesheet" href="/blog/css/style.css">
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
-  
-    
-<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
 
-  
-  
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
 
-  <!-- 自定义美化样式（source/css/custom.css） -->
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
   
 <link rel="stylesheet" href="/blog/css/custom.css">
 
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
 <meta name="generator" content="Hexo 8.1.2"></head>
 
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/blog/" id="logo">gochat 项目学习博客</a>
-      </h1>
-      
-        <h2 id="subtitle-wrap">
-          <a href="/blog/" id="subtitle">Go + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记</a>
-        </h2>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 88vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
         
-          <a class="main-nav-link" href="/blog/">首页</a>
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
         
-          <a class="main-nav-link" href="/blog/archives">归档</a>
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
         
-          <a class="main-nav-link" href="/blog/about/">关于</a>
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
         
-      </nav>
-      <nav id="sub-nav">
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
         
         
-          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
         
-        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://127.0.0.1:8080/blog"></form>
-      </div>
-    </div>
-  </div>
-</header>
-
-      <div class="outer">
-        <section id="main">
-  
-    <article id="post-00-课程导读-从0到1怎么学" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T06:00:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D/">开始之前</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/">课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p><strong>这是一篇「课程说明书」</strong>。花 10 分钟读完，能帮你少走很多弯路。</p>
-</blockquote>
-<h2 id="一、这门课面向谁"><a href="#一、这门课面向谁" class="headerlink" title="一、这门课面向谁"></a>一、这门课面向谁</h2><p>如果你满足以下条件，这篇博客就是为你写的：</p>
-<ul>
-<li>✅ 会 Go 基本语法（变量、函数、struct、interface、goroutine 的写法见过）</li>
-<li>✅ 懂计算机基础（进程&#x2F;线程、HTTP、数据库是什么、SQL 会写一点）</li>
-<li>❌ 没做过完整项目（不知道分层怎么分、项目怎么组织）</li>
-<li>❌ 没用过 Gin &#x2F; GORM &#x2F; Redis &#x2F; WebSocket &#x2F; gRPC &#x2F; RabbitMQ</li>
-</ul>
-<p><strong>不需要</strong>你提前会这些框架——文章会从「它是什么、为什么用它」讲起。</p>
-<h2 id="二、学完你能得到什么"><a href="#二、学完你能得到什么" class="headerlink" title="二、学完你能得到什么"></a>二、学完你能得到什么</h2><p>一个<strong>能跑、能讲、能改</strong>的完整后端项目：</p>
-<table>
-<thead>
-<tr>
-<th>能力</th>
-<th>具体表现</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>能跑</td>
-<td>一条命令启动，浏览器打开就是仿微信界面</td>
-</tr>
-<tr>
-<td>能讲</td>
-<td>面试时能说清每个模块「解决什么问题、怎么解决、有什么坑」</td>
-</tr>
-<tr>
-<td>能改</td>
-<td>看懂任意一个文件的代码，能自己加功能（如消息撤回）</td>
-</tr>
-</tbody></table>
-<h2 id="三、先建立全局印象"><a href="#三、先建立全局印象" class="headerlink" title="三、先建立全局印象"></a>三、先建立全局印象</h2><p><img src="/blog/blog/images/architecture.svg" alt="gochat 系统架构"></p>
-<p>看图先记住三件事：</p>
-<ol>
-<li><strong>客户端只和 Gateway（:8080）说话</strong></li>
-<li><strong>内部服务（user :9001 &#x2F; chat :9002）用 gRPC 通信</strong></li>
-<li><strong>消息推送是异步的</strong>：落库 → outbox → RabbitMQ → 消费者 → WebSocket</li>
-</ol>
-<p>现在看不懂没关系，读完 M1–M7 再回来看，会有「哦——原来如此」的感觉。</p>
-<h2 id="四、学习路径（重要）"><a href="#四、学习路径（重要）" class="headerlink" title="四、学习路径（重要）"></a>四、学习路径（重要）</h2><p><strong>不要</strong>从第一行代码开始读！按这个顺序：</p>
-<h3 id="第-1-步：先跑起来（1-小时）"><a href="#第-1-步：先跑起来（1-小时）" class="headerlink" title="第 1 步：先跑起来（1 小时）"></a>第 1 步：先跑起来（1 小时）</h3><ol>
-<li>装 Docker，<code>docker compose up -d</code> 起 MySQL&#x2F;Redis&#x2F;RabbitMQ</li>
-<li><code>go run . -db</code> 启动，浏览器打开 <code>http://127.0.0.1:8080/</code></li>
-<li>注册两个账号，互相发消息、建群、打语音</li>
-</ol>
-<blockquote>
-<p><strong>目标</strong>：先有「这东西能干嘛」的体感，再研究「它怎么实现的」。</p>
-</blockquote>
-<h3 id="第-2-步：读懂骨架（半天）"><a href="#第-2-步：读懂骨架（半天）" class="headerlink" title="第 2 步：读懂骨架（半天）"></a>第 2 步：读懂骨架（半天）</h3><p>按顺序读这 3 篇：</p>
-<ol>
-<li><a href="/blog/2026/11/13/%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/">环境准备与项目启动（逐行）</a></li>
-<li><a href="/blog/2026/11/13/%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/">一次 HTTP 请求的完整链路（逐行）</a></li>
-<li><a href="/blog/2026/11/13/%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/">代码地图：每个文件是干什么的</a></li>
-</ol>
-<blockquote>
-<p><strong>目标</strong>：知道项目怎么分层、请求从哪进从哪出。</p>
-</blockquote>
-<h3 id="第-3-步：按里程碑深入（每天一个）"><a href="#第-3-步：按里程碑深入（每天一个）" class="headerlink" title="第 3 步：按里程碑深入（每天一个）"></a>第 3 步：按里程碑深入（每天一个）</h3><table>
-<thead>
-<tr>
-<th>顺序</th>
-<th>文章</th>
-<th>核心知识点</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>M1</td>
-<td>认证与好友</td>
-<td>JWT 双 token、事务、软删除</td>
-</tr>
-<tr>
-<td>M2</td>
-<td>单聊与 WebSocket</td>
-<td>消息幂等、游标分页、长连接</td>
-</tr>
-<tr>
-<td>M3</td>
-<td>群聊</td>
-<td>建群事务、权限模型</td>
-</tr>
-<tr>
-<td>M4</td>
-<td>并发加固</td>
-<td>优雅退出、限流、goroutine</td>
-</tr>
-<tr>
-<td>M5</td>
-<td>WebRTC 语音</td>
-<td>信令、SDP&#x2F;ICE、P2P</td>
-</tr>
-<tr>
-<td>M6</td>
-<td>微服务</td>
-<td>gRPC、服务拆分</td>
-</tr>
-<tr>
-<td>M7</td>
-<td>消息队列</td>
-<td>Outbox 模式、最终一致性</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p><strong>目标</strong>：每个里程碑都能回答「解决什么问题 &#x2F; 怎么解决 &#x2F; 有什么坑」。</p>
-</blockquote>
-<h3 id="第-4-步：面试冲刺"><a href="#第-4-步：面试冲刺" class="headerlink" title="第 4 步：面试冲刺"></a>第 4 步：面试冲刺</h3><ul>
-<li><a href="/blog/2026/11/13/%E9%9D%A2%E8%AF%95%E9%9B%86-72%E9%A2%98/">面试集 72 题</a></li>
-<li><a href="/blog/2026/11/13/%E5%9C%BA%E6%99%AF%E9%9B%86-30%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF/">场景集 30 个</a></li>
-<li><a href="/blog/2026/11/13/%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/">踩坑集</a></li>
-</ul>
-<h2 id="五、读代码的三条铁律"><a href="#五、读代码的三条铁律" class="headerlink" title="五、读代码的三条铁律"></a>五、读代码的三条铁律</h2><h3 id="铁律-1：沿「一条请求」走，不要按目录读"><a href="#铁律-1：沿「一条请求」走，不要按目录读" class="headerlink" title="铁律 1：沿「一条请求」走，不要按目录读"></a>铁律 1：沿「一条请求」走，不要按目录读</h3><p>不要按 <code>model → service → router</code> 的顺序读。正确做法：</p>
-<blockquote>
-<p>打开一个接口（如注册），从路由出发，跟着参数一路往下走，直到数据落库、响应返回。</p>
-</blockquote>
-<p>这样你能看到「层与层之间怎么传数据」，比按目录读高效 10 倍。</p>
-<h3 id="铁律-2：先看「注释里的三种标记」"><a href="#铁律-2：先看「注释里的三种标记」" class="headerlink" title="铁律 2：先看「注释里的三种标记」"></a>铁律 2：先看「注释里的三种标记」</h3><p>项目代码里大量使用这三种标记，看到就停下来读：</p>
-<ul>
-<li><strong>【思路】</strong> —— 为什么这么设计</li>
-<li><strong>【注意点】</strong> —— 容易踩的坑</li>
-<li><strong>【面试点】</strong> —— 面试会问什么</li>
-</ul>
-<h3 id="铁律-3：每个里程碑回答三个问题"><a href="#铁律-3：每个里程碑回答三个问题" class="headerlink" title="铁律 3：每个里程碑回答三个问题"></a>铁律 3：每个里程碑回答三个问题</h3><p>读完后，合上电脑，问自己：</p>
-<ol>
-<li><strong>这步解决什么问题？</strong>（不讲代码，讲需求）</li>
-<li><strong>怎么解决的？</strong>（讲设计，不逐行背）</li>
-<li><strong>有什么坑？</strong>（能说出 2–3 个）</li>
-</ol>
-<p>答得出来 &#x3D; 真懂了；答不出来 &#x3D; 回去补。</p>
-<h2 id="六、你需要准备的环境"><a href="#六、你需要准备的环境" class="headerlink" title="六、你需要准备的环境"></a>六、你需要准备的环境</h2><table>
-<thead>
-<tr>
-<th>工具</th>
-<th>版本</th>
-<th>用途</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Go</td>
-<td>1.21+</td>
-<td>运行项目</td>
-</tr>
-<tr>
-<td>Docker Desktop</td>
-<td>最新</td>
-<td>跑 MySQL&#x2F;Redis&#x2F;RabbitMQ</td>
-</tr>
-<tr>
-<td>编辑器</td>
-<td>VS Code + Go 插件</td>
-<td>读代码&#x2F;调试</td>
-</tr>
-<tr>
-<td>浏览器</td>
-<td>Chrome&#x2F;Edge</td>
-<td>体验前端</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p>数据库等依赖全部用 Docker，<strong>不需要在本机安装 MySQL</strong>。</p>
-</blockquote>
-<h2 id="七、遇到看不懂怎么办"><a href="#七、遇到看不懂怎么办" class="headerlink" title="七、遇到看不懂怎么办"></a>七、遇到看不懂怎么办</h2><ol>
-<li><strong>先看文章里的图</strong>：架构图&#x2F;流程图往往比代码更容易懂</li>
-<li><strong>用 <code>git log</code> 看演进</strong>：每个里程碑一个提交，<code>git show &lt;commit&gt;</code> 能看到这步改了什么</li>
-<li><strong>改坏它</strong>：把 access token 有效期改成 1 分钟，观察无感刷新；把超时改小，观察重连——比读十遍都有效</li>
-</ol>
-<hr>
-<p>下一篇 → <a href="/blog/2026/11/13/%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/">环境准备与项目启动（逐行讲解）</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/" data-id="cuidB9hOZCTt0DcDSS03IMSW_" data-title="课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%85%A5%E9%97%A8/" rel="tag">入门</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" rel="tag">学习路线</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-01-环境准备与项目启动-逐行" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T05:50:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/%E4%BB%8E0%E5%88%B01/">从0到1</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/">环境准备与项目启动（逐行讲解）</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p>目标：搞懂「从一条命令到服务能响应」，这中间发生了什么。<br>读完你能理解 <code>main.go</code>、<code>config.yaml</code>、<code>core/</code> 三者的关系。</p>
-</blockquote>
-<h2 id="一、先看项目怎么启动"><a href="#一、先看项目怎么启动" class="headerlink" title="一、先看项目怎么启动"></a>一、先看项目怎么启动</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker compose up -d    # 起 MySQL / Redis / RabbitMQ</span><br><span class="line">go run . -db            # 编译并运行，-db 表示顺便建表</span><br></pre></td></tr></table></figure>
-
-<p><code>go run .</code> 会找当前目录的 <code>package main</code>，也就是 <code>main.go</code>。</p>
-<h2 id="二、config-yaml：配置为什么单独放文件"><a href="#二、config-yaml：配置为什么单独放文件" class="headerlink" title="二、config.yaml：配置为什么单独放文件"></a>二、config.yaml：配置为什么单独放文件</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">addr:</span> <span class="string">&quot;:8080&quot;</span></span><br><span class="line"><span class="attr">mysql:</span></span><br><span class="line">  <span class="attr">host:</span> <span class="string">&quot;127.0.0.1&quot;</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">3307</span></span><br><span class="line">  <span class="attr">user:</span> <span class="string">&quot;gochat&quot;</span></span><br><span class="line">  <span class="attr">password:</span> <span class="string">&quot;gochat123&quot;</span></span><br><span class="line">  <span class="attr">database:</span> <span class="string">&quot;gochat&quot;</span></span><br><span class="line"><span class="attr">redis:</span></span><br><span class="line">  <span class="attr">addr:</span> <span class="string">&quot;127.0.0.1:6379&quot;</span></span><br><span class="line"><span class="attr">jwt:</span></span><br><span class="line">  <span class="attr">secret:</span> <span class="string">&quot;gochat-dev-secret-change-me&quot;</span></span><br><span class="line">  <span class="attr">access_expire_minutes:</span> <span class="number">120</span></span><br><span class="line">  <span class="attr">refresh_expire_hours:</span> <span class="number">720</span></span><br><span class="line"><span class="attr">grpc:</span></span><br><span class="line">  <span class="attr">user_addr:</span> <span class="string">&quot;127.0.0.1:9001&quot;</span></span><br><span class="line">  <span class="attr">chat_addr:</span> <span class="string">&quot;127.0.0.1:9002&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>为什么不硬编码在代码里？</strong></p>
-<ul>
-<li>开发&#x2F;测试&#x2F;生产环境配置不同，改配置不用改代码</li>
-<li>密码、密钥不应该进 git（生产用环境变量&#x2F;配置中心）</li>
-<li>运维可以直接改配置重启，不用重新编译</li>
-</ul>
-<h2 id="三、internal-config：配置的-Go-结构体"><a href="#三、internal-config：配置的-Go-结构体" class="headerlink" title="三、internal&#x2F;config：配置的 Go 结构体"></a>三、internal&#x2F;config：配置的 Go 结构体</h2><p>YAML 是文本，Go 需要结构体来接。<code>internal/config/mysql_config.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Mysql <span class="keyword">struct</span> &#123;</span><br><span class="line">    Host     <span class="type">string</span> <span class="string">`yaml:&quot;host&quot;`</span></span><br><span class="line">    Port     <span class="type">int</span>    <span class="string">`yaml:&quot;port&quot;`</span></span><br><span class="line">    User     <span class="type">string</span> <span class="string">`yaml:&quot;user&quot;`</span></span><br><span class="line">    Password <span class="type">string</span> <span class="string">`yaml:&quot;password&quot;`</span></span><br><span class="line">    Database <span class="type">string</span> <span class="string">`yaml:&quot;database&quot;`</span></span><br><span class="line">    Charset  <span class="type">string</span> <span class="string">`yaml:&quot;charset&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// DB_DSN 把结构体拼成 GORM 需要的 DSN 字符串</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m Mysql)</span></span> DB_DSN() <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> fmt.Sprintf(<span class="string">&quot;%s:%s@tcp(%s:%d)/%s?charset=%s&amp;parseTime=True&amp;loc=Local&quot;</span>,</span><br><span class="line">        m.User, m.Password, m.Host, m.Port, m.Database, m.Charset)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行解释</strong>：</p>
-<ul>
-<li><code>`yaml:&quot;host&quot;`</code> 是 <strong>struct tag</strong>，告诉 YAML 库：YAML 里的 <code>host</code> 对应这个字段</li>
-<li><code>DB_DSN()</code> 是<strong>方法</strong>（值接收者），把配置拼成 DSN</li>
-<li><code>parseTime=True</code>：让 MySQL 的 DATETIME 自动解析成 Go 的 <code>time.Time</code>（否则拿到的是字符串）</li>
-<li><code>loc=Local</code>：时区用本地时区</li>
-</ul>
-<blockquote>
-<p><strong>注意点</strong>：<code>type Mysql struct{}</code> 只放「数据定义」，不放「读取逻辑」——读取逻辑在 <code>core/</code> 里。<br>这是用户最初就要求的分工：<strong>定义与读取分离</strong>。</p>
-</blockquote>
-<h2 id="四、core-init-config-go：读取配置的三步"><a href="#四、core-init-config-go：读取配置的三步" class="headerlink" title="四、core&#x2F;init_config.go：读取配置的三步"></a>四、core&#x2F;init_config.go：读取配置的三步</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 解析命令行参数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">LoadConfigFile</span><span class="params">()</span></span> &#123;</span><br><span class="line">    flag.StringVar(&amp;flagConfig.ConfigPath, <span class="string">&quot;config&quot;</span>, <span class="string">&quot;./config.yaml&quot;</span>, <span class="string">&quot;配置文件路径&quot;</span>)</span><br><span class="line">    flag.BoolVar(&amp;flagConfig.InitDB, <span class="string">&quot;db&quot;</span>, <span class="literal">false</span>, <span class="string">&quot;是否初始化数据库表&quot;</span>)</span><br><span class="line">    flag.Parse()</span><br><span class="line">    global.ConfigPath = &amp;flagConfig.ConfigPath</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行</strong>：</p>
-<ul>
-<li><code>flag.StringVar(指针, 参数名, 默认值, 说明)</code> —— 注意第 3 个参数是<strong>默认值</strong>，不是说明文字（这里踩过坑！）</li>
-<li><code>-db</code> 参数决定要不要执行 AutoMigrate（建表）</li>
-<li>解析结果存到 <code>global.ConfigPath</code>（全局变量）</li>
-</ul>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 2. 读文件 + 解析 YAML</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">LoadConfig</span><span class="params">()</span></span> (<span class="type">bool</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    bytes, err := os.ReadFile(*global.ConfigPath)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>, fmt.Errorf(<span class="string">&quot;config 加载失败: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> err := yaml.Unmarshal(bytes, &amp;global.Config); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>, fmt.Errorf(<span class="string">&quot;yaml 配置解析错误: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行</strong>：</p>
-<ul>
-<li><code>os.ReadFile</code> 把整个文件读成 <code>[]byte</code></li>
-<li><code>yaml.Unmarshal(bytes, &amp;global.Config)</code> —— 第二个参数<strong>必须传指针</strong>，否则解析结果写不进去</li>
-<li><code>%w</code> 是 Go 的错误包装语法，保留原始错误链（<code>errors.Is</code> 能判断）</li>
-</ul>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 3. 初始化各种基础服务</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">InitBaseServices</span><span class="params">()</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> _, err := db.LoadMysql(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;数据库连接失败: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> flagConfig.InitDB &#123;</span><br><span class="line">        <span class="keyword">if</span> _, err := db.InitMysqlTables(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;数据库建表失败: %w&quot;</span>, err)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> _, err := db.LoadRedis(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;初始化 Redis 失败: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> err := mq.LoadMq(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Printf(<span class="string">&quot;RabbitMQ 连接失败，消息将使用同步推送: %v&quot;</span>, err)   <span class="comment">// 可选依赖，失败降级</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行</strong>：</p>
-<ul>
-<li>MySQL&#x2F;Redis 是<strong>必需依赖</strong>：失败就返回 error，main 里 <code>log.Fatal</code> 退出</li>
-<li>RabbitMQ 是<strong>可选依赖</strong>：失败只打日志，应用继续跑（消息改为同步推送）——这就是「降级设计」</li>
-</ul>
-<h2 id="五、db-LoadMysql：GORM-连接数据库"><a href="#五、db-LoadMysql：GORM-连接数据库" class="headerlink" title="五、db.LoadMysql：GORM 连接数据库"></a>五、db.LoadMysql：GORM 连接数据库</h2><p><code>core/db/init_mysql.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">LoadMysql</span><span class="params">()</span></span> (*gorm.DB, <span class="type">error</span>) &#123;</span><br><span class="line">    dsn := global.Config.Mysql.DB_DSN()</span><br><span class="line"></span><br><span class="line">    db, err := gorm.Open(mysql.Open(dsn), &amp;gorm.Config&#123;</span><br><span class="line">        DisableForeignKeyConstraintWhenMigrating: <span class="literal">true</span>,  <span class="comment">// 不生成物理外键</span></span><br><span class="line">        TranslateError: <span class="literal">true</span>,                            <span class="comment">// Duplicate 错误翻译成哨兵错误</span></span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> db, fmt.Errorf(<span class="string">&quot;数据库连接失败: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    sqlDB, _ := db.DB()            <span class="comment">// 取出底层 *sql.DB</span></span><br><span class="line">    sqlDB.SetMaxOpenConns(<span class="number">50</span>)      <span class="comment">// 最大连接数</span></span><br><span class="line">    sqlDB.SetMaxIdleConns(<span class="number">10</span>)      <span class="comment">// 最大空闲连接</span></span><br><span class="line">    sqlDB.SetConnMaxLifetime(time.Hour)  <span class="comment">// 连接最长存活时间</span></span><br><span class="line"></span><br><span class="line">    global.DB = db                 <span class="comment">// 存到全局，供 service 层使用</span></span><br><span class="line">    <span class="keyword">return</span> db, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行</strong>：</p>
-<ul>
-<li><code>gorm.Open(mysql.Open(dsn), ...)</code> —— 注意第一个参数是 <strong><code>gorm.Dialector</code></strong>，不是 dsn 字符串（这里踩过坑）</li>
-<li><code>DisableForeignKeyConstraintWhenMigrating</code>：迁移时不建物理外键，约束交给应用层</li>
-<li><code>TranslateError</code>：MySQL 的 <code>Duplicate entry</code> 会变成 <code>gorm.ErrDuplicatedKey</code>，业务代码能用 <code>errors.Is</code> 判断</li>
-<li><strong>连接池</strong>：不设置的话默认可能无限开连接，DB 会被打爆</li>
-</ul>
-<h2 id="六、main-go：把所有东西串起来"><a href="#六、main-go：把所有东西串起来" class="headerlink" title="六、main.go：把所有东西串起来"></a>六、main.go：把所有东西串起来</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    core.LoadConfigFile()                                    <span class="comment">// 1. 解析参数</span></span><br><span class="line">    <span class="keyword">if</span> _, err := core.LoadConfig(); err != <span class="literal">nil</span> &#123;             <span class="comment">// 2. 读配置</span></span><br><span class="line">        log.Fatalf(<span class="string">&quot;加载配置失败: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> err := core.InitBaseServices(); err != <span class="literal">nil</span> &#123;          <span class="comment">// 3. 连 DB/Redis/MQ</span></span><br><span class="line">        log.Fatalf(<span class="string">&quot;初始化基础服务失败: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    grpcServers, err := grpcx.StartServers(...)              <span class="comment">// 4. 起 gRPC 微服务</span></span><br><span class="line">    grpcx.Dial(...)                                          <span class="comment">//    建立客户端连接</span></span><br><span class="line"></span><br><span class="line">    srv := &amp;http.Server&#123;Addr: ..., Handler: router.NewRouter()&#125;  <span class="comment">// 5. 起 HTTP</span></span><br><span class="line">    <span class="keyword">go</span> srv.ListenAndServe()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 6. 等退出信号，优雅关闭</span></span><br><span class="line">    &lt;-quit</span><br><span class="line">    srv.Shutdown(ctx)</span><br><span class="line">    ws.DefaultHub.CloseAll()</span><br><span class="line">    core.CloseBaseServices()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>为什么用 <code>http.Server</code> 而不是 <code>r.Run()</code>？</strong></p>
-<p><code>r.Run()</code> 是阻塞的，进程被 kill 时处理中的请求会被硬切断。<br>用 <code>http.Server</code> + 信号监听，可以做到「停止接收新请求 → 等待处理中的请求完成 → 释放资源」。</p>
-<h2 id="七、-health：最简单的接口"><a href="#七、-health：最简单的接口" class="headerlink" title="七、&#x2F;health：最简单的接口"></a>七、&#x2F;health：最简单的接口</h2><p><code>internal/router/health/health_api.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HealthRouter</span><span class="params">(r *gin.Engine)</span></span> &#123;</span><br><span class="line">    r.GET(<span class="string">&quot;/health&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.JSON(<span class="number">200</span>, gin.H&#123;<span class="string">&quot;status&quot;</span>: <span class="string">&quot;ok&quot;</span>&#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行</strong>：</p>
-<ul>
-<li><code>r.GET(路径, handler)</code> 注册一个 GET 路由</li>
-<li><code>c *gin.Context</code> 是 gin 的请求上下文（拿参数、写响应都用它）</li>
-<li><code>gin.H</code> 就是 <code>map[string]any</code> 的简写</li>
-<li><strong>为什么要有健康检查？</strong> 负载均衡&#x2F;K8s 用它判断服务是否存活</li>
-</ul>
-<h2 id="八、动手练习"><a href="#八、动手练习" class="headerlink" title="八、动手练习"></a>八、动手练习</h2><ol>
-<li>把 <code>server.addr</code> 改成 <code>:9090</code>，重启，访问 <code>http://127.0.0.1:9090/health</code></li>
-<li>把 <code>-db</code> 参数去掉，观察启动日志（不再建表，但服务正常）</li>
-<li>故意把 MySQL 密码改错，观察启动报错信息</li>
-</ol>
-<hr>
-<p>下一篇 → <a href="/blog/2026/11/13/%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/">一次 HTTP 请求的完整链路（逐行）</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/" data-id="cuidMyiKthXCBOpNOQUd4qBMA" data-title="环境准备与项目启动（逐行讲解）" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/main/" rel="tag">main</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%85%A5%E9%97%A8/" rel="tag">入门</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%85%8D%E7%BD%AE/" rel="tag">配置</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-02-一次HTTP请求的完整链路-逐行" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T05:40:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/%E4%BB%8E0%E5%88%B01/">从0到1</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/">一次 HTTP 请求的完整链路（逐行）</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p>以「用户注册」为例，从 URL 一路追到数据库，把分层彻底看懂。<br>这是<strong>最重要的一篇</strong>——看懂这条链路，项目里 80% 的代码你都能读懂。</p>
-</blockquote>
-<h2 id="一、请求长什么样"><a href="#一、请求长什么样" class="headerlink" title="一、请求长什么样"></a>一、请求长什么样</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">POST /api/v1/register</span><br><span class="line">Content-Type: application/json</span><br><span class="line"></span><br><span class="line">&#123;&quot;username&quot;:&quot;alice&quot;,&quot;password&quot;:&quot;123456&quot;,&quot;nickname&quot;:&quot;爱丽丝&quot;&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="二、链路全图"><a href="#二、链路全图" class="headerlink" title="二、链路全图"></a>二、链路全图</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">main.go</span><br><span class="line">  └─ router.NewRouter()</span><br><span class="line">       ├─ userapi.UserRouter(r)          ← 注册所有用户路由</span><br><span class="line">       │    └─ pub.POST(&quot;/register&quot;, Register)</span><br><span class="line">       │</span><br><span class="line">HTTP 请求进来</span><br><span class="line">  └─ Register(c *gin.Context)            ← handler：解析 + 校验 + 响应</span><br><span class="line">       └─ userservice.UserRegister(...)  ← service：业务逻辑 + 事务</span><br><span class="line">            └─ global.DB.Create(&amp;user)   ← model：落库</span><br></pre></td></tr></table></figure>
-
-<h2 id="三、第-1-站：路由怎么注册的"><a href="#三、第-1-站：路由怎么注册的" class="headerlink" title="三、第 1 站：路由怎么注册的"></a>三、第 1 站：路由怎么注册的</h2><p><code>internal/router/router.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewRouter</span><span class="params">()</span></span> *gin.Engine &#123;</span><br><span class="line">    r := gin.Default()</span><br><span class="line">    health.HealthRouter(r)</span><br><span class="line">    userapi.UserRouter(r)     <span class="comment">// 用户相关路由</span></span><br><span class="line">    friendapi.FriendRouter(r)</span><br><span class="line">    chatapi.ChatRouter(r)</span><br><span class="line">    groupapi.GroupRouter(r)</span><br><span class="line">    callapi.CallRouter(r)</span><br><span class="line">    rpcapi.RPCRouter(r)</span><br><span class="line">    r.GET(<span class="string">&quot;/ws&quot;</span>, ws.ServeWS)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 静态资源：前端 + 博客</span></span><br><span class="line">    r.Static(<span class="string">&quot;/css&quot;</span>, <span class="string">&quot;./web/css&quot;</span>)</span><br><span class="line">    r.StaticFile(<span class="string">&quot;/&quot;</span>, <span class="string">&quot;./web/index.html&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> r</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>internal/router/user_router/user_api.go</code> 里：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UserRouter</span><span class="params">(r *gin.Engine)</span></span> &#123;</span><br><span class="line">    <span class="comment">// 公开组：不需要登录</span></span><br><span class="line">    pub := r.Group(<span class="string">&quot;/api/v1&quot;</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        pub.POST(<span class="string">&quot;/token/refresh&quot;</span>, Refresh)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 登录/注册单独限流</span></span><br><span class="line">    authGroup := r.Group(<span class="string">&quot;/api/v1&quot;</span>, middleware.RateLimit(<span class="number">20</span>, time.Minute))</span><br><span class="line">    &#123;</span><br><span class="line">        authGroup.POST(<span class="string">&quot;/register&quot;</span>, Register)</span><br><span class="line">        authGroup.POST(<span class="string">&quot;/login&quot;</span>, Login)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 鉴权组：整组挂 Auth 中间件</span></span><br><span class="line">    priv := r.Group(<span class="string">&quot;/api/v1&quot;</span>, middleware.Auth())</span><br><span class="line">    &#123;</span><br><span class="line">        priv.GET(<span class="string">&quot;/users/me&quot;</span>, GetUserProfile)</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行理解</strong>：</p>
-<ul>
-<li><code>r.Group(&quot;/api/v1&quot;)</code> 创建一个<strong>路由组</strong>，组内路径自动加前缀</li>
-<li><code>r.Group(&quot;/api/v1&quot;, middleware.Auth())</code> 第二个参数是<strong>中间件</strong>，组内所有路由都会先执行它</li>
-<li><strong>为什么要分组？</strong> 把「需要登录」和「不需要登录」的接口分开，避免漏挂鉴权（最常见的安全事故）</li>
-</ul>
-<h2 id="四、第-2-站：handler-逐行"><a href="#四、第-2-站：handler-逐行" class="headerlink" title="四、第 2 站：handler 逐行"></a>四、第 2 站：handler 逐行</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Register</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ① 绑定 + 校验请求体</span></span><br><span class="line">    <span class="keyword">var</span> req registerReq</span><br><span class="line">    <span class="keyword">if</span> err := c.ShouldBindJSON(&amp;req); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        resp.Fail(c, http.StatusBadRequest, <span class="string">&quot;参数错误: &quot;</span>+err.Error())</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ② 调 service</span></span><br><span class="line">    u, err := userservice.UserRegister(req.Username, req.Password, req.Nickname)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        resp.Fail(c, http.StatusBadRequest, err.Error())</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ③ 写响应</span></span><br><span class="line">    resp.OK(c, gin.H&#123;<span class="string">&quot;user_id&quot;</span>: u.ID, <span class="string">&quot;username&quot;</span>: u.Username&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>请求体结构体：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> registerReq <span class="keyword">struct</span> &#123;</span><br><span class="line">    Username <span class="type">string</span> <span class="string">`json:&quot;username&quot; binding:&quot;required,min=3,max=32&quot;`</span></span><br><span class="line">    Password <span class="type">string</span> <span class="string">`json:&quot;password&quot; binding:&quot;required,min=6,max=64&quot;`</span></span><br><span class="line">    Nickname <span class="type">string</span> <span class="string">`json:&quot;nickname&quot; binding:&quot;required,max=32&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行理解</strong>：</p>
-<ul>
-<li><code>json:&quot;username&quot;</code>：JSON 字段名</li>
-<li><code>binding:&quot;required,min=3,max=32&quot;</code>：<strong>gin 内置的参数校验</strong><ul>
-<li><code>required</code> 必填</li>
-<li><code>min/max</code> 长度范围</li>
-<li>校验失败时 <code>ShouldBindJSON</code> 返回 error</li>
-</ul>
-</li>
-<li><code>c.ShouldBindJSON(&amp;req)</code>：把请求体 JSON 解析到结构体并校验</li>
-<li><code>return</code> 非常重要：出错必须 return，否则会继续往下执行</li>
-</ul>
-<h3 id="响应为什么统一格式"><a href="#响应为什么统一格式" class="headerlink" title="响应为什么统一格式"></a>响应为什么统一格式</h3><p><code>internal/router/resp/resp.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">OK</span><span class="params">(c *gin.Context, data any)</span></span> &#123;</span><br><span class="line">    c.JSON(http.StatusOK, gin.H&#123;<span class="string">&quot;code&quot;</span>: <span class="number">0</span>, <span class="string">&quot;message&quot;</span>: <span class="string">&quot;ok&quot;</span>, <span class="string">&quot;data&quot;</span>: data&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fail</span><span class="params">(c *gin.Context, status <span class="type">int</span>, msg <span class="type">string</span>)</span></span> &#123;</span><br><span class="line">    c.JSON(status, gin.H&#123;<span class="string">&quot;code&quot;</span>: status, <span class="string">&quot;message&quot;</span>: msg&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>统一成 <code>{code, message, data}</code>，前端只需一套解析逻辑。</p>
-<h2 id="五、第-3-站：service-逐行"><a href="#五、第-3-站：service-逐行" class="headerlink" title="五、第 3 站：service 逐行"></a>五、第 3 站：service 逐行</h2><p><code>internal/service/user_service/register_service.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UserRegister</span><span class="params">(username, password, nickname <span class="type">string</span>)</span></span> (*usermodel.User, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="comment">// ① 用户名查重</span></span><br><span class="line">    <span class="keyword">var</span> count <span class="type">int64</span></span><br><span class="line">    <span class="keyword">if</span> err := global.DB.Model(&amp;usermodel.User&#123;&#125;).</span><br><span class="line">        Where(<span class="string">&quot;username = ?&quot;</span>, username).</span><br><span class="line">        Count(&amp;count).Error; err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;查询用户失败: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> count &gt; <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">&quot;用户名已存在&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ② 密码加密（绝不存明文）</span></span><br><span class="line">    hash, err := auth.Hash(password)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;密码加密失败: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ③ 事务：创建用户 + 默认设置</span></span><br><span class="line">    user := &amp;usermodel.User&#123;</span><br><span class="line">        Username:     username,</span><br><span class="line">        PasswordHash: hash,</span><br><span class="line">        Nickname:     nickname,</span><br><span class="line">    &#125;</span><br><span class="line">    err = global.DB.Transaction(<span class="function"><span class="keyword">func</span><span class="params">(tx *gorm.DB)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> err := tx.Create(user).Error; err != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> err</span><br><span class="line">        &#125;</span><br><span class="line">        settings := &amp;usermodel.UserSettings&#123;UserID: user.ID&#125;</span><br><span class="line">        <span class="keyword">return</span> tx.Create(settings).Error</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;创建用户失败: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> user, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行理解</strong>：</p>
-<ul>
-<li><code>Model(&amp;User{})</code> 指定操作哪张表；<code>Where</code> 条件；<code>Count(&amp;count)</code> 计数</li>
-<li><code>?</code> 是<strong>占位符</strong>，防 SQL 注入（千万不要字符串拼接）</li>
-<li><code>.Error</code> —— GORM 的链式调用返回 <code>*gorm.DB</code>，错误在 <code>.Error</code> 字段</li>
-<li><code>auth.Hash</code> 用 bcrypt 加密：<strong>同一密码每次结果不同</strong>（随机 salt）</li>
-<li><code>global.DB.Transaction(func(tx) error {...})</code>：函数返回 error 就自动回滚</li>
-<li><strong>为什么用户和设置要同事务？</strong> 它们 1:1 必须成对出现，否则出现「有用户没设置」的脏数据</li>
-<li><code>tx.Create(user)</code> 之后 <code>user.ID</code> 会被 GORM <strong>回填</strong>（自增主键）</li>
-</ul>
-<h2 id="六、第-4-站：model"><a href="#六、第-4-站：model" class="headerlink" title="六、第 4 站：model"></a>六、第 4 站：model</h2><p><code>internal/model/user_model/user_model.go</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">    model.Model          <span class="comment">// 嵌入：ID / CreatedAt / UpdatedAt / DeletedAt</span></span><br><span class="line">    Username     <span class="type">string</span>  <span class="string">`gorm:&quot;type:varchar(32);uniqueIndex;not null&quot;`</span></span><br><span class="line">    PasswordHash <span class="type">string</span>  <span class="string">`gorm:&quot;type:varchar(255);not null&quot; json:&quot;-&quot;`</span></span><br><span class="line">    Nickname     <span class="type">string</span>  <span class="string">`gorm:&quot;type:varchar(32);not null;default:&#x27;&#x27;&quot;`</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(User)</span></span> TableName() <span class="type">string</span> &#123; <span class="keyword">return</span> <span class="string">&quot;users&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>逐行理解</strong>：</p>
-<ul>
-<li>嵌入 <code>model.Model</code>（内部是 <code>gorm.Model</code>）→ 自动获得 <code>ID/CreatedAt/UpdatedAt/DeletedAt</code></li>
-<li><code>uniqueIndex</code>：建唯一索引（<strong>并发注册的最后防线</strong>）</li>
-<li><code>json:&quot;-&quot;</code>：序列化时忽略（密码哈希绝不出现在响应里）</li>
-<li><code>TableName()</code>：显式指定表名（否则默认是 <code>users</code> 单数化，容易猜错）</li>
-</ul>
-<h2 id="七、为什么这样分层"><a href="#七、为什么这样分层" class="headerlink" title="七、为什么这样分层"></a>七、为什么这样分层</h2><table>
-<thead>
-<tr>
-<th>层</th>
-<th>职责</th>
-<th>不该做什么</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>handler</td>
-<td>解析请求、参数校验、写响应</td>
-<td>不写业务逻辑</td>
-</tr>
-<tr>
-<td>service</td>
-<td>业务规则、事务、调 model</td>
-<td>不 import gin</td>
-</tr>
-<tr>
-<td>model</td>
-<td>描述表结构</td>
-<td>不掺业务逻辑</td>
-</tr>
-</tbody></table>
-<p><strong>好处</strong>：</p>
-<ol>
-<li><strong>可测试</strong>：service 是纯 Go 函数，单测不用起 HTTP 服务</li>
-<li><strong>可迁移</strong>：M6 拆 gRPC 时，service 完全不用改（<code>*gin.Context</code> 只存在 handler 层）</li>
-<li><strong>可复用</strong>：HTTP 接口和 gRPC 接口可以调同一个 service</li>
-</ol>
-<h2 id="八、动手练习"><a href="#八、动手练习" class="headerlink" title="八、动手练习"></a>八、动手练习</h2><ol>
-<li>给注册接口加一个「昵称不能全空格」的校验（提示：在 service 里 <code>strings.TrimSpace</code>）</li>
-<li>把 <code>/register</code> 从公开组移到鉴权组，观察发生了什么</li>
-<li>用 <code>curl</code> 发一个 <code>username</code> 只有 2 位的请求，看错误信息</li>
-</ol>
-<hr>
-<p>下一篇 → <a href="/blog/2026/11/13/%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/">代码地图：每个文件是干什么的</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/" data-id="cuidR3vzjPeMU5D3uRCEB-27h" data-title="一次 HTTP 请求的完整链路（逐行）" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%85%A5%E9%97%A8/" rel="tag">入门</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%88%86%E5%B1%82/" rel="tag">分层</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-03-代码地图-每个文件是干什么的" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T05:30:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/%E4%BB%8E0%E5%88%B01/">从0到1</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/">代码地图：每个文件是干什么的</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p>把项目当一本书，这篇是「目录页」。读某个功能时，来这里查它在哪个文件。</p>
-</blockquote>
-<h2 id="一、顶层"><a href="#一、顶层" class="headerlink" title="一、顶层"></a>一、顶层</h2><table>
-<thead>
-<tr>
-<th>文件&#x2F;目录</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>main.go</code></td>
-<td>入口：加载配置 → 初始化服务 → 启动 HTTP&#x2F;gRPC&#x2F;MQ → 优雅退出</td>
-</tr>
-<tr>
-<td><code>config.yaml</code></td>
-<td>配置（数据库、Redis、RabbitMQ、JWT、gRPC）</td>
-</tr>
-<tr>
-<td><code>docker-compose.yml</code></td>
-<td>MySQL &#x2F; Redis &#x2F; RabbitMQ 三个依赖</td>
-</tr>
-<tr>
-<td><code>README.md</code></td>
-<td>运行指南</td>
-</tr>
-<tr>
-<td><code>web/</code></td>
-<td>仿微信前端（Go 托管）</td>
-</tr>
-<tr>
-<td><code>blog/</code></td>
-<td>Hexo 学习博客</td>
-</tr>
-<tr>
-<td><code>scripts/</code></td>
-<td>演示数据脚本</td>
-</tr>
-</tbody></table>
-<h2 id="二、core-（启动装配层）"><a href="#二、core-（启动装配层）" class="headerlink" title="二、core&#x2F;（启动装配层）"></a>二、core&#x2F;（启动装配层）</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>init_config.go</code></td>
-<td>解析参数、读 YAML、初始化所有服务、关闭服务</td>
-</tr>
-<tr>
-<td><code>db/init_mysql.go</code></td>
-<td>GORM 连接 MySQL + 连接池 + AutoMigrate</td>
-</tr>
-<tr>
-<td><code>db/init_redis.go</code></td>
-<td>Redis 连接（带 Ping 校验）</td>
-</tr>
-<tr>
-<td><code>jwt/init_jwt.go</code></td>
-<td>JWT 初始化（预留）</td>
-</tr>
-<tr>
-<td><code>mq/init_rabbitmq.go</code></td>
-<td>RabbitMQ 连接 + 声明持久化队列</td>
-</tr>
-<tr>
-<td><code>server/init_server.go</code></td>
-<td>服务初始化（预留）</td>
-</tr>
-</tbody></table>
-<h2 id="三、global"><a href="#三、global" class="headerlink" title="三、global&#x2F;"></a>三、global&#x2F;</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>global.go</code></td>
-<td>全局变量：<code>Config</code>（配置）、<code>DB</code>（GORM）、<code>Redis</code>、<code>MQ</code></td>
-</tr>
-</tbody></table>
-<blockquote>
-<p>全局变量不优雅但简单。生产项目常用依赖注入替代。</p>
-</blockquote>
-<h2 id="四、internal-config-（配置结构体）"><a href="#四、internal-config-（配置结构体）" class="headerlink" title="四、internal&#x2F;config&#x2F;（配置结构体）"></a>四、internal&#x2F;config&#x2F;（配置结构体）</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>config.go</code></td>
-<td>聚合 <code>Config</code> 结构体</td>
-</tr>
-<tr>
-<td><code>mysql_config.go</code></td>
-<td><code>Mysql</code> + <code>DB_DSN()</code> 方法</td>
-</tr>
-<tr>
-<td><code>redis_config.go</code> &#x2F; <code>jwt_config.go</code> &#x2F; <code>rabbittmq_config.go</code> &#x2F; <code>grpc_config.go</code></td>
-<td>对应配置结构体</td>
-</tr>
-</tbody></table>
-<h2 id="五、internal-model-（数据模型，按域拆）"><a href="#五、internal-model-（数据模型，按域拆）" class="headerlink" title="五、internal&#x2F;model&#x2F;（数据模型，按域拆）"></a>五、internal&#x2F;model&#x2F;（数据模型，按域拆）</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>表</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>model.go</code></td>
-<td>基础 <code>Model</code>（嵌入 gorm.Model）</td>
-</tr>
-<tr>
-<td><code>user_model/user_model.go</code></td>
-<td><code>users</code></td>
-</tr>
-<tr>
-<td><code>user_model/user_settings_model.go</code></td>
-<td><code>user_settings</code></td>
-</tr>
-<tr>
-<td><code>friend_model/friend_request_model.go</code></td>
-<td><code>friend_requests</code></td>
-</tr>
-<tr>
-<td><code>friend_model/friendship_model.go</code></td>
-<td><code>friendships</code></td>
-</tr>
-<tr>
-<td><code>friend_model/friend_groups_model.go</code></td>
-<td><code>friend_groups</code></td>
-</tr>
-<tr>
-<td><code>friend_model/blacklist_model.go</code></td>
-<td><code>blacklist</code></td>
-</tr>
-<tr>
-<td><code>chat_model/chat_model.go</code></td>
-<td><code>conversations</code> &#x2F; <code>conversation_members</code> &#x2F; <code>messages</code></td>
-</tr>
-<tr>
-<td><code>group_model/group_model.go</code></td>
-<td><code>groups</code></td>
-</tr>
-<tr>
-<td><code>call_model/call_model.go</code></td>
-<td><code>call_records</code></td>
-</tr>
-<tr>
-<td><code>mq_model/outbox_model.go</code></td>
-<td><code>outbox_messages</code> + 事件契约</td>
-</tr>
-</tbody></table>
-<h2 id="六、internal-auth-（认证工具）"><a href="#六、internal-auth-（认证工具）" class="headerlink" title="六、internal&#x2F;auth&#x2F;（认证工具）"></a>六、internal&#x2F;auth&#x2F;（认证工具）</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>password_util.go</code></td>
-<td>bcrypt 加密 &#x2F; 校验</td>
-</tr>
-<tr>
-<td><code>jwt.go</code></td>
-<td>双 token 签发 &#x2F; 解析（HS256、jti、type）</td>
-</tr>
-<tr>
-<td><code>token_store.go</code></td>
-<td>Redis 存 refresh jti &#x2F; GETDEL 原子消费 &#x2F; SCAN 批量删</td>
-</tr>
-</tbody></table>
-<h2 id="七、internal-middleware"><a href="#七、internal-middleware" class="headerlink" title="七、internal&#x2F;middleware&#x2F;"></a>七、internal&#x2F;middleware&#x2F;</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>auth.go</code></td>
-<td>JWT 鉴权中间件（Bearer 解析、type 校验、写 context）</td>
-</tr>
-<tr>
-<td><code>ratelimit.go</code></td>
-<td>滑动窗口限流中间件</td>
-</tr>
-</tbody></table>
-<h2 id="八、internal-service-（业务逻辑，按域拆）"><a href="#八、internal-service-（业务逻辑，按域拆）" class="headerlink" title="八、internal&#x2F;service&#x2F;（业务逻辑，按域拆）"></a>八、internal&#x2F;service&#x2F;（业务逻辑，按域拆）</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>user_service/register_service.go</code></td>
-<td>注册（查重 + bcrypt + 事务）</td>
-</tr>
-<tr>
-<td><code>user_service/login_service.go</code></td>
-<td>登录（签发双 token + Redis）</td>
-</tr>
-<tr>
-<td><code>user_service/refresh_service.go</code></td>
-<td>刷新（GETDEL + rotation + 复用检测）</td>
-</tr>
-<tr>
-<td><code>user_service/logout_service.go</code></td>
-<td>登出（撤销 jti）</td>
-</tr>
-<tr>
-<td><code>user_service/user_info_service.go</code></td>
-<td>我的资料</td>
-</tr>
-<tr>
-<td><code>user_service/user_search_service.go</code></td>
-<td>用户搜索</td>
-</tr>
-<tr>
-<td><code>user_service/user_update_service.go</code></td>
-<td>改资料 &#x2F; 设置（部分更新）</td>
-</tr>
-<tr>
-<td><code>friend_service/friend_service.go</code></td>
-<td>好友全部业务（申请&#x2F;接受事务&#x2F;列表&#x2F;备注&#x2F;删除&#x2F;黑名单）</td>
-</tr>
-<tr>
-<td><code>chat_service/conversation_service.go</code></td>
-<td>会话创建去重 &#x2F; 会话列表 &#x2F; 已读</td>
-</tr>
-<tr>
-<td><code>chat_service/message_service.go</code></td>
-<td>发消息（幂等 + 事务）&#x2F; 历史分页</td>
-</tr>
-<tr>
-<td><code>group_service/group_service.go</code></td>
-<td>建群事务 &#x2F; 成员管理 &#x2F; 权限 &#x2F; 解散</td>
-</tr>
-<tr>
-<td><code>call_service/call_service.go</code></td>
-<td>通话状态机（invite&#x2F;accept&#x2F;reject&#x2F;cancel&#x2F;end）</td>
-</tr>
-</tbody></table>
-<h2 id="九、internal-router-（HTTP-层，按域拆）"><a href="#九、internal-router-（HTTP-层，按域拆）" class="headerlink" title="九、internal&#x2F;router&#x2F;（HTTP 层，按域拆）"></a>九、internal&#x2F;router&#x2F;（HTTP 层，按域拆）</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>router.go</code></td>
-<td>汇总所有路由 + 静态资源</td>
-</tr>
-<tr>
-<td><code>resp/resp.go</code></td>
-<td>统一响应格式</td>
-</tr>
-<tr>
-<td><code>health/health_api.go</code></td>
-<td><code>/health</code></td>
-</tr>
-<tr>
-<td><code>user_router/user_api.go</code></td>
-<td>注册&#x2F;登录&#x2F;刷新&#x2F;登出&#x2F;资料&#x2F;搜索&#x2F;设置</td>
-</tr>
-<tr>
-<td><code>friend_router/friend_api.go</code></td>
-<td>好友申请&#x2F;列表&#x2F;备注&#x2F;删除&#x2F;黑名单</td>
-</tr>
-<tr>
-<td><code>chat_router/chat_api.go</code></td>
-<td>会话&#x2F;消息&#x2F;已读&#x2F;在线状态</td>
-</tr>
-<tr>
-<td><code>group_router/group_api.go</code></td>
-<td>群 CRUD + 成员</td>
-</tr>
-<tr>
-<td><code>call_router/call_api.go</code></td>
-<td>通话记录</td>
-</tr>
-<tr>
-<td><code>rpc_router/rpc_api.go</code></td>
-<td>HTTP gateway → gRPC 演示</td>
-</tr>
-</tbody></table>
-<h2 id="十、internal-ws-（WebSocket）"><a href="#十、internal-ws-（WebSocket）" class="headerlink" title="十、internal&#x2F;ws&#x2F;（WebSocket）"></a>十、internal&#x2F;ws&#x2F;（WebSocket）</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>hub.go</code></td>
-<td>连接管理（userID → 多连接，RWMutex）</td>
-</tr>
-<tr>
-<td><code>client.go</code></td>
-<td>读泵&#x2F;写泵&#x2F;消息处理&#x2F;通话信令</td>
-</tr>
-<tr>
-<td><code>handler.go</code></td>
-<td>握手升级 + token 鉴权</td>
-</tr>
-<tr>
-<td><code>push.go</code></td>
-<td>给会话成员推送（HTTP&#x2F;WS 共用）</td>
-</tr>
-</tbody></table>
-<h2 id="十一、internal-grpcx-（微服务）"><a href="#十一、internal-grpcx-（微服务）" class="headerlink" title="十一、internal&#x2F;grpcx&#x2F;（微服务）"></a>十一、internal&#x2F;grpcx&#x2F;（微服务）</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>contract.go</code></td>
-<td>服务契约（请求&#x2F;响应 struct + 方法名）</td>
-</tr>
-<tr>
-<td><code>codec.go</code></td>
-<td>JSON codec（无 protoc 环境的替代方案）</td>
-</tr>
-<tr>
-<td><code>server.go</code></td>
-<td>gRPC 服务端 + 客户端 + 生命周期</td>
-</tr>
-</tbody></table>
-<h2 id="十二、internal-mq-与-outbox"><a href="#十二、internal-mq-与-outbox" class="headerlink" title="十二、internal&#x2F;mq&#x2F; 与 outbox&#x2F;"></a>十二、internal&#x2F;mq&#x2F; 与 outbox&#x2F;</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>mq.go</code></td>
-<td>Outbox worker（轮询发布）+ Consumer（消费推送）</td>
-</tr>
-<tr>
-<td><code>outbox/outbox.go</code></td>
-<td>事务内写 outbox 记录</td>
-</tr>
-</tbody></table>
-<h2 id="十三、前端-web"><a href="#十三、前端-web" class="headerlink" title="十三、前端 web&#x2F;"></a>十三、前端 web&#x2F;</h2><table>
-<thead>
-<tr>
-<th>文件</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>index.html</code></td>
-<td>登录页 + 三栏主界面 + 弹窗容器</td>
-</tr>
-<tr>
-<td><code>css/app.css</code></td>
-<td>仿微信样式</td>
-</tr>
-<tr>
-<td><code>js/api.js</code></td>
-<td>HTTP 客户端（<strong>单飞无感刷新</strong>）</td>
-</tr>
-<tr>
-<td><code>js/ws.js</code></td>
-<td>WebSocket（心跳&#x2F;重连&#x2F;事件分发）</td>
-</tr>
-<tr>
-<td><code>js/webrtc.js</code></td>
-<td>WebRTC 语音通话</td>
-</tr>
-<tr>
-<td><code>js/app.js</code></td>
-<td>主逻辑（会话&#x2F;消息&#x2F;好友&#x2F;群&#x2F;设置&#x2F;通话）</td>
-</tr>
-</tbody></table>
-<h2 id="十四、查功能速查表"><a href="#十四、查功能速查表" class="headerlink" title="十四、查功能速查表"></a>十四、查功能速查表</h2><table>
-<thead>
-<tr>
-<th>我想看…</th>
-<th>去这里</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>登录怎么实现</td>
-<td><code>user_service/login_service.go</code></td>
-</tr>
-<tr>
-<td>双 token 怎么签发</td>
-<td><code>auth/jwt.go</code></td>
-</tr>
-<tr>
-<td>鉴权中间件</td>
-<td><code>middleware/auth.go</code></td>
-</tr>
-<tr>
-<td>消息怎么防重复</td>
-<td><code>chat_service/message_service.go</code></td>
-</tr>
-<tr>
-<td>WebSocket 怎么管理连接</td>
-<td><code>ws/hub.go</code> + <code>ws/client.go</code></td>
-</tr>
-<tr>
-<td>群聊权限</td>
-<td><code>group_service/group_service.go</code></td>
-</tr>
-<tr>
-<td>通话状态机</td>
-<td><code>call_service/call_service.go</code></td>
-</tr>
-<tr>
-<td>异步推送链路</td>
-<td><code>mq/mq.go</code> + <code>outbox/outbox.go</code></td>
-</tr>
-<tr>
-<td>gRPC 契约</td>
-<td><code>grpcx/contract.go</code></td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/" data-id="cuidUP-2eBeRR2_HV4_v9uLnW" data-title="代码地图：每个文件是干什么的" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%85%A5%E9%97%A8/" rel="tag">入门</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" rel="tag">目录结构</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-04-踩坑集-24个真实坑" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T05:20:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/%E4%BB%8E0%E5%88%B01/">从0到1</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/">踩坑集：24 个真实坑（含原因与解法）</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p>这些都是本项目<strong>真实踩过</strong>的坑（编译报错、逻辑 bug、线上隐患）。<br>遇到问题先来这里查一眼，能省很多时间。</p>
-</blockquote>
-<h2 id="A-Go-语言坑"><a href="#A-Go-语言坑" class="headerlink" title="A. Go 语言坑"></a>A. Go 语言坑</h2><h3 id="1-flag-StringVar-参数顺序"><a href="#1-flag-StringVar-参数顺序" class="headerlink" title="1. flag.StringVar 参数顺序"></a>1. <code>flag.StringVar</code> 参数顺序</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 默认值写成了说明文字 → 默认配置路径变成 &quot;默认使用config.yaml&quot;</span></span><br><span class="line">flag.StringVar(&amp;path, <span class="string">&quot;config&quot;</span>, <span class="string">&quot;默认使用config.yaml&quot;</span>, <span class="string">&quot;./config.yaml&quot;</span>)</span><br><span class="line"><span class="comment">// ✅ 签名是 (指针, 参数名, 默认值, 说明)</span></span><br><span class="line">flag.StringVar(&amp;path, <span class="string">&quot;config&quot;</span>, <span class="string">&quot;./config.yaml&quot;</span>, <span class="string">&quot;配置文件路径&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-Go-不支持从-struct-解构"><a href="#2-Go-不支持从-struct-解构" class="headerlink" title="2. Go 不支持从 struct 解构"></a>2. Go 不支持从 struct 解构</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ 编译错误：assignment mismatch</span></span><br><span class="line">addr, password, db := global.Config.Redis</span><br><span class="line"><span class="comment">// ✅</span></span><br><span class="line">cfg := global.Config.Redis</span><br><span class="line">client := redis.NewClient(&amp;redis.Options&#123;Addr: cfg.Addr, Password: cfg.Password, DB: cfg.DB&#125;)</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-空-go-文件缺-package"><a href="#3-空-go-文件缺-package" class="headerlink" title="3. 空 .go 文件缺 package"></a>3. 空 .go 文件缺 <code>package</code></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis_config.go:1:1: expected &#x27;package&#x27;, found &#x27;EOF&#x27;</span><br></pre></td></tr></table></figure>
-<p>每个 <code>.go</code> 文件第一行必须是 <code>package xxx</code>。</p>
-<h3 id="4-if-err-nil-分支把错误吞了"><a href="#4-if-err-nil-分支把错误吞了" class="headerlink" title="4. if err != nil 分支把错误吞了"></a>4. <code>if err != nil</code> 分支把错误吞了</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>, <span class="literal">nil</span>   <span class="comment">// ❌ 调用方以为&quot;业务结果为 false&quot;，实际是出错了</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> <span class="literal">false</span>, err       <span class="comment">// ✅</span></span><br></pre></td></tr></table></figure>
-<p><strong>检查习惯</strong>：问自己「这个 err 最后去哪了」。</p>
-<h3 id="5-os-Exit-0-掩盖故障"><a href="#5-os-Exit-0-掩盖故障" class="headerlink" title="5. os.Exit(0) 掩盖故障"></a>5. <code>os.Exit(0)</code> 掩盖故障</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123; os.Exit(<span class="number">0</span>) &#125;   <span class="comment">// ❌ 退出码 0 = 成功</span></span><br></pre></td></tr></table></figure>
-<p>应该 <code>log.Fatalf</code>（退出码 1）或返回 error。</p>
-<h2 id="B-GORM-坑"><a href="#B-GORM-坑" class="headerlink" title="B. GORM 坑"></a>B. GORM 坑</h2><h3 id="6-First-Find-Create-返回-gorm-DB"><a href="#6-First-Find-Create-返回-gorm-DB" class="headerlink" title="6. First/Find/Create 返回 *gorm.DB"></a>6. <code>First/Find/Create</code> 返回 <code>*gorm.DB</code></h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ First 只返回一个值</span></span><br><span class="line">user, err := db.First(&amp;user, id)</span><br><span class="line"><span class="comment">// ✅ 错误在 .Error</span></span><br><span class="line"><span class="keyword">if</span> err := db.First(&amp;user, id).Error; err != <span class="literal">nil</span> &#123; ... &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="7-gorm-Open-第一个参数要-Dialector"><a href="#7-gorm-Open-第一个参数要-Dialector" class="headerlink" title="7. gorm.Open 第一个参数要 Dialector"></a>7. <code>gorm.Open</code> 第一个参数要 Dialector</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">db, err := gorm.Open(dsn, &amp;gorm.Config&#123;&#125;)            <span class="comment">// ❌ 类型不匹配</span></span><br><span class="line">db, err := gorm.Open(mysql.Open(dsn), &amp;gorm.Config&#123;&#125;) <span class="comment">// ✅</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="8-零值陷阱：部分更新把字段清空"><a href="#8-零值陷阱：部分更新把字段清空" class="headerlink" title="8. 零值陷阱：部分更新把字段清空"></a>8. 零值陷阱：部分更新把字段清空</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用户只传 &#123;&quot;nickname&quot;:&quot;x&quot;&#125;，其余字段是零值</span></span><br><span class="line">db.Updates(&amp;req)   <span class="comment">// ❌ 可能把头像清空 / 或不更新想清空的字段</span></span><br></pre></td></tr></table></figure>
-<p>解法：<strong>请求结构体用指针</strong> &#x2F; 用 <code>map[string]any</code> &#x2F; 用 <code>Select</code> 指定列。</p>
-<h3 id="9-双指针"><a href="#9-双指针" class="headerlink" title="9. 双指针"></a>9. 双指针</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> u *User</span><br><span class="line">db.First(&amp;u)    <span class="comment">// ❌ 传的是 **User</span></span><br><span class="line"><span class="keyword">var</span> u User</span><br><span class="line">db.First(&amp;u)    <span class="comment">// ✅</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="10-软删除-唯一索引冲突"><a href="#10-软删除-唯一索引冲突" class="headerlink" title="10. 软删除 + 唯一索引冲突"></a>10. 软删除 + 唯一索引冲突</h3><p>删除好友只是 <code>status=2</code>（或写 <code>deleted_at</code>），行还在 → 重新创建会撞唯一索引。<br>解法：<code>Unscoped()</code> 查旧行，存在就恢复。</p>
-<h3 id="11-同一对用户只能有一条好友申请"><a href="#11-同一对用户只能有一条好友申请" class="headerlink" title="11. 同一对用户只能有一条好友申请"></a>11. 同一对用户只能有一条好友申请</h3><p><code>UNIQUE(from_user_id, to_user_id)</code> 导致「删除好友后重新申请」失败。<br>解法：先查旧行，存在就复用（重置 status&#x3D;0）。</p>
-<h2 id="C-认证-中间件坑"><a href="#C-认证-中间件坑" class="headerlink" title="C. 认证 &#x2F; 中间件坑"></a>C. 认证 &#x2F; 中间件坑</h2><h3 id="12-context-key-不一致"><a href="#12-context-key-不一致" class="headerlink" title="12. context key 不一致"></a>12. context key 不一致</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c.Set(<span class="string">&quot;userId&quot;</span>, ...)        <span class="comment">// 中间件写</span></span><br><span class="line">uid := c.GetUint(<span class="string">&quot;user_id&quot;</span>) <span class="comment">// ❌ 永远 0</span></span><br></pre></td></tr></table></figure>
-<p>解法：定义常量 <code>middleware.CtxUserID</code>，两边都用。</p>
-<h3 id="13-GetUint-vs-GetUint64"><a href="#13-GetUint-vs-GetUint64" class="headerlink" title="13. GetUint vs GetUint64"></a>13. <code>GetUint</code> vs <code>GetUint64</code></h3><p>中间件存的是 <code>uint64</code>，用 <code>GetUint</code> 类型断言失败 → 返回 0，<strong>不报错</strong>。</p>
-<h3 id="14-c-Abort-后必须-return"><a href="#14-c-Abort-后必须-return" class="headerlink" title="14. c.Abort() 后必须 return"></a>14. <code>c.Abort()</code> 后必须 <code>return</code></h3><p><code>Abort</code> 只是标记「后续别执行」，当前函数会继续跑。不 return 会继续执行后面的逻辑。</p>
-<h3 id="15-JWT-不校验签名算法"><a href="#15-JWT-不校验签名算法" class="headerlink" title="15. JWT 不校验签名算法"></a>15. JWT 不校验签名算法</h3><p>不校验 <code>t.Method.(*jwt.SigningMethodHMAC)</code> 会有 <code>alg=none</code> &#x2F; HS256↔RS256 混淆攻击。</p>
-<h2 id="D-数据库-性能坑"><a href="#D-数据库-性能坑" class="headerlink" title="D. 数据库 &#x2F; 性能坑"></a>D. 数据库 &#x2F; 性能坑</h2><h3 id="16-LIKE-x-不走索引"><a href="#16-LIKE-x-不走索引" class="headerlink" title="16. LIKE &#39;%x%&#39; 不走索引"></a>16. <code>LIKE &#39;%x%&#39;</code> 不走索引</h3><p>B+ 树只能前缀匹配。数据量大时全表扫描。<br>解法：前缀匹配 <code>x%</code>、全文索引、或 ES。</p>
-<h3 id="17-N-1-查询"><a href="#17-N-1-查询" class="headerlink" title="17. N+1 查询"></a>17. N+1 查询</h3><p>列表里每条记录都去查一次关联表 → 1+N 次查询。<br>解法：收集 id → <code>WHERE id IN (...)</code> 一次查（2 次查询）。</p>
-<h3 id="18-事务里混用-global-DB"><a href="#18-事务里混用-global-DB" class="headerlink" title="18. 事务里混用 global.DB"></a>18. 事务里混用 <code>global.DB</code></h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tx.Transaction(<span class="function"><span class="keyword">func</span><span class="params">(tx *gorm.DB)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    tx.Create(&amp;a)        <span class="comment">// 在事务里</span></span><br><span class="line">    global.DB.Create(&amp;b) <span class="comment">// ❌ 独立提交，失败不回滚</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p><strong>判断标准</strong>：事务函数里出现 <code>global.DB</code> 就是 bug。</p>
-<h3 id="19-未读数-N-次-count"><a href="#19-未读数-N-次-count" class="headerlink" title="19. 未读数 N 次 count"></a>19. 未读数 N 次 count</h3><p>会话多时列表要 count N 次。生产用 Redis 计数器优化。</p>
-<h2 id="E-WebSocket-坑"><a href="#E-WebSocket-坑" class="headerlink" title="E. WebSocket 坑"></a>E. WebSocket 坑</h2><h3 id="20-gorilla-websocket-不能并发写"><a href="#20-gorilla-websocket-不能并发写" class="headerlink" title="20. gorilla&#x2F;websocket 不能并发写"></a>20. gorilla&#x2F;websocket 不能并发写</h3><p>多个 goroutine 同时写同一个连接会 panic。<br>解法：<strong>读写分离</strong>，所有写操作交给 WritePump（通过 channel）。</p>
-<h3 id="21-WS-用错-context"><a href="#21-WS-用错-context" class="headerlink" title="21. WS 用错 context"></a>21. WS 用错 context</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chatservice.SendMessage(c.Request.Context(), ...)  <span class="comment">// ❌ WS 里没有 HTTP 请求</span></span><br><span class="line">chatservice.SendMessage(context.Background(), ...)  <span class="comment">// ✅</span></span><br></pre></td></tr></table></figure>
-<p>WS 连接生命周期远长于 HTTP 请求。</p>
-<h2 id="F-前端坑"><a href="#F-前端坑" class="headerlink" title="F. 前端坑"></a>F. 前端坑</h2><h3 id="22-hidden-被-CSS-display-flex-覆盖"><a href="#22-hidden-被-CSS-display-flex-覆盖" class="headerlink" title="22. [hidden] 被 CSS display:flex 覆盖"></a>22. <code>[hidden]</code> 被 CSS <code>display:flex</code> 覆盖</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.login-view</span> &#123; <span class="attribute">display</span>: flex; &#125;   <span class="comment">/* 覆盖了 hidden 的 display:none */</span></span><br></pre></td></tr></table></figure>
-<p>结果：登录页&#x2F;通话遮罩一直挡住界面。<br>解法：<code>[hidden] { display: none !important; }</code></p>
-<h3 id="23-函数写了但没绑定事件"><a href="#23-函数写了但没绑定事件" class="headerlink" title="23. 函数写了但没绑定事件"></a>23. 函数写了但没绑定事件</h3><p><code>switchPanel()</code> 定义了，但导航按钮没 <code>addEventListener</code> → 点了没反应。<br><strong>排查方法</strong>：F12 Console 加日志，确认函数是否被调用。</p>
-<h2 id="G-工具-环境坑"><a href="#G-工具-环境坑" class="headerlink" title="G. 工具 &#x2F; 环境坑"></a>G. 工具 &#x2F; 环境坑</h2><h3 id="24-PowerShell-5-1-读-UTF-8-无-BOM-的-ps1-中文乱码"><a href="#24-PowerShell-5-1-读-UTF-8-无-BOM-的-ps1-中文乱码" class="headerlink" title="24. PowerShell 5.1 读 UTF-8 无 BOM 的 .ps1 中文乱码"></a>24. PowerShell 5.1 读 UTF-8 无 BOM 的 .ps1 中文乱码</h3><p>症状：<code>Missing closing &#39;}&#39;</code> 之类莫名语法错误。<br>解法：脚本保存为 <strong>UTF-8 with BOM</strong>。</p>
-<h3 id="25-Set-Content-Encoding-ASCII-把中文变"><a href="#25-Set-Content-Encoding-ASCII-把中文变" class="headerlink" title="25. Set-Content -Encoding ASCII 把中文变 ?"></a>25. <code>Set-Content -Encoding ASCII</code> 把中文变 <code>?</code></h3><p>写请求体时用 UTF-8：</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="type">System.IO.File</span>]::WriteAllText(<span class="variable">$path</span>, <span class="variable">$body</span>, (<span class="built_in">New-Object</span> System.Text.UTF8Encoding(<span class="variable">$false</span>)))</span><br></pre></td></tr></table></figure>
-
-<h3 id="26-amqp-Table-的-value-不支持-uint"><a href="#26-amqp-Table-的-value-不支持-uint" class="headerlink" title="26. amqp.Table 的 value 不支持 uint"></a>26. <code>amqp.Table</code> 的 value 不支持 <code>uint</code></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">table field &quot;outbox_id&quot; value uint not supported</span><br></pre></td></tr></table></figure>
-<p>解法：转成 <code>int64</code>。</p>
-<h3 id="27-race-需要-cgo-gcc"><a href="#27-race-需要-cgo-gcc" class="headerlink" title="27. -race 需要 cgo + gcc"></a>27. <code>-race</code> 需要 cgo + gcc</h3><p>Windows 上没装 MinGW 会报 <code>-race requires cgo</code>。Linux&#x2F;macOS 开箱即用。</p>
-<hr>
-<h2 id="排错方法论（比背坑更重要）"><a href="#排错方法论（比背坑更重要）" class="headerlink" title="排错方法论（比背坑更重要）"></a>排错方法论（比背坑更重要）</h2><ol>
-<li><strong>看错误信息的第一行</strong>，不要看堆栈后半段</li>
-<li><strong>定位到文件和行号</strong>，打开那一行前后 20 行</li>
-<li><strong>二分法</strong>：注释掉一半代码，看问题是否消失</li>
-<li><strong>打日志</strong>：<code>fmt.Printf</code> &#x2F; <code>log.Printf</code> 打印关键变量</li>
-<li><strong>最小复现</strong>：写一个 20 行的小程序复现问题，往往自己就明白了</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/" data-id="cuidV751Xjr0o9jEIzAvyxqrM" data-title="踩坑集：24 个真实坑（含原因与解法）" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E9%94%99/" rel="tag">排错</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-01-项目介绍与架构" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T05:10:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/">项目介绍：从零实现一个仿微信 IM 后端</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="为什么做这个项目"><a href="#为什么做这个项目" class="headerlink" title="为什么做这个项目"></a>为什么做这个项目</h2><p>我想系统练习三件事：<strong>并发编程、微服务拆分、消息队列</strong>。普通的 CRUD 项目练不到这些，<br>于是决定做一个「仿微信」的即时通讯后端：</p>
-<ul>
-<li>有长连接（WebSocket）→ 练并发</li>
-<li>有多个业务域（用户&#x2F;好友&#x2F;聊天&#x2F;群&#x2F;通话）→ 练拆分</li>
-<li>有异步推送需求 → 练消息队列</li>
-</ul>
-<h2 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h2><table>
-<thead>
-<tr>
-<th>层</th>
-<th>技术</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Web 框架</td>
-<td>Gin</td>
-</tr>
-<tr>
-<td>ORM</td>
-<td>GORM + MySQL 8</td>
-</tr>
-<tr>
-<td>缓存</td>
-<td>Redis</td>
-</tr>
-<tr>
-<td>鉴权</td>
-<td>JWT 双 token</td>
-</tr>
-<tr>
-<td>实时通信</td>
-<td>gorilla&#x2F;websocket</td>
-</tr>
-<tr>
-<td>语音</td>
-<td>WebRTC（信令服务）</td>
-</tr>
-<tr>
-<td>微服务</td>
-<td>gRPC</td>
-</tr>
-<tr>
-<td>消息队列</td>
-<td>RabbitMQ</td>
-</tr>
-<tr>
-<td>前端</td>
-<td>原生 HTML&#x2F;CSS&#x2F;JS（仿微信三栏）</td>
-</tr>
-</tbody></table>
-<h2 id="架构演进：先单体，再微服务"><a href="#架构演进：先单体，再微服务" class="headerlink" title="架构演进：先单体，再微服务"></a>架构演进：先单体，再微服务</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">M0–M5：单体</span><br><span class="line">  客户端 ──HTTP/WS──► 单体服务 ──► MySQL / Redis</span><br><span class="line"></span><br><span class="line">M6–M7：拆分</span><br><span class="line">  客户端 ──HTTP──► gateway ──gRPC──► user 服务 / chat 服务</span><br><span class="line">                        │</span><br><span class="line">                        └──► RabbitMQ ──► 异步推送</span><br></pre></td></tr></table></figure>
-
-<p><strong>为什么先单体</strong>：只有先体会单体的痛点（扩缩容、故障隔离、部署耦合），才知道为什么要拆。</p>
-<h2 id="里程碑"><a href="#里程碑" class="headerlink" title="里程碑"></a>里程碑</h2><table>
-<thead>
-<tr>
-<th>里程碑</th>
-<th>内容</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>M0</td>
-<td>脚手架、配置、健康检查</td>
-</tr>
-<tr>
-<td>M1</td>
-<td>注册&#x2F;登录（双 token）、资料、好友（申请&#x2F;事务&#x2F;黑名单）</td>
-</tr>
-<tr>
-<td>M2</td>
-<td>会话、消息幂等、WebSocket、离线消息</td>
-</tr>
-<tr>
-<td>M3</td>
-<td>群聊（建群事务、成员管理、权限）</td>
-</tr>
-<tr>
-<td>M4</td>
-<td>并发加固（优雅退出、限流、并发安全）</td>
-</tr>
-<tr>
-<td>M5</td>
-<td>WebRTC 语音通话（信令转发）</td>
-</tr>
-<tr>
-<td>M6</td>
-<td>gRPC 微服务 + gateway</td>
-</tr>
-<tr>
-<td>M7</td>
-<td>RabbitMQ + 本地消息表（最终一致性）</td>
-</tr>
-</tbody></table>
-<h2 id="代码与文档"><a href="#代码与文档" class="headerlink" title="代码与文档"></a>代码与文档</h2><ul>
-<li>项目代码：<code>gochat/</code></li>
-<li>学习文档：<code>gochat-study/learn/</code>（每个里程碑一篇）</li>
-<li>面试集：<code>gochat-study/面试集.md</code></li>
-<li>场景集：<code>gochat-study/场景集.md</code></li>
-</ul>
-<h2 id="这个博客"><a href="#这个博客" class="headerlink" title="这个博客"></a>这个博客</h2><p>本博客记录每个里程碑的<strong>设计思路、踩过的坑、面试考点</strong>，作为自己的学习笔记，<br>也方便后来者参考。</p>
-<p>下一篇：<a href="/blog/2026/11/13/%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B-%E5%8F%8Ctoken%E4%B8%8E%E4%BA%8B%E5%8A%A1/">认证与好友：双 token 无感刷新与事务</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" data-id="cuidGRZo8CfPpj8NLR33mLFXv" data-title="项目介绍：从零实现一个仿微信 IM 后端" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-02-认证与好友" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T05:00:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">认证与好友：双 token 与事务</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="一、为什么用双-token"><a href="#一、为什么用双-token" class="headerlink" title="一、为什么用双 token"></a>一、为什么用双 token</h2><p>单 token 的矛盾：</p>
-<ul>
-<li>有效期长 → 体验好，但泄露风险大、无法撤销</li>
-<li>有效期短 → 安全，但频繁掉登录</li>
-</ul>
-<p><strong>双 token</strong>：</p>
-<ul>
-<li><code>access token</code>：2 小时，每个请求携带，泄露窗口小</li>
-<li><code>refresh token</code>：30 天，只用来换新 access，存服务端可撤销</li>
-</ul>
-<p>用户只要 30 天内用过，refresh 自动续期 → <strong>无感不掉登录</strong>。</p>
-<h2 id="二、无感刷新的完整流程"><a href="#二、无感刷新的完整流程" class="headerlink" title="二、无感刷新的完整流程"></a>二、无感刷新的完整流程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">① 登录 → 签发 access + refresh(jti) → Redis: SET refresh:&#123;uid&#125;:&#123;jti&#125; 1 EX 30d</span><br><span class="line">② 调接口 → 中间件验 access</span><br><span class="line">③ access 过期(401) → 客户端调 /token/refresh</span><br><span class="line">     → 服务端验 refresh → GETDEL 消费旧 jti → 签发新 token 对（rotation）</span><br><span class="line">④ 登出 → DEL refresh:&#123;uid&#125;:&#123;jti&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="关键点-1：用-GETDEL-原子消费"><a href="#关键点-1：用-GETDEL-原子消费" class="headerlink" title="关键点 1：用 GETDEL 原子消费"></a>关键点 1：用 GETDEL 原子消费</h3><p><code>Exists</code> + <code>Del</code> 是两条命令，中间有时间窗口，并发下两个请求都可能通过 → 都签发新 token，<br>rotation 就失效了。<code>GETDEL</code> 是原子命令，只有一个请求能成功。</p>
-<h3 id="关键点-2：rotation-复用检测"><a href="#关键点-2：rotation-复用检测" class="headerlink" title="关键点 2：rotation + 复用检测"></a>关键点 2：rotation + 复用检测</h3><p>每次刷新都换新 refresh，旧的作废。<br>如果旧 jti 不存在却仍被使用 → 可能被盗用 → <strong>撤销该用户所有 refresh</strong>（强制下线）。</p>
-<h3 id="关键点-3：并发刷新怎么办"><a href="#关键点-3：并发刷新怎么办" class="headerlink" title="关键点 3：并发刷新怎么办"></a>关键点 3：并发刷新怎么办</h3><p>5 个请求同时 401 会触发 5 次刷新，rotation 会让第 2~5 次用旧 token → 被判定盗用。</p>
-<p>解法：</p>
-<ol>
-<li><strong>客户端 single-flight</strong>：刷新进行中，其他请求等待同一个结果</li>
-<li>服务端 <code>GETDEL</code> 防双签发</li>
-<li>宽限期：消费标记短 TTL，区分正常重试和盗用</li>
-</ol>
-<h2 id="三、JWT-的安全要点"><a href="#三、JWT-的安全要点" class="headerlink" title="三、JWT 的安全要点"></a>三、JWT 的安全要点</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 必须校验签名算法，防 alg=none / 算法混淆</span></span><br><span class="line"><span class="keyword">if</span> _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;unexpected signing method&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>其他要点：</p>
-<ul>
-<li>payload 是 <strong>base64 不是加密</strong>，只放 user_id&#x2F;username，绝不放密码</li>
-<li>secret 从配置读，不硬编码</li>
-<li>access 短命 + refresh 可撤销</li>
-</ul>
-<h2 id="四、好友关系：双向两行"><a href="#四、好友关系：双向两行" class="headerlink" title="四、好友关系：双向两行"></a>四、好友关系：双向两行</h2><p>A、B 成为好友后插 <code>(A,B)</code> 和 <code>(B,A)</code> 两行。</p>
-<ul>
-<li>查「我的好友」只需 <code>WHERE user_id=?</code></li>
-<li>每行可独立存备注&#x2F;分组&#x2F;星标</li>
-<li>代价：写入要写两行 → <strong>必须用事务</strong></li>
-</ul>
-<h2 id="五、接受好友申请：事务-条件更新"><a href="#五、接受好友申请：事务-条件更新" class="headerlink" title="五、接受好友申请：事务 + 条件更新"></a>五、接受好友申请：事务 + 条件更新</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">tx.Transaction(<span class="function"><span class="keyword">func</span><span class="params">(tx *gorm.DB)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="comment">// 条件更新：只有「发给我的、待处理的」才能接受</span></span><br><span class="line">    res := tx.Model(&amp;FriendRequest&#123;&#125;).</span><br><span class="line">        Where(<span class="string">&quot;id = ? AND to_user_id = ? AND status = 0&quot;</span>, reqID, userID).</span><br><span class="line">        Update(<span class="string">&quot;status&quot;</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">if</span> res.RowsAffected == <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> errors.New(<span class="string">&quot;申请不存在或已被处理&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 插两条好友关系</span></span><br><span class="line">    upsertFriendship(tx, fromID, toID)</span><br><span class="line">    upsertFriendship(tx, toID, fromID)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<p><code>WHERE status=0</code> 让「判断 + 修改」成为原子操作，天然抗并发重复接受。</p>
-<h2 id="六、踩过的坑"><a href="#六、踩过的坑" class="headerlink" title="六、踩过的坑"></a>六、踩过的坑</h2><h3 id="坑-1：软删除-唯一索引"><a href="#坑-1：软删除-唯一索引" class="headerlink" title="坑 1：软删除 + 唯一索引"></a>坑 1：软删除 + 唯一索引</h3><p>删除好友只是 <code>status=2</code>，行还在。重新加好友时 INSERT 会撞唯一索引。<br>解法：<code>Unscoped()</code> 查旧行，存在就恢复 <code>status=1</code>。</p>
-<h3 id="坑-2：GORM-零值陷阱"><a href="#坑-2：GORM-零值陷阱" class="headerlink" title="坑 2：GORM 零值陷阱"></a>坑 2：GORM 零值陷阱</h3><p>改资料时只传昵称，其余字段是零值。用结构体 <code>Updates</code> 可能清空字段。<br>解法：<strong>请求用指针 &#x2F; 用 map 组装 &#x2F; Select 指定字段</strong>。</p>
-<h3 id="坑-3：先查后写的竞态"><a href="#坑-3：先查后写的竞态" class="headerlink" title="坑 3：先查后写的竞态"></a>坑 3：先查后写的竞态</h3><p>注册查重后插入，并发下两个请求都可能通过。<br><strong>唯一索引是最后防线</strong>，业务层查重只是为了友好提示。</p>
-<h2 id="七、面试点"><a href="#七、面试点" class="headerlink" title="七、面试点"></a>七、面试点</h2><ol>
-<li>为什么用双 token？access 和 refresh 各解决什么问题？</li>
-<li>JWT payload 加密吗？能放什么？</li>
-<li>JWT 安全风险有哪些？怎么防算法混淆？</li>
-<li>无状态 JWT 怎么登出？→ jti + Redis 白名单</li>
-<li>并发刷新怎么处理？</li>
-<li>好友关系为什么存两行？</li>
-<li>接受好友申请为什么必须事务？</li>
-<li>如何防止并发重复接受？</li>
-<li>软删除和唯一索引冲突怎么解？</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" data-id="cuidTAvetvC5Wf1Z23L5ndOvi" data-title="认证与好友：双 token 与事务" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-03-实时消息与WebSocket" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T04:50:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/">实时消息与 WebSocket</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="一、会话-消息两层抽象"><a href="#一、会话-消息两层抽象" class="headerlink" title="一、会话 + 消息两层抽象"></a>一、会话 + 消息两层抽象</h2><p>单聊和群聊共用一套表：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">conversations         会话（type: 1单聊 / 2群聊）</span><br><span class="line">conversation_members  成员（谁在会话、读到哪）</span><br><span class="line">messages              消息（conversation_id + sender_id + content）</span><br></pre></td></tr></table></figure>
-
-<p>好处：消息表不用区分单聊&#x2F;群聊，统一按 <code>conversation_id</code> 查。<br>M3 做群聊时只需要新增 <code>groups</code> 表，消息逻辑完全复用。</p>
-<h2 id="二、消息幂等（重点）"><a href="#二、消息幂等（重点）" class="headerlink" title="二、消息幂等（重点）"></a>二、消息幂等（重点）</h2><p>网络重试、用户连点、WS 重发都会导致同一条消息发多次。</p>
-<p><strong>方案</strong>：客户端生成 <code>client_msg_id</code>，数据库 <code>UNIQUE(sender_id, client_msg_id)</code>。</p>
-<p>服务端：</p>
-<ol>
-<li>先查是否已存在 → 存在直接返回（幂等）</li>
-<li>不存在 → 插入</li>
-<li>并发撞唯一索引 → 捕获 <code>gorm.ErrDuplicatedKey</code> → 再查返回</li>
-</ol>
-<p>配套：GORM 开启 <code>TranslateError: true</code>，把 MySQL 的 Duplicate 错误翻译成哨兵错误。</p>
-<h2 id="三、分页：游标-offset"><a href="#三、分页：游标-offset" class="headerlink" title="三、分页：游标 &gt; offset"></a>三、分页：游标 &gt; offset</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- ❌ offset：越翻越慢，新消息插入还会错位</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> messages <span class="keyword">WHERE</span> conversation_id<span class="operator">=</span>? <span class="keyword">ORDER</span> <span class="keyword">BY</span> id <span class="keyword">DESC</span> LIMIT <span class="number">20</span> <span class="keyword">OFFSET</span> <span class="number">1000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ✅ 游标：用上一页最后一条 id 作锚点</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> messages <span class="keyword">WHERE</span> conversation_id<span class="operator">=</span>? <span class="keyword">AND</span> id <span class="operator">&lt;</span> ? <span class="keyword">ORDER</span> <span class="keyword">BY</span> id <span class="keyword">DESC</span> LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="四、WebSocket-架构"><a href="#四、WebSocket-架构" class="headerlink" title="四、WebSocket 架构"></a>四、WebSocket 架构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Hub      管理所有连接（userID -&gt; 多个连接），RWMutex 保护</span><br><span class="line">Client   一个连接，读 goroutine + 写 goroutine</span><br><span class="line">ServeWS  HTTP 握手升级 + token 校验</span><br></pre></td></tr></table></figure>
-
-<h3 id="为什么读写分离"><a href="#为什么读写分离" class="headerlink" title="为什么读写分离"></a>为什么读写分离</h3><p>gorilla&#x2F;websocket <strong>不允许并发写</strong>。所以：</p>
-<ul>
-<li><code>ReadPump</code>：唯一从 socket 读</li>
-<li><code>WritePump</code>：唯一往 socket 写</li>
-<li>其他 goroutine 发消息 &#x3D; 往 <code>send</code> channel 塞数据</li>
-</ul>
-<h3 id="心跳"><a href="#心跳" class="headerlink" title="心跳"></a>心跳</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">conn.SetReadDeadline(now + <span class="number">60</span>s)</span><br><span class="line">conn.SetPongHandler(<span class="function"><span class="keyword">func</span><span class="params">(<span class="type">string</span>)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> conn.SetReadDeadline(now + <span class="number">60</span>s)  <span class="comment">// 收到 pong 续期</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// WritePump 每 54s 发一次 ping</span></span><br></pre></td></tr></table></figure>
-
-<p>作用：清理「网线拔了但 TCP 没断」的僵尸连接。</p>
-<h3 id="慢消费者隔离"><a href="#慢消费者隔离" class="headerlink" title="慢消费者隔离"></a>慢消费者隔离</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> &#123;</span><br><span class="line"><span class="keyword">case</span> c.send &lt;- payload:</span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    c.Close()   <span class="comment">// 队列满 → 断开慢连接</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>一个慢客户端不能拖垮给其他人推送的 goroutine。</p>
-<h2 id="五、离线消息"><a href="#五、离线消息" class="headerlink" title="五、离线消息"></a>五、离线消息</h2><p><strong>不需要单独离线表</strong>：</p>
-<ul>
-<li>消息落库到 <code>messages</code></li>
-<li>用户上线后拉历史 <code>GET /conversations/:id/messages</code></li>
-<li><code>conversation_members.last_read_message_id</code> 算未读数</li>
-</ul>
-<p>这就是「持久化 + 上线拉取 + 未读数」的标准做法。</p>
-<h2 id="六、WS-鉴权"><a href="#六、WS-鉴权" class="headerlink" title="六、WS 鉴权"></a>六、WS 鉴权</h2><p>浏览器 WebSocket API 不能自定义 header，所以 token 走 query：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ws://host/ws?token=&lt;access&gt;</span><br></pre></td></tr></table></figure>
-
-<p>服务端在<strong>升级连接之前</strong>校验，非法直接 401。</p>
-<h2 id="七、踩过的坑"><a href="#七、踩过的坑" class="headerlink" title="七、踩过的坑"></a>七、踩过的坑</h2><ol>
-<li><code>CheckOrigin</code> 生产环境必须校验（CSWSH 跨站 WebSocket 劫持）</li>
-<li>WS 连接用 <code>context.Background()</code>，不能用 HTTP 请求的 ctx</li>
-<li><code>Enqueue</code> 要做 non-blocking + recover（连接关闭后 channel 会关闭）</li>
-<li>Hub 持锁时不要做 IO，先复制连接列表再释放锁</li>
-</ol>
-<h2 id="八、面试点"><a href="#八、面试点" class="headerlink" title="八、面试点"></a>八、面试点</h2><ol>
-<li>WebSocket 和长轮询&#x2F;SSE 的区别？</li>
-<li>为什么读写要分离？</li>
-<li>心跳解决什么问题？</li>
-<li>大量连接怎么管理？多实例怎么办？</li>
-<li>消息怎么保证不重复？</li>
-<li>离线消息怎么实现？</li>
-<li>慢消费者怎么处理？</li>
-<li>游标分页 vs offset 分页？</li>
-<li>未读数怎么高效计算？</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" data-id="cuid4I2ZeTPY-qTZgqz4o5xqL" data-title="实时消息与 WebSocket" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-04-群聊设计与权限" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T04:40:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/">群聊设计与权限</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="一、复用会话抽象"><a href="#一、复用会话抽象" class="headerlink" title="一、复用会话抽象"></a>一、复用会话抽象</h2><p>M2 已经把「会话 + 成员 + 消息」抽象好了，所以群聊几乎是免费的：</p>
-<ul>
-<li>群聊 &#x3D; <code>type=2</code> 的会话 + <code>groups</code> 表（群元信息）</li>
-<li>群消息发送&#x2F;推送完全复用 M2 的 <code>SendMessage</code> &#x2F; <code>PushMessage</code></li>
-</ul>
-<p>M3 新增的只是<strong>群的生命周期管理</strong>：建群、拉人、踢人、改资料、解散。</p>
-<blockquote>
-<p>这就是好抽象的复利：M2 多花点心思，M3 直接受益。</p>
-</blockquote>
-<h2 id="二、groups-表设计"><a href="#二、groups-表设计" class="headerlink" title="二、groups 表设计"></a>二、groups 表设计</h2><table>
-<thead>
-<tr>
-<th>字段</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>conversation_id</td>
-<td>关联会话（唯一）</td>
-</tr>
-<tr>
-<td>owner_id</td>
-<td>群主</td>
-</tr>
-<tr>
-<td>name &#x2F; avatar</td>
-<td>群名称&#x2F;头像</td>
-</tr>
-<tr>
-<td>announcement</td>
-<td>群公告</td>
-</tr>
-<tr>
-<td>member_count</td>
-<td>冗余人数</td>
-</tr>
-<tr>
-<td>max_members</td>
-<td>上限（默认 200）</td>
-</tr>
-<tr>
-<td>status</td>
-<td>1 正常 &#x2F; 2 已解散</td>
-</tr>
-</tbody></table>
-<h3 id="为什么冗余-member-count"><a href="#为什么冗余-member-count" class="headerlink" title="为什么冗余 member_count"></a>为什么冗余 member_count</h3><p>群列表要显示人数。不冗余的话每次都 <code>COUNT(*)</code>。<br>加人&#x2F;踢人时用 <code>gorm.Expr(&quot;member_count + ?&quot;)</code> <strong>原子自增</strong>，避免并发覆盖。</p>
-<h2 id="三、建群必须用事务"><a href="#三、建群必须用事务" class="headerlink" title="三、建群必须用事务"></a>三、建群必须用事务</h2><p>建群要做 4 件事：</p>
-<ol>
-<li>创建会话（type&#x3D;2）</li>
-<li>创建 groups 行</li>
-<li>插入群主（role&#x3D;1）</li>
-<li>插入其他成员</li>
-</ol>
-<p>不做事务的后果：</p>
-<ul>
-<li>有会话没群 → 会话列表出现无名会话</li>
-<li>有群没群主 → 没人能管理</li>
-<li>有群没会话 → 群消息发不出去</li>
-</ul>
-<h2 id="四、权限模型"><a href="#四、权限模型" class="headerlink" title="四、权限模型"></a>四、权限模型</h2><table>
-<thead>
-<tr>
-<th>操作</th>
-<th>谁可以</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>拉人进群</td>
-<td>任何成员（类微信）</td>
-</tr>
-<tr>
-<td>踢人</td>
-<td>只有群主</td>
-</tr>
-<tr>
-<td>退群</td>
-<td>任何成员（群主不能直接退）</td>
-</tr>
-<tr>
-<td>改群名&#x2F;公告</td>
-<td>只有群主</td>
-</tr>
-<tr>
-<td>解散群</td>
-<td>只有群主</td>
-</tr>
-</tbody></table>
-<p>统一校验套路：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">g, err := getGroupByID(ctx, groupID)   <span class="comment">// 存在且未解散</span></span><br><span class="line"><span class="keyword">if</span> <span class="type">uint64</span>(g.OwnerID) != operatorID &#123; <span class="keyword">return</span> errors.New(<span class="string">&quot;只有群主可以...&quot;</span>) &#125;</span><br><span class="line">ok, _ := isMember(ctx, g.ConversationID, userID)</span><br></pre></td></tr></table></figure>
-
-<h2 id="五、并发问题"><a href="#五、并发问题" class="headerlink" title="五、并发问题"></a>五、并发问题</h2><h3 id="人数上限有竞态"><a href="#人数上限有竞态" class="headerlink" title="人数上限有竞态"></a>人数上限有竞态</h3><p>两个请求同时拉人，可能都通过 <code>member_count + n &gt; max</code> 的校验 → 超员。</p>
-<p>解法：</p>
-<ol>
-<li>事务里 <code>SELECT ... FOR UPDATE</code> 锁群行（悲观锁）</li>
-<li>Redis 分布式锁</li>
-<li>接受轻微超员（产品上可容忍）</li>
-</ol>
-<h3 id="计数用原子表达式"><a href="#计数用原子表达式" class="headerlink" title="计数用原子表达式"></a>计数用原子表达式</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tx.Model(&amp;Group&#123;&#125;).Where(<span class="string">&quot;id = ?&quot;</span>, g.ID).</span><br><span class="line">    Update(<span class="string">&quot;member_count&quot;</span>, gorm.Expr(<span class="string">&quot;member_count + ?&quot;</span>, <span class="built_in">len</span>(addIDs)))</span><br></pre></td></tr></table></figure>
-
-<p>不要「先读再写」，并发会丢更新。</p>
-<h2 id="六、解散群"><a href="#六、解散群" class="headerlink" title="六、解散群"></a>六、解散群</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">status = <span class="number">2</span>          <span class="comment">// 群标记已解散</span></span><br><span class="line">软删除 conversation  <span class="comment">// 会话列表不再出现</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>保留数据</strong>：群消息、群记录保留，便于审计&#x2F;回溯。<br>IM 的群和消息一般软删，个人数据（如黑名单）可以物理删。</p>
-<h2 id="七、面试点"><a href="#七、面试点" class="headerlink" title="七、面试点"></a>七、面试点</h2><ol>
-<li>群聊为什么复用会话模型？</li>
-<li>建群为什么必须事务？</li>
-<li>人数怎么高效统计？为什么冗余？</li>
-<li>并发加人怎么防超员？</li>
-<li>群权限怎么设计？</li>
-<li>群主退群怎么处理？（转让&#x2F;解散）</li>
-<li>群消息扇出到 200 人怎么优化？</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" data-id="cuidPHImBxFKvO1a1doyKvZs3" data-title="群聊设计与权限" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-05-并发加固与优雅退出" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T04:30:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">并发加固与优雅退出</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="一、优雅退出"><a href="#一、优雅退出" class="headerlink" title="一、优雅退出"></a>一、优雅退出</h2><p>以前 <code>r.Run()</code> 直接阻塞，进程被 kill 时：</p>
-<ul>
-<li>处理中的请求被硬切断</li>
-<li>WebSocket 没 Close 帧，客户端要等超时</li>
-<li>DB&#x2F;Redis 连接没释放</li>
-</ul>
-<p>现在的做法：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">srv := &amp;http.Server&#123;Addr: ..., Handler: router.NewRouter()&#125;</span><br><span class="line"><span class="keyword">go</span> srv.ListenAndServe()</span><br><span class="line"></span><br><span class="line">quit := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal, <span class="number">1</span>)</span><br><span class="line">signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)</span><br><span class="line">&lt;-quit</span><br><span class="line"></span><br><span class="line">srv.Shutdown(ctx)        <span class="comment">// 1. 停止接收新请求，等处理中的完成（10s 超时）</span></span><br><span class="line">ws.DefaultHub.CloseAll() <span class="comment">// 2. 断开所有 WS</span></span><br><span class="line">grpcServers.Stop()       <span class="comment">// 3. 停止 gRPC</span></span><br><span class="line">core.CloseBaseServices() <span class="comment">// 4. 释放 DB/Redis</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>顺序很重要</strong>：先停 HTTP（不再有新请求）→ 再关 WS → 最后关依赖。</p>
-<h2 id="二、限流：滑动窗口"><a href="#二、限流：滑动窗口" class="headerlink" title="二、限流：滑动窗口"></a>二、限流：滑动窗口</h2><p>为什么需要：登录接口可被撞库、注册可被刷、搜索可被扫用户。</p>
-<h3 id="为什么用滑动窗口"><a href="#为什么用滑动窗口" class="headerlink" title="为什么用滑动窗口"></a>为什么用滑动窗口</h3><p>固定窗口在边界会翻倍：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">59 秒发 10 次 + 60 秒发 10 次 = 1 秒内 20 次（虽然每分钟限 10）</span><br></pre></td></tr></table></figure>
-
-<p>滑动窗口只统计「最近 60 秒」，边界平滑。</p>
-<h3 id="实现要点"><a href="#实现要点" class="headerlink" title="实现要点"></a>实现要点</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> rateLimiter <span class="keyword">struct</span> &#123;</span><br><span class="line">    mu     sync.Mutex</span><br><span class="line">    hits   <span class="keyword">map</span>[<span class="type">string</span>][]time.Time  <span class="comment">// key(IP) -&gt; 请求时间</span></span><br><span class="line">    limit  <span class="type">int</span></span><br><span class="line">    window time.Duration</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>每次请求：清理过期 → 判断超限 → 记录。<br><strong>懒清理</strong>（请求时清理），不用后台 goroutine。</p>
-<h3 id="局限"><a href="#局限" class="headerlink" title="局限"></a>局限</h3><p>单机内存限流在多实例下会翻倍。生产用 Redis（INCR + EXPIRE 或 Lua 脚本）。</p>
-<p>实测：连续登录 25 次 → 前 20 次 401，之后 429。</p>
-<h2 id="三、WebSocket-并发安全"><a href="#三、WebSocket-并发安全" class="headerlink" title="三、WebSocket 并发安全"></a>三、WebSocket 并发安全</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h *Hub)</span></span> SendToUser(userID <span class="type">uint64</span>, payload []<span class="type">byte</span>) <span class="type">bool</span> &#123;</span><br><span class="line">    h.mu.RLock()</span><br><span class="line">    conns := h.clients[userID]</span><br><span class="line">    list := <span class="built_in">make</span>([]*Client, <span class="number">0</span>, <span class="built_in">len</span>(conns))  <span class="comment">// 复制</span></span><br><span class="line">    <span class="keyword">for</span> c := <span class="keyword">range</span> conns &#123; list = <span class="built_in">append</span>(list, c) &#125;</span><br><span class="line">    h.mu.RUnlock()                           <span class="comment">// 先释放锁</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _, c := <span class="keyword">range</span> list &#123; c.Enqueue(payload) &#125;  <span class="comment">// 再做 IO</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(list) &gt; <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>持锁不做 IO</strong>，否则会放大锁竞争。</p>
-<h2 id="四、扇出并发控制"><a href="#四、扇出并发控制" class="headerlink" title="四、扇出并发控制"></a>四、扇出并发控制</h2><p>群成员 200 人，无脑起 200 个 goroutine 会有瞬时压力。<br>用带缓冲 channel 当信号量：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pushConcurrency = <span class="number">16</span></span><br><span class="line"><span class="keyword">var</span> pushSem = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;, pushConcurrency)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _, uid := <span class="keyword">range</span> memberIDs &#123;</span><br><span class="line">    wg.Add(<span class="number">1</span>)</span><br><span class="line">    pushSem &lt;- <span class="keyword">struct</span>&#123;&#125;&#123;&#125;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(uid <span class="type">uint64</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">defer</span> wg.Done()</span><br><span class="line">        <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; &lt;-pushSem &#125;()</span><br><span class="line">        hub.SendToUser(uid, frame)</span><br><span class="line">    &#125;(uid)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>小会话（≤10 人）直接顺序推送。</p>
-<h2 id="五、goroutine-泄漏排查"><a href="#五、goroutine-泄漏排查" class="headerlink" title="五、goroutine 泄漏排查"></a>五、goroutine 泄漏排查</h2><table>
-<thead>
-<tr>
-<th>泄漏点</th>
-<th>原因</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>启动 goroutine 后没人关</td>
-<td><code>for { &lt;-ch }</code> 但 ch 永不关闭</td>
-</tr>
-<tr>
-<td>阻塞在 channel 发送</td>
-<td>消费者已退出</td>
-</tr>
-<tr>
-<td>阻塞在网络 IO</td>
-<td>没设超时</td>
-</tr>
-<tr>
-<td>定时器没 Stop</td>
-<td><code>time.NewTicker</code> 忘了 Stop</td>
-</tr>
-</tbody></table>
-<p>排查：<code>go test -race</code>（需 cgo）、pprof goroutine 数量。</p>
-<h2 id="六、其他改进"><a href="#六、其他改进" class="headerlink" title="六、其他改进"></a>六、其他改进</h2><ul>
-<li><code>InitBaseServices()</code> 从 <code>os.Exit(0)</code> 改为返回 error（退出码 1，不跳过 defer）</li>
-<li>删掉启动日志里打印完整 Config（会泄露数据库密码&#x2F;JWT secret）</li>
-</ul>
-<h2 id="七、面试点"><a href="#七、面试点" class="headerlink" title="七、面试点"></a>七、面试点</h2><ol>
-<li>优雅退出要做哪些事？顺序为什么重要？</li>
-<li>固定窗口 vs 滑动窗口 vs 令牌桶？</li>
-<li>单机限流 vs 分布式限流？</li>
-<li>如何检测数据竞争？<code>-race</code> 原理？</li>
-<li>goroutine 泄漏怎么排查？常见场景？</li>
-<li>如何控制并发数？</li>
-<li>为什么锁里不能做 IO？</li>
-<li>进程退出怎么保证数据不丢？</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" data-id="cuidW9GHBECzkR0uzscFtl8Xy" data-title="并发加固与优雅退出" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-
-
-  <nav id="page-nav">
-    
-    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><a class="page-number" href="/blog/page/3/">3</a><a class="extend next" rel="next" href="/blog/page/2/">下一页 &raquo;</a>
-  </nav>
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">分类</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%BB%8E0%E5%88%B01/">从0到1</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D/">开始之前</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/">里程碑</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">面试准备</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Outbox/" rel="tag">Outbox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/main/" rel="tag">main</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/protobuf/" rel="tag">protobuf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%A5%E9%97%A8/" rel="tag">入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%AB%E8%82%A1/" rel="tag">八股</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E5%B1%82/" rel="tag">分层</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" rel="tag">场景题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A4%8D%E7%9B%98/" rel="tag">复盘</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A5%BD%E5%8F%8B/" rel="tag">好友</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" rel="tag">学习路线</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%8E%92%E9%94%99/" rel="tag">排错</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" rel="tag">目录结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1/" rel="tag">设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AF%9D%E6%9C%AF/" rel="tag">话术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%85%8D%E7%BD%AE/" rel="tag">配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" rel="tag">阅读方法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/blog/tags/GORM/" style="font-size: 16.67px;">GORM</a> <a href="/blog/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/IM/" style="font-size: 10px;">IM</a> <a href="/blog/tags/JWT/" style="font-size: 13.33px;">JWT</a> <a href="/blog/tags/Outbox/" style="font-size: 10px;">Outbox</a> <a href="/blog/tags/P2P/" style="font-size: 13.33px;">P2P</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 13.33px;">RabbitMQ</a> <a href="/blog/tags/Redis/" style="font-size: 13.33px;">Redis</a> <a href="/blog/tags/WebRTC/" style="font-size: 16.67px;">WebRTC</a> <a href="/blog/tags/WebSocket/" style="font-size: 16.67px;">WebSocket</a> <a href="/blog/tags/gRPC/" style="font-size: 13.33px;">gRPC</a> <a href="/blog/tags/goroutine/" style="font-size: 13.33px;">goroutine</a> <a href="/blog/tags/main/" style="font-size: 10px;">main</a> <a href="/blog/tags/protobuf/" style="font-size: 10px;">protobuf</a> <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 20px;">事务</a> <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" style="font-size: 13.33px;">优雅退出</a> <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" style="font-size: 13.33px;">信令</a> <a href="/blog/tags/%E5%85%A5%E9%97%A8/" style="font-size: 20px;">入门</a> <a href="/blog/tags/%E5%85%AB%E8%82%A1/" style="font-size: 10px;">八股</a> <a href="/blog/tags/%E5%88%86%E5%B1%82/" style="font-size: 10px;">分层</a> <a href="/blog/tags/%E5%88%86%E9%A1%B5/" style="font-size: 13.33px;">分页</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">前端</a> <a href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" style="font-size: 10px;">场景题</a> <a href="/blog/tags/%E5%A4%8D%E7%9B%98/" style="font-size: 10px;">复盘</a> <a href="/blog/tags/%E5%A5%BD%E5%8F%8B/" style="font-size: 10px;">好友</a> <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" style="font-size: 13.33px;">学习路线</a> <a href="/blog/tags/%E5%B9%82%E7%AD%89/" style="font-size: 13.33px;">幂等</a> <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" style="font-size: 20px;">并发</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%8E%92%E9%94%99/" style="font-size: 10px;">排错</a> <a href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 10px;">最佳实践</a> <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" style="font-size: 13.33px;">最终一致性</a> <a href="/blog/tags/%E6%9D%83%E9%99%90/" style="font-size: 13.33px;">权限</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 10px;">架构</a> <a href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" style="font-size: 10px;">目录结构</a> <a href="/blog/tags/%E7%BE%A4%E8%81%8A/" style="font-size: 13.33px;">群聊</a> <a href="/blog/tags/%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">设计</a> <a href="/blog/tags/%E8%AF%9D%E6%9C%AF/" style="font-size: 10px;">话术</a> <a href="/blog/tags/%E8%B8%A9%E5%9D%91/" style="font-size: 10px;">踩坑</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">配置</a> <a href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" style="font-size: 10px;">阅读方法</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 13.33px;">限流</a> <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 16.67px;">面试</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/11/">十一月 2026</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/">课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/">环境准备与项目启动（逐行讲解）</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/">一次 HTTP 请求的完整链路（逐行）</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/">代码地图：每个文件是干什么的</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/">踩坑集：24 个真实坑（含原因与解法）</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/">项目介绍：从零实现一个仿微信 IM 后端</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">认证与好友：双 token 与事务</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/">实时消息与 WebSocket</a>
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
           </li>
         
       </ul>
     </div>
   </div>
+</nav>
 
-  
-</aside>
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
         
       </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      
-        <span style="color:#9ca3af">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM </span>
-      
-      &copy; 2026 gochat<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
-</footer>
+</div>
 
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.25)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="从 0 到 1，逐行读懂一个 Go 后端项目"></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
     </div>
-    <nav id="mobile-nav">
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          >
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+<h1 style="display: none">gochat 项目学习博客</h1>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/" target="_self">
+          课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/" target="_self">
+        <div>
+          这是一篇「课程说明书」。花 10 分钟读完，能帮你少走很多弯路。  一、这门课面向谁如果你满足以下条件，这篇博客就是为你写的：  ✅ 会 Go 基本语法（变量、函数、struct、interface、goroutine 的写法见过） ✅ 懂计算机基础（进程&#x2F;线程、HTTP、数据库是什么、SQL 会写一点） ❌ 没做过完整项目（不知道分层怎么分、项目怎么组织） ❌ 没用过 Gin &#x
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 14:00" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
   
-    <a href="/blog/" class="mobile-nav-link">首页</a>
   
-    <a href="/blog/archives" class="mobile-nav-link">归档</a>
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D/" class="category-chain-item">开始之前</a>
   
-    <a href="/blog/about/" class="mobile-nav-link">关于</a>
   
-</nav>
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%85%A5%E9%97%A8/">#入门</a>
+            
+              <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/">#学习路线</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/" target="_self">
+          环境准备与项目启动（逐行讲解）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/" target="_self">
+        <div>
+          目标：搞懂「从一条命令到服务能响应」，这中间发生了什么。读完你能理解 main.go、config.yaml、core/ 三者的关系。  一、先看项目怎么启动12docker compose up -d    # 起 MySQL / Redis / RabbitMQgo run . -db            # 编译并运行，-db 表示顺便建表  go run . 会找当前目录的 packa
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:50" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E4%BB%8E0%E5%88%B01/" class="category-chain-item">从0到1</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%85%A5%E9%97%A8/">#入门</a>
+            
+              <a href="/blog/tags/%E9%85%8D%E7%BD%AE/">#配置</a>
+            
+              <a href="/blog/tags/main/">#main</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/" target="_self">
+          一次 HTTP 请求的完整链路（逐行）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/" target="_self">
+        <div>
+          以「用户注册」为例，从 URL 一路追到数据库，把分层彻底看懂。这是最重要的一篇——看懂这条链路，项目里 80% 的代码你都能读懂。  一、请求长什么样1234POST /api/v1/registerContent-Type: application/json&#123;&quot;username&quot;:&quot;alice&quot;,&quot;password&quot;:&q
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:40" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E4%BB%8E0%E5%88%B01/" class="category-chain-item">从0到1</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%85%A5%E9%97%A8/">#入门</a>
+            
+              <a href="/blog/tags/GORM/">#GORM</a>
+            
+              <a href="/blog/tags/Gin/">#Gin</a>
+            
+              <a href="/blog/tags/%E5%88%86%E5%B1%82/">#分层</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/" target="_self">
+          代码地图：每个文件是干什么的
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/" target="_self">
+        <div>
+          把项目当一本书，这篇是「目录页」。读某个功能时，来这里查它在哪个文件。  一、顶层   文件&#x2F;目录 作用    main.go 入口：加载配置 → 初始化服务 → 启动 HTTP&#x2F;gRPC&#x2F;MQ → 优雅退出   config.yaml 配置（数据库、Redis、RabbitMQ、JWT、gRPC）   docker-compose.yml MySQL &#x2F;
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:30" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E4%BB%8E0%E5%88%B01/" class="category-chain-item">从0到1</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%85%A5%E9%97%A8/">#入门</a>
+            
+              <a href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/">#目录结构</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/" target="_self">
+          踩坑集：24 个真实坑（含原因与解法）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/" target="_self">
+        <div>
+          这些都是本项目真实踩过的坑（编译报错、逻辑 bug、线上隐患）。遇到问题先来这里查一眼，能省很多时间。  A. Go 语言坑1. flag.StringVar 参数顺序1234// ❌ 默认值写成了说明文字 → 默认配置路径变成 &quot;默认使用config.yaml&quot;flag.StringVar(&amp;path, &quot;config&quot;, &quot;默认使用c
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:20" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E4%BB%8E0%E5%88%B01/" class="category-chain-item">从0到1</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E8%B8%A9%E5%9D%91/">#踩坑</a>
+            
+              <a href="/blog/tags/%E6%8E%92%E9%94%99/">#排错</a>
+            
+              <a href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">#最佳实践</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" target="_self">
+          项目介绍：从零实现一个仿微信 IM 后端
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" target="_self">
+        <div>
+          为什么做这个项目我想系统练习三件事：并发编程、微服务拆分、消息队列。普通的 CRUD 项目练不到这些，于是决定做一个「仿微信」的即时通讯后端：  有长连接（WebSocket）→ 练并发 有多个业务域（用户&#x2F;好友&#x2F;聊天&#x2F;群&#x2F;通话）→ 练拆分 有异步推送需求 → 练消息队列  技术栈   层 技术    Web 框架 Gin   ORM GORM + MySQ
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:10" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E6%80%BB%E8%A7%88/" class="category-chain-item">总览</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/Go/">#Go</a>
+            
+              <a href="/blog/tags/%E6%9E%B6%E6%9E%84/">#架构</a>
+            
+              <a href="/blog/tags/IM/">#IM</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" target="_self">
+          认证与好友：双 token 与事务
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" target="_self">
+        <div>
+          一、为什么用双 token单 token 的矛盾：  有效期长 → 体验好，但泄露风险大、无法撤销 有效期短 → 安全，但频繁掉登录  双 token：  access token：2 小时，每个请求携带，泄露窗口小 refresh token：30 天，只用来换新 access，存服务端可撤销  用户只要 30 天内用过，refresh 自动续期 → 无感不掉登录。 二、无感刷新的完整流程123
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 13:00" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" class="category-chain-item">M1 认证与好友</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/JWT/">#JWT</a>
+            
+              <a href="/blog/tags/Redis/">#Redis</a>
+            
+              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+            
+              <a href="/blog/tags/GORM/">#GORM</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" target="_self">
+          实时消息与 WebSocket
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" target="_self">
+        <div>
+          一、会话 + 消息两层抽象单聊和群聊共用一套表： 123conversations         会话（type: 1单聊 / 2群聊）conversation_members  成员（谁在会话、读到哪）messages              消息（conversation_id + sender_id + content）  好处：消息表不用区分单聊&#x2F;群聊，统一按 convers
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 12:50" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/" class="category-chain-item">M2 实时消息</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/WebSocket/">#WebSocket</a>
+            
+              <a href="/blog/tags/%E5%B9%82%E7%AD%89/">#幂等</a>
+            
+              <a href="/blog/tags/%E5%88%86%E9%A1%B5/">#分页</a>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" target="_self">
+          群聊设计与权限
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" target="_self">
+        <div>
+          一、复用会话抽象M2 已经把「会话 + 成员 + 消息」抽象好了，所以群聊几乎是免费的：  群聊 &#x3D; type=2 的会话 + groups 表（群元信息） 群消息发送&#x2F;推送完全复用 M2 的 SendMessage &#x2F; PushMessage  M3 新增的只是群的生命周期管理：建群、拉人、踢人、改资料、解散。  这就是好抽象的复利：M2 多花点心思，M3 直接受益
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 12:40" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/" class="category-chain-item">M3 群聊</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+            
+              <a href="/blog/tags/%E7%BE%A4%E8%81%8A/">#群聊</a>
+            
+              <a href="/blog/tags/%E6%9D%83%E9%99%90/">#权限</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" target="_self">
+          并发加固与优雅退出
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" target="_self">
+        <div>
+          一、优雅退出以前 r.Run() 直接阻塞，进程被 kill 时：  处理中的请求被硬切断 WebSocket 没 Close 帧，客户端要等超时 DB&#x2F;Redis 连接没释放  现在的做法： 1234567891011srv := &amp;http.Server&#123;Addr: ..., Handler: router.NewRouter()&#125;go srv.Liste
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-13 12:30" pubdate>
+              2026-11-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/" class="category-chain-item">M4 并发加固</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
+            
+              <a href="/blog/tags/%E9%99%90%E6%B5%81/">#限流</a>
+            
+              <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/">#优雅退出</a>
+            
+              <a href="/blog/tags/goroutine/">#goroutine</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/#board">2</a><a class="page-number" href="/blog/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/5/#board">5</a><a class="extend next" rel="next" href="/blog/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     
 
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-<script src="/blog/js/jquery-3.6.4.min.js"></script>
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
 
 
 
   
-<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
 
 
 
 
-<script src="/blog/js/script.js"></script>
 
 
 
 
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
 
-  </div>
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
 </body>
 </html>

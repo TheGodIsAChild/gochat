@@ -1,0 +1,1157 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="Go + Gin + GORM + Redis + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记">
+<meta property="og:type" content="website">
+<meta property="og:title" content="分类">
+<meta property="og:url" content="http://127.0.0.1:8080/blog/categories/index.html">
+<meta property="og:site_name" content="gochat 项目学习博客">
+<meta property="og:description" content="Go + Gin + GORM + Redis + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="gochat">
+<meta property="article:tag" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>分类 - gochat 项目学习博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 40vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.6)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="分类"></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          >
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+
+
+
+<div class="category-list">
+  
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="源码走读"
+        id="heading-5999a7f07c27d12ab89f420ce9cf22bf" role="tab" data-toggle="collapse" href="#collapse-5999a7f07c27d12ab89f420ce9cf22bf"
+        aria-expanded="false"
+      >
+        源码走读
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>22</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-5999a7f07c27d12ab89f420ce9cf22bf"
+           role="tabpanel" aria-labelledby="heading-5999a7f07c27d12ab89f420ce9cf22bf">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/12/S00-%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB%E6%80%BB%E7%B4%A2%E5%BC%95/" title="源码走读总索引：核心文件全览"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读总索引：核心文件全览</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/12/S01-%E6%BA%90%E7%A0%81-main/" title="源码走读 S01：main.go"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读 S01：main.go</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/12/S02-%E6%BA%90%E7%A0%81-init-config/" title="源码走读 S02：init_config.go"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读 S02：init_config.go</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/12/S03-%E6%BA%90%E7%A0%81-init-mysql/" title="源码走读 S03：init_mysql.go"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读 S03：init_mysql.go</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/12/S04-%E6%BA%90%E7%A0%81-global/" title="源码走读 S04：global.go"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读 S04：global.go</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/12/S05-%E6%BA%90%E7%A0%81-auth/" title="源码走读 S05：auth.go"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读 S05：auth.go</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/12/S06-%E6%BA%90%E7%A0%81-jwt/" title="源码走读 S06：jwt.go"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读 S06：jwt.go</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/12/S07-%E6%BA%90%E7%A0%81-token-store/" title="源码走读 S07：token_store.go"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读 S07：token_store.go</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/12/S08-%E6%BA%90%E7%A0%81-register-service/" title="源码走读 S08：register_service.go"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读 S08：register_service.go</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/12/S09-%E6%BA%90%E7%A0%81-login-service/" title="源码走读 S09：login_service.go"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">源码走读 S09：login_service.go</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/categories/%E6%BA%90%E7%A0%81%E8%B5%B0%E8%AF%BB/" class="list-group-item list-group-item-action">
+          <span class="category-post">More...</span>
+        </a>
+        
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="里程碑"
+        id="heading-1aecdc8556726b392c6dd04b70b5f662" role="tab" data-toggle="collapse" href="#collapse-1aecdc8556726b392c6dd04b70b5f662"
+        aria-expanded="false"
+      >
+        里程碑
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>7</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-1aecdc8556726b392c6dd04b70b5f662"
+           role="tabpanel" aria-labelledby="heading-1aecdc8556726b392c6dd04b70b5f662">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/97-M7-RabbitMQ%E4%B8%8E%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M7 详细设计：RabbitMQ 与 Outbox 最终一致性"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">M7 详细设计：RabbitMQ 与 Outbox 最终一致性</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/96-M6-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8C%96-gRPC-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M6 详细设计：微服务化与 gRPC"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">M6 详细设计：微服务化与 gRPC</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/95-M5-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/94-M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/93-M3-%E7%BE%A4%E8%81%8A-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M3 详细设计：群聊（建群事务 / 权限 / 人数统计）"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">M3 详细设计：群聊（建群事务 / 权限 / 人数统计）</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/92-M2-%E5%8D%95%E8%81%8A%E4%B8%8EWebSocket-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵）"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">M2 详细设计：单聊与 WebSocket（幂等 / 分页 / 读写泵）</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/91-M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M1 详细设计：认证与好友（双 token / 事务 / 软删除）"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">M1 详细设计：认证与好友（双 token / 事务 / 软删除）</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="从0到1"
+        id="heading-7415e8fcbd5becec126bf2d2b12ae77a" role="tab" data-toggle="collapse" href="#collapse-7415e8fcbd5becec126bf2d2b12ae77a"
+        aria-expanded="false"
+      >
+        从0到1
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/%E4%BB%8E0%E5%88%B01/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>4</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-7415e8fcbd5becec126bf2d2b12ae77a"
+           role="tabpanel" aria-labelledby="heading-7415e8fcbd5becec126bf2d2b12ae77a">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/" title="环境准备与项目启动（逐行讲解）"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">环境准备与项目启动（逐行讲解）</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/" title="一次 HTTP 请求的完整链路（逐行）"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">一次 HTTP 请求的完整链路（逐行）</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/" title="代码地图：每个文件是干什么的"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">代码地图：每个文件是干什么的</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/" title="踩坑集：24 个真实坑（含原因与解法）"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">踩坑集：24 个真实坑（含原因与解法）</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="面试准备"
+        id="heading-4347a53be888cb09b28ddcca5972fff6" role="tab" data-toggle="collapse" href="#collapse-4347a53be888cb09b28ddcca5972fff6"
+        aria-expanded="false"
+      >
+        面试准备
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>3</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-4347a53be888cb09b28ddcca5972fff6"
+           role="tabpanel" aria-labelledby="heading-4347a53be888cb09b28ddcca5972fff6">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/100-%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93%E4%B8%8E%E9%9D%A2%E8%AF%95%E8%AF%9D%E6%9C%AF/" title="项目总结与面试话术：怎么讲这个项目"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">项目总结与面试话术：怎么讲这个项目</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/99-%E5%9C%BA%E6%99%AF%E9%9B%86-30%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF/" title="场景集：30 个业务场景怎么实现"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">场景集：30 个业务场景怎么实现</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/98-%E9%9D%A2%E8%AF%95%E9%9B%86-72%E9%A2%98/" title="面试集：72 道高频题（含简答与代码位置）"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">面试集：72 道高频题（含简答与代码位置）</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="开始之前"
+        id="heading-0ba51e77de3bc30bdf5e158d72a84d1d" role="tab" data-toggle="collapse" href="#collapse-0ba51e77de3bc30bdf5e158d72a84d1d"
+        aria-expanded="false"
+      >
+        开始之前
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>2</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-0ba51e77de3bc30bdf5e158d72a84d1d"
+           role="tabpanel" aria-labelledby="heading-0ba51e77de3bc30bdf5e158d72a84d1d">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/" title="课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目</span>
+        </a>
+      
+    
+      
+      
+        <a href="/blog/2026/11/13/90-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%9B%BE/" title="学习路线图：这个项目该怎么学"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">学习路线图：这个项目该怎么学</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="总览"
+        id="heading-08806ea31559a1e1251553066a013f67" role="tab" data-toggle="collapse" href="#collapse-08806ea31559a1e1251553066a013f67"
+        aria-expanded="false"
+      >
+        总览
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/%E6%80%BB%E8%A7%88/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>1</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-08806ea31559a1e1251553066a013f67"
+           role="tabpanel" aria-labelledby="heading-08806ea31559a1e1251553066a013f67">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" title="项目介绍：从零实现一个仿微信 IM 后端"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">项目介绍：从零实现一个仿微信 IM 后端</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="M1 认证与好友"
+        id="heading-76dabdc9b39c74b3c98c611ddbef73fd" role="tab" data-toggle="collapse" href="#collapse-76dabdc9b39c74b3c98c611ddbef73fd"
+        aria-expanded="false"
+      >
+        M1 认证与好友
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>1</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-76dabdc9b39c74b3c98c611ddbef73fd"
+           role="tabpanel" aria-labelledby="heading-76dabdc9b39c74b3c98c611ddbef73fd">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" title="认证与好友：双 token 与事务"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">认证与好友：双 token 与事务</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="M3 群聊"
+        id="heading-d689972cc1f736587deecfb08ed30ec8" role="tab" data-toggle="collapse" href="#collapse-d689972cc1f736587deecfb08ed30ec8"
+        aria-expanded="false"
+      >
+        M3 群聊
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>1</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-d689972cc1f736587deecfb08ed30ec8"
+           role="tabpanel" aria-labelledby="heading-d689972cc1f736587deecfb08ed30ec8">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/04-%E7%BE%A4%E8%81%8A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%9D%83%E9%99%90/" title="群聊设计与权限"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">群聊设计与权限</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="M2 实时消息"
+        id="heading-13990222b7da1940a024d72d117b978f" role="tab" data-toggle="collapse" href="#collapse-13990222b7da1940a024d72d117b978f"
+        aria-expanded="false"
+      >
+        M2 实时消息
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>1</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-13990222b7da1940a024d72d117b978f"
+           role="tabpanel" aria-labelledby="heading-13990222b7da1940a024d72d117b978f">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" title="实时消息与 WebSocket"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">实时消息与 WebSocket</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="M4 并发加固"
+        id="heading-19b3b9f6989594067a77a3cc65afcdad" role="tab" data-toggle="collapse" href="#collapse-19b3b9f6989594067a77a3cc65afcdad"
+        aria-expanded="false"
+      >
+        M4 并发加固
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>1</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-19b3b9f6989594067a77a3cc65afcdad"
+           role="tabpanel" aria-labelledby="heading-19b3b9f6989594067a77a3cc65afcdad">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/05-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA%E4%B8%8E%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" title="并发加固与优雅退出"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">并发加固与优雅退出</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="M5 语音通话"
+        id="heading-e4b8bd79782f4302834d37f4f100082b" role="tab" data-toggle="collapse" href="#collapse-e4b8bd79782f4302834d37f4f100082b"
+        aria-expanded="false"
+      >
+        M5 语音通话
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>1</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-e4b8bd79782f4302834d37f4f100082b"
+           role="tabpanel" aria-labelledby="heading-e4b8bd79782f4302834d37f4f100082b">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/06-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/" title="WebRTC 语音通话实现"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">WebRTC 语音通话实现</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="M6-M7 分布式"
+        id="heading-f7d146827fdc5fdaf7579c473c2abc67" role="tab" data-toggle="collapse" href="#collapse-f7d146827fdc5fdaf7579c473c2abc67"
+        aria-expanded="false"
+      >
+        M6-M7 分布式
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>1</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-f7d146827fdc5fdaf7579c473c2abc67"
+           role="tabpanel" aria-labelledby="heading-f7d146827fdc5fdaf7579c473c2abc67">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/07-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" title="微服务与消息队列"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">微服务与消息队列</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="前端与面试"
+        id="heading-213491da4a52a5ebc7f37b32c554bbf2" role="tab" data-toggle="collapse" href="#collapse-213491da4a52a5ebc7f37b32c554bbf2"
+        aria-expanded="false"
+      >
+        前端与面试
+        <span class="list-group-count"></span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+        <a href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/" class="category-count col-2 col-md-1 col-xm-1">
+          <i class="iconfont icon-articles"></i>
+          <span>1</span>
+        </a>
+      
+      <div class="category-collapse collapse " id="collapse-213491da4a52a5ebc7f37b32c554bbf2"
+           role="tabpanel" aria-labelledby="heading-213491da4a52a5ebc7f37b32c554bbf2">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/blog/2026/11/13/08-%E4%BB%BF%E5%BE%AE%E4%BF%A1%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/" title="仿微信前端与面试准备"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">仿微信前端与面试准备</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+</div>
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

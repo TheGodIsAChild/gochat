@@ -1,12 +1,25 @@
+
+
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
   
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
   
-  <title>M4 详细设计：并发加固（优雅退出 / 限流 / goroutine） | gochat 项目学习博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="对应提交：M4: graceful shutdown + CloseBaseServices + sliding-window rate limit + WS CloseAll + bounded fan-out + hub concurrency tests   一、里程碑目标前面 M1–M3 功能跑通了，但还有几个「生产环境才会暴露」的问题：    问题 后果 本里程碑方案    进程被 k">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="author" content="gochat">
+  <meta name="keywords" content="Go, IM, WebSocket, WebRTC, gRPC, RabbitMQ, 微服务, 并发编程">
+  
+    <meta name="description" content="对应提交：M4: graceful shutdown + CloseBaseServices + sliding-window rate limit + WS CloseAll + bounded fan-out + hub concurrency tests   一、里程碑目标前面 M1–M3 功能跑通了，但还有几个「生产环境才会暴露」的问题：    问题 后果 本里程碑方案    进程被 k">
 <meta property="og:type" content="article">
 <meta property="og:title" content="M4 详细设计：并发加固（优雅退出 &#x2F; 限流 &#x2F; goroutine）">
 <meta property="og:url" content="http://127.0.0.1:8080/blog/2026/11/13/94-M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/index.html">
@@ -14,110 +27,352 @@
 <meta property="og:description" content="对应提交：M4: graceful shutdown + CloseBaseServices + sliding-window rate limit + WS CloseAll + bounded fan-out + hub concurrency tests   一、里程碑目标前面 M1–M3 功能跑通了，但还有几个「生产环境才会暴露」的问题：    问题 后果 本里程碑方案    进程被 k">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-11-13T00:40:00.000Z">
-<meta property="article:modified_time" content="2026-11-12T17:09:07.008Z">
+<meta property="article:modified_time" content="2026-11-12T17:14:58.331Z">
 <meta property="article:author" content="gochat">
 <meta property="article:tag" content="goroutine">
 <meta property="article:tag" content="优雅退出">
 <meta property="article:tag" content="并发">
 <meta property="article:tag" content="限流">
-<meta name="twitter:card" content="summary">
-  
-    <link rel="alternate" href="/blog/atom.xml" title="gochat 项目学习博客" type="application/atom+xml">
+<meta name="twitter:card" content="summary_large_image">
   
   
-    <link rel="shortcut icon" href="/blog/favicon.png">
   
-  
-    
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+  <title>M4 详细设计：并发加固（优雅退出 / 限流 / goroutine） - gochat 项目学习博客</title>
 
-  
-  
-<link rel="stylesheet" href="/blog/css/style.css">
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
-  
-    
-<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
 
-  
-  
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
 
-  <!-- 自定义美化样式（source/css/custom.css） -->
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
   
 <link rel="stylesheet" href="/blog/css/custom.css">
 
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"127.0.0.1","root":"/blog/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0,"max_depth":3,"min_depth":0,"expand":true},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
 <meta name="generator" content="Hexo 8.1.2"></head>
 
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/blog/" id="logo">gochat 项目学习博客</a>
-      </h1>
-      
-        <h2 id="subtitle-wrap">
-          <a href="/blog/" id="subtitle">Go + WebSocket + WebRTC + gRPC + RabbitMQ 实战学习笔记</a>
-        </h2>
-      
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 50vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>gochat 学习博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
         
-          <a class="main-nav-link" href="/blog/">首页</a>
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
         
-          <a class="main-nav-link" href="/blog/archives">归档</a>
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
         
-          <a class="main-nav-link" href="/blog/about/">关于</a>
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
         
-      </nav>
-      <nav id="sub-nav">
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/blog/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
         
         
-          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
         
-        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://127.0.0.1:8080/blog"></form>
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
       </div>
     </div>
   </div>
-</header>
+</div>
 
-      <div class="outer">
-        <section id="main"><article id="post-94-M4-并发加固-详细设计" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/blog/2026/11/13/94-M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" class="article-date">
-  <time class="dt-published" datetime="2026-11-13T00:40:00.000Z" itemprop="datePublished">2026-11-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/">里程碑</a>
-  </div>
+  
 
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/hero.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.55)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）"></span>
+          
+        </div>
+
         
-  
-    <h1 class="p-name article-title" itemprop="headline name">
-      M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）
-    </h1>
-  
-
-      </header>
+          
+  <div class="mt-3">
     
-    <div class="e-content article-entry" itemprop="articleBody">
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-11-13 08:40" pubdate>
+          2026年11月13日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          41 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
       
-        <blockquote>
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
 <p>对应提交：<code>M4: graceful shutdown + CloseBaseServices + sliding-window rate limit + WS CloseAll + bounded fan-out + hub concurrency tests</code></p>
 </blockquote>
 <hr>
@@ -157,9 +412,9 @@
 </tr>
 </tbody></table>
 <hr>
-<h2 id="二、优雅退出（Graceful-Shutdown）"><a href="#二、优雅退出（Graceful-Shutdown）" class="headerlink" title="二、优雅退出（Graceful Shutdown）"></a>二、优雅退出（Graceful Shutdown）</h2><h3 id="以前的问题"><a href="#以前的问题" class="headerlink" title="以前的问题"></a>以前的问题</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">r.Run(addr)   <span class="comment">// 阻塞</span></span><br><span class="line"><span class="comment">// 进程被 SIGINT/SIGTERM 杀掉时：</span></span><br><span class="line"><span class="comment">// 1. 处理中的请求直接被切断，客户端看到连接重置</span></span><br><span class="line"><span class="comment">// 2. WebSocket 没发 Close 帧，客户端要等心跳超时才感知</span></span><br><span class="line"><span class="comment">// 3. DB/Redis 连接没释放</span></span><br></pre></td></tr></table></figure>
+<h2 id="二、优雅退出（Graceful-Shutdown）"><a href="#二、优雅退出（Graceful-Shutdown）" class="headerlink" title="二、优雅退出（Graceful Shutdown）"></a>二、优雅退出（Graceful Shutdown）</h2><h3 id="以前的问题"><a href="#以前的问题" class="headerlink" title="以前的问题"></a>以前的问题</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go">r.Run(addr)   <span class="hljs-comment">// 阻塞</span><br><span class="hljs-comment">// 进程被 SIGINT/SIGTERM 杀掉时：</span><br><span class="hljs-comment">// 1. 处理中的请求直接被切断，客户端看到连接重置</span><br><span class="hljs-comment">// 2. WebSocket 没发 Close 帧，客户端要等心跳超时才感知</span><br><span class="hljs-comment">// 3. DB/Redis 连接没释放</span><br></code></pre></td></tr></table></figure>
 
-<h3 id="现在的做法"><a href="#现在的做法" class="headerlink" title="现在的做法"></a>现在的做法</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">srv := &amp;http.Server&#123;Addr: ..., Handler: router.NewRouter()&#125;</span><br><span class="line"><span class="keyword">go</span> srv.ListenAndServe()</span><br><span class="line"></span><br><span class="line">quit := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal, <span class="number">1</span>)</span><br><span class="line">signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)</span><br><span class="line">&lt;-quit</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. 停止接收新请求，等待处理中的请求完成（最多 10s）</span></span><br><span class="line">ctx, cancel := context.WithTimeout(context.Background(), <span class="number">10</span>*time.Second)</span><br><span class="line"><span class="keyword">defer</span> cancel()</span><br><span class="line">srv.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. 主动断开所有 WebSocket</span></span><br><span class="line">ws.DefaultHub.CloseAll()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. 释放 DB / Redis</span></span><br><span class="line">core.CloseBaseServices()</span><br></pre></td></tr></table></figure>
+<h3 id="现在的做法"><a href="#现在的做法" class="headerlink" title="现在的做法"></a>现在的做法</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs go">srv := &amp;http.Server&#123;Addr: ..., Handler: router.NewRouter()&#125;<br><span class="hljs-keyword">go</span> srv.ListenAndServe()<br><br>quit := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> os.Signal, <span class="hljs-number">1</span>)<br>signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)<br>&lt;-quit<br><br><span class="hljs-comment">// 1. 停止接收新请求，等待处理中的请求完成（最多 10s）</span><br>ctx, cancel := context.WithTimeout(context.Background(), <span class="hljs-number">10</span>*time.Second)<br><span class="hljs-keyword">defer</span> cancel()<br>srv.Shutdown(ctx)<br><br><span class="hljs-comment">// 2. 主动断开所有 WebSocket</span><br>ws.DefaultHub.CloseAll()<br><br><span class="hljs-comment">// 3. 释放 DB / Redis</span><br>core.CloseBaseServices()<br></code></pre></td></tr></table></figure>
 
 <h3 id="为什么顺序是「先-HTTP-后-WS-后-DB」"><a href="#为什么顺序是「先-HTTP-后-WS-后-DB」" class="headerlink" title="为什么顺序是「先 HTTP 后 WS 后 DB」"></a>为什么顺序是「先 HTTP 后 WS 后 DB」</h3><ul>
 <li>先关 HTTP：不再接新请求，等在途请求处理完</li>
@@ -173,7 +428,7 @@
 <li><strong>注册接口</strong>：可被批量注册垃圾账号</li>
 <li><strong>搜索接口</strong>：可被批量扫用户</li>
 </ul>
-<h3 id="实现：内存滑动窗口"><a href="#实现：内存滑动窗口" class="headerlink" title="实现：内存滑动窗口"></a>实现：内存滑动窗口</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> rateLimiter <span class="keyword">struct</span> &#123;</span><br><span class="line">    mu     sync.Mutex</span><br><span class="line">    hits   <span class="keyword">map</span>[<span class="type">string</span>][]time.Time   <span class="comment">// key(IP) -&gt; 请求时间列表</span></span><br><span class="line">    limit  <span class="type">int</span></span><br><span class="line">    window time.Duration</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="实现：内存滑动窗口"><a href="#实现：内存滑动窗口" class="headerlink" title="实现：内存滑动窗口"></a>实现：内存滑动窗口</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> rateLimiter <span class="hljs-keyword">struct</span> &#123;<br>    mu     sync.Mutex<br>    hits   <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>][]time.Time   <span class="hljs-comment">// key(IP) -&gt; 请求时间列表</span><br>    limit  <span class="hljs-type">int</span><br>    window time.Duration<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>每次请求：</p>
 <ol>
@@ -182,7 +437,7 @@
 <li>未超限则记录本次</li>
 </ol>
 <h3 id="为什么用滑动窗口而不是固定窗口"><a href="#为什么用滑动窗口而不是固定窗口" class="headerlink" title="为什么用滑动窗口而不是固定窗口"></a>为什么用滑动窗口而不是固定窗口</h3><p>固定窗口在边界会翻倍：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">59s 发 10 次 + 60s 发 10 次 = 1 秒内 20 次（虽然每分钟限 10）</span><br></pre></td></tr></table></figure>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">59s</span> 发 <span class="hljs-number">10</span> 次 + <span class="hljs-number">60</span>s 发 <span class="hljs-number">10</span> 次 = <span class="hljs-number">1</span> 秒内 <span class="hljs-number">20</span> 次（虽然每分钟限 <span class="hljs-number">10</span>）<br></code></pre></td></tr></table></figure>
 <p>滑动窗口只统计「最近 60 秒」，边界平滑。</p>
 <h3 id="当前配置"><a href="#当前配置" class="headerlink" title="当前配置"></a>当前配置</h3><table>
 <thead>
@@ -212,13 +467,13 @@
 <li><strong>推送</strong>：消息发送（读锁）</li>
 <li><strong>遍历</strong>：<code>SendToUser</code> 复制连接列表后释放锁</li>
 </ol>
-<h3 id="关键代码"><a href="#关键代码" class="headerlink" title="关键代码"></a>关键代码</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h *Hub)</span></span> SendToUser(userID <span class="type">uint64</span>, payload []<span class="type">byte</span>) <span class="type">bool</span> &#123;</span><br><span class="line">    h.mu.RLock()</span><br><span class="line">    conns := h.clients[userID]</span><br><span class="line">    list := <span class="built_in">make</span>([]*Client, <span class="number">0</span>, <span class="built_in">len</span>(conns))   <span class="comment">// 复制！</span></span><br><span class="line">    <span class="keyword">for</span> c := <span class="keyword">range</span> conns &#123; list = <span class="built_in">append</span>(list, c) &#125;</span><br><span class="line">    h.mu.RUnlock()                            <span class="comment">// 释放锁后再做 IO</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _, c := <span class="keyword">range</span> list &#123; c.Enqueue(payload) &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(list) &gt; <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="关键代码"><a href="#关键代码" class="headerlink" title="关键代码"></a>关键代码</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(h *Hub)</span></span> SendToUser(userID <span class="hljs-type">uint64</span>, payload []<span class="hljs-type">byte</span>) <span class="hljs-type">bool</span> &#123;<br>    h.mu.RLock()<br>    conns := h.clients[userID]<br>    list := <span class="hljs-built_in">make</span>([]*Client, <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(conns))   <span class="hljs-comment">// 复制！</span><br>    <span class="hljs-keyword">for</span> c := <span class="hljs-keyword">range</span> conns &#123; list = <span class="hljs-built_in">append</span>(list, c) &#125;<br>    h.mu.RUnlock()                            <span class="hljs-comment">// 释放锁后再做 IO</span><br><br>    <span class="hljs-keyword">for</span> _, c := <span class="hljs-keyword">range</span> list &#123; c.Enqueue(payload) &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">len</span>(list) &gt; <span class="hljs-number">0</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p><strong>为什么先复制再释放锁</strong>：持锁期间做 channel 操作&#x2F;网络 IO 会阻塞其他 goroutine，放大锁竞争。</p>
-<h3 id="并发测试"><a href="#并发测试" class="headerlink" title="并发测试"></a>并发测试</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 200 个 goroutine 同时注册/推送/注销</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestHubConcurrentRegisterSendUnregister</span><span class="params">(t *testing.T)</span></span> &#123; ... &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="并发测试"><a href="#并发测试" class="headerlink" title="并发测试"></a>并发测试</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 200 个 goroutine 同时注册/推送/注销</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestHubConcurrentRegisterSendUnregister</span><span class="hljs-params">(t *testing.T)</span></span> &#123; ... &#125;<br></code></pre></td></tr></table></figure>
 
 <p>运行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go <span class="built_in">test</span> ./internal/ws/ -race -count=1</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">go <span class="hljs-built_in">test</span> ./internal/ws/ -race -count=1<br></code></pre></td></tr></table></figure>
 
 <blockquote>
 <p><strong>注意</strong>：<code>-race</code> 需要 cgo + gcc。本机没装 gcc 时只能跑普通测试。<br>安装 MinGW&#x2F;TDM-GCC 后即可用 <code>-race</code> 检测数据竞争。<br>在 Linux&#x2F;macOS 上 <code>-race</code> 开箱即用。</p>
@@ -229,7 +484,7 @@
 <li>goroutine 数量瞬间暴涨</li>
 <li>对 Hub 锁、网络造成瞬时压力</li>
 </ul>
-<h3 id="方案：信号量限制并发数"><a href="#方案：信号量限制并发数" class="headerlink" title="方案：信号量限制并发数"></a>方案：信号量限制并发数</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pushConcurrency = <span class="number">16</span></span><br><span class="line"><span class="keyword">var</span> pushSem = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;, pushConcurrency)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _, uid := <span class="keyword">range</span> memberIDs &#123;</span><br><span class="line">    wg.Add(<span class="number">1</span>)</span><br><span class="line">    pushSem &lt;- <span class="keyword">struct</span>&#123;&#125;&#123;&#125;          <span class="comment">// 获取令牌（满了就阻塞等待）</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(uid <span class="type">uint64</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">defer</span> wg.Done()</span><br><span class="line">        <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; &lt;-pushSem &#125;()  <span class="comment">// 释放令牌</span></span><br><span class="line">        DefaultHub.SendToUser(uid, frame)</span><br><span class="line">    &#125;(uid)</span><br><span class="line">&#125;</span><br><span class="line">wg.Wait()</span><br></pre></td></tr></table></figure>
+<h3 id="方案：信号量限制并发数"><a href="#方案：信号量限制并发数" class="headerlink" title="方案：信号量限制并发数"></a>方案：信号量限制并发数</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">const</span> pushConcurrency = <span class="hljs-number">16</span><br><span class="hljs-keyword">var</span> pushSem = <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;, pushConcurrency)<br><br><span class="hljs-keyword">for</span> _, uid := <span class="hljs-keyword">range</span> memberIDs &#123;<br>    wg.Add(<span class="hljs-number">1</span>)<br>    pushSem &lt;- <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125;          <span class="hljs-comment">// 获取令牌（满了就阻塞等待）</span><br>    <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(uid <span class="hljs-type">uint64</span>)</span></span> &#123;<br>        <span class="hljs-keyword">defer</span> wg.Done()<br>        <span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123; &lt;-pushSem &#125;()  <span class="hljs-comment">// 释放令牌</span><br>        DefaultHub.SendToUser(uid, frame)<br>    &#125;(uid)<br>&#125;<br>wg.Wait()<br></code></pre></td></tr></table></figure>
 
 <p>小会话（≤10 人）直接顺序推送，避免 goroutine 开销。</p>
 <p><strong>面试点</strong>：如何控制并发数？三种方式——</p>
@@ -269,14 +524,14 @@
 <li><code>Enqueue</code> 队列满 → 主动断开慢连接</li>
 <li>优雅退出时 <code>CloseAll()</code> 清空所有连接（每个连接的读写 goroutine 都会随 conn 关闭而退出）</li>
 </ul>
-<h3 id="排查工具"><a href="#排查工具" class="headerlink" title="排查工具"></a>排查工具</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go <span class="built_in">test</span> -race                       <span class="comment"># 数据竞争</span></span><br><span class="line">go tool pprof http://localhost:6060/debug/pprof/goroutine  <span class="comment"># goroutine 数</span></span><br></pre></td></tr></table></figure>
+<h3 id="排查工具"><a href="#排查工具" class="headerlink" title="排查工具"></a>排查工具</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">go <span class="hljs-built_in">test</span> -race                       <span class="hljs-comment"># 数据竞争</span><br>go tool pprof http://localhost:6060/debug/pprof/goroutine  <span class="hljs-comment"># goroutine 数</span><br></code></pre></td></tr></table></figure>
 <p>（本项目暂未挂 pprof，M6 可加）</p>
 <hr>
 <h2 id="七、初始化错误处理改进"><a href="#七、初始化错误处理改进" class="headerlink" title="七、初始化错误处理改进"></a>七、初始化错误处理改进</h2><p><strong>以前</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    fmt.Print(...)</span><br><span class="line">    os.Exit(<span class="number">0</span>)   <span class="comment">// ❌ 退出码 0 = 成功；且跳过 defer</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Print(...)<br>    os.Exit(<span class="hljs-number">0</span>)   <span class="hljs-comment">// ❌ 退出码 0 = 成功；且跳过 defer</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p><strong>现在</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">InitBaseServices</span><span class="params">()</span></span> <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> _, err := db.LoadMysql(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;数据库连接失败: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// main:</span></span><br><span class="line"><span class="keyword">if</span> err := core.InitBaseServices(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Fatalf(...)   <span class="comment">// 退出码 1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">InitBaseServices</span><span class="hljs-params">()</span></span> <span class="hljs-type">error</span> &#123;<br>    <span class="hljs-keyword">if</span> _, err := db.LoadMysql(); err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;数据库连接失败: %w&quot;</span>, err)<br>    &#125;<br>    ...<br>&#125;<br><span class="hljs-comment">// main:</span><br><span class="hljs-keyword">if</span> err := core.InitBaseServices(); err != <span class="hljs-literal">nil</span> &#123;<br>    log.Fatalf(...)   <span class="hljs-comment">// 退出码 1</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p><strong>顺手修掉的安全问题</strong>：以前 <code>main</code> 里有 <code>fmt.Println(&quot;Config：&quot;, global.Config)</code>，<br>会把数据库密码、JWT secret <strong>打印到日志</strong>。已删除。</p>
 <blockquote>
@@ -284,7 +539,7 @@
 </blockquote>
 <hr>
 <h2 id="八、压测建议（可选实践）"><a href="#八、压测建议（可选实践）" class="headerlink" title="八、压测建议（可选实践）"></a>八、压测建议（可选实践）</h2><p>用 <code>hey</code> 或 <code>wrk</code> 压非 DB 接口：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hey -n 10000 -c 100 http://127.0.0.1:8080/health</span><br><span class="line">hey -n 2000 -c 50 -m POST -H <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">    -d <span class="string">&#x27;&#123;&quot;username&quot;:&quot;x&quot;,&quot;password&quot;:&quot;y&quot;&#125;&#x27;</span> http://127.0.0.1:8080/api/v1/login</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">hey -n 10000 -c 100 http://127.0.0.1:8080/health<br>hey -n 2000 -c 50 -m POST -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> \<br>    -d <span class="hljs-string">&#x27;&#123;&quot;username&quot;:&quot;x&quot;,&quot;password&quot;:&quot;y&quot;&#125;&#x27;</span> http://127.0.0.1:8080/api/v1/login<br></code></pre></td></tr></table></figure>
 
 <p>观察：</p>
 <ul>
@@ -370,173 +625,417 @@
 <li>信令复用 WebSocket 长连接</li>
 </ul>
 
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
       
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://127.0.0.1:8080/blog/2026/11/13/94-M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" data-id="cuidVewE30IAbbA-CdAAfmtnq" data-title="M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li></ul>
 
-    </footer>
-  </div>
+<span class="category-chains">
+  
   
     
-<nav id="article-nav">
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">里程碑</a>
   
-    <a href="/blog/2026/11/13/95-M5-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">前一篇</strong>
-      <div class="article-nav-title">
-        
-          M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）
-        
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" class="print-no-link">#并发</a>
+      
+        <a href="/blog/tags/%E9%99%90%E6%B5%81/" class="print-no-link">#限流</a>
+      
+        <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" class="print-no-link">#优雅退出</a>
+      
+        <a href="/blog/tags/goroutine/" class="print-no-link">#goroutine</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>M4 详细设计：并发加固（优雅退出 / 限流 / goroutine）</div>
+      <div>http://127.0.0.1:8080/blog/2026/11/13/94-M4-并发加固-详细设计/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gochat</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年11月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2026/11/13/95-M5-WebRTC%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">M5 详细设计：WebRTC 语音通话（信令 / SDP / ICE）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2026/11/13/93-M3-%E7%BE%A4%E8%81%8A-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" title="M3 详细设计：群聊（建群事务 / 权限 / 人数统计）">
+                        <span class="hidden-mobile">M3 详细设计：群聊（建群事务 / 权限 / 人数统计）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
       </div>
-    </a>
-  
-  
-    <a href="/blog/2026/11/13/93-M3-%E7%BE%A4%E8%81%8A-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">后一篇</strong>
-      <div class="article-nav-title">M3 详细设计：群聊（建群事务 / 权限 / 人数统计）</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">分类</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M1-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">M1 认证与好友</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M2-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF/">M2 实时消息</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M3-%E7%BE%A4%E8%81%8A/">M3 群聊</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M4-%E5%B9%B6%E5%8F%91%E5%8A%A0%E5%9B%BA/">M4 并发加固</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M5-%E8%AF%AD%E9%9F%B3%E9%80%9A%E8%AF%9D/">M5 语音通话</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/M6-M7-%E5%88%86%E5%B8%83%E5%BC%8F/">M6-M7 分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%BB%8E0%E5%88%B01/">从0到1</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%89%8D%E7%AB%AF%E4%B8%8E%E9%9D%A2%E8%AF%95/">前端与面试</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D/">开始之前</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E8%A7%88/">总览</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%87%8C%E7%A8%8B%E7%A2%91/">里程碑</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/">面试准备</a></li></ul>
     </div>
-  </div>
 
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/GORM/" rel="tag">GORM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IM/" rel="tag">IM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/JWT/" rel="tag">JWT</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Outbox/" rel="tag">Outbox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/P2P/" rel="tag">P2P</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebRTC/" rel="tag">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/WebSocket/" rel="tag">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/goroutine/" rel="tag">goroutine</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/main/" rel="tag">main</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/protobuf/" rel="tag">protobuf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%8B%E5%8A%A1/" rel="tag">事务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" rel="tag">优雅退出</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BF%A1%E4%BB%A4/" rel="tag">信令</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%A5%E9%97%A8/" rel="tag">入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%85%AB%E8%82%A1/" rel="tag">八股</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E5%B1%82/" rel="tag">分层</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%88%86%E9%A1%B5/" rel="tag">分页</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" rel="tag">场景题</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A4%8D%E7%9B%98/" rel="tag">复盘</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A5%BD%E5%8F%8B/" rel="tag">好友</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" rel="tag">学习路线</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%82%E7%AD%89/" rel="tag">幂等</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%8E%92%E9%94%99/" rel="tag">排错</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag">最终一致性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9D%83%E9%99%90/" rel="tag">权限</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" rel="tag">目录结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E7%BE%A4%E8%81%8A/" rel="tag">群聊</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1/" rel="tag">设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AF%9D%E6%9C%AF/" rel="tag">话术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%85%8D%E7%BD%AE/" rel="tag">配置</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" rel="tag">阅读方法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/blog/tags/GORM/" style="font-size: 16.67px;">GORM</a> <a href="/blog/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/IM/" style="font-size: 10px;">IM</a> <a href="/blog/tags/JWT/" style="font-size: 13.33px;">JWT</a> <a href="/blog/tags/Outbox/" style="font-size: 10px;">Outbox</a> <a href="/blog/tags/P2P/" style="font-size: 13.33px;">P2P</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 13.33px;">RabbitMQ</a> <a href="/blog/tags/Redis/" style="font-size: 13.33px;">Redis</a> <a href="/blog/tags/WebRTC/" style="font-size: 16.67px;">WebRTC</a> <a href="/blog/tags/WebSocket/" style="font-size: 16.67px;">WebSocket</a> <a href="/blog/tags/gRPC/" style="font-size: 13.33px;">gRPC</a> <a href="/blog/tags/goroutine/" style="font-size: 13.33px;">goroutine</a> <a href="/blog/tags/main/" style="font-size: 10px;">main</a> <a href="/blog/tags/protobuf/" style="font-size: 10px;">protobuf</a> <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/" style="font-size: 20px;">事务</a> <a href="/blog/tags/%E4%BC%98%E9%9B%85%E9%80%80%E5%87%BA/" style="font-size: 13.33px;">优雅退出</a> <a href="/blog/tags/%E4%BF%A1%E4%BB%A4/" style="font-size: 13.33px;">信令</a> <a href="/blog/tags/%E5%85%A5%E9%97%A8/" style="font-size: 20px;">入门</a> <a href="/blog/tags/%E5%85%AB%E8%82%A1/" style="font-size: 10px;">八股</a> <a href="/blog/tags/%E5%88%86%E5%B1%82/" style="font-size: 10px;">分层</a> <a href="/blog/tags/%E5%88%86%E9%A1%B5/" style="font-size: 13.33px;">分页</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">前端</a> <a href="/blog/tags/%E5%9C%BA%E6%99%AF%E9%A2%98/" style="font-size: 10px;">场景题</a> <a href="/blog/tags/%E5%A4%8D%E7%9B%98/" style="font-size: 10px;">复盘</a> <a href="/blog/tags/%E5%A5%BD%E5%8F%8B/" style="font-size: 10px;">好友</a> <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" style="font-size: 13.33px;">学习路线</a> <a href="/blog/tags/%E5%B9%82%E7%AD%89/" style="font-size: 13.33px;">幂等</a> <a href="/blog/tags/%E5%B9%B6%E5%8F%91/" style="font-size: 20px;">并发</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%8E%92%E9%94%99/" style="font-size: 10px;">排错</a> <a href="/blog/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 10px;">最佳实践</a> <a href="/blog/tags/%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7/" style="font-size: 13.33px;">最终一致性</a> <a href="/blog/tags/%E6%9D%83%E9%99%90/" style="font-size: 13.33px;">权限</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 10px;">架构</a> <a href="/blog/tags/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/" style="font-size: 10px;">目录结构</a> <a href="/blog/tags/%E7%BE%A4%E8%81%8A/" style="font-size: 13.33px;">群聊</a> <a href="/blog/tags/%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">设计</a> <a href="/blog/tags/%E8%AF%9D%E6%9C%AF/" style="font-size: 10px;">话术</a> <a href="/blog/tags/%E8%B8%A9%E5%9D%91/" style="font-size: 10px;">踩坑</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">配置</a> <a href="/blog/tags/%E9%98%85%E8%AF%BB%E6%96%B9%E6%B3%95/" style="font-size: 10px;">阅读方法</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 13.33px;">限流</a> <a href="/blog/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 16.67px;">面试</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/11/">十一月 2026</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/blog/2026/11/13/00-%E8%AF%BE%E7%A8%8B%E5%AF%BC%E8%AF%BB-%E4%BB%8E0%E5%88%B01%E6%80%8E%E4%B9%88%E5%AD%A6/">课程导读：只会 Go 语法，怎么从 0 到 1 学会这个项目</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/01-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8-%E9%80%90%E8%A1%8C/">环境准备与项目启动（逐行讲解）</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/02-%E4%B8%80%E6%AC%A1HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E9%93%BE%E8%B7%AF-%E9%80%90%E8%A1%8C/">一次 HTTP 请求的完整链路（逐行）</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/03-%E4%BB%A3%E7%A0%81%E5%9C%B0%E5%9B%BE-%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%9A%84/">代码地图：每个文件是干什么的</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/04-%E8%B8%A9%E5%9D%91%E9%9B%86-24%E4%B8%AA%E7%9C%9F%E5%AE%9E%E5%9D%91/">踩坑集：24 个真实坑（含原因与解法）</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/">项目介绍：从零实现一个仿微信 IM 后端</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/">认证与好友：双 token 与事务</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2026/11/13/03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/">实时消息与 WebSocket</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
+    <div class="side-col d-none d-lg-block col-lg-2">
       
-        <span style="color:#9ca3af">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM </span>
-      
-      &copy; 2026 gochat<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
 
     </div>
-    <nav id="mobile-nav">
+  </div>
+</div>
+
+
+
+
+
   
-    <a href="/blog/" class="mobile-nav-link">首页</a>
+
+
+
   
-    <a href="/blog/archives" class="mobile-nav-link">归档</a>
+
+
+
   
-    <a href="/blog/about/" class="mobile-nav-link">关于</a>
+
+
+
   
-</nav>
+
+
+
+  
+
+
+
+
+
+
+
     
 
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
-<script src="/blog/js/jquery-3.6.4.min.js"></script>
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span style="color:#94a3b8">gochat 学习博客 · 用 Go 从 0 到 1 实现一个仿微信 IM</span> <span style="color:#64748b"> · Powered by </span> <a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a> <span style="color:#64748b"> & </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
 
 
 
   
-<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
 
 
 
 
-<script src="/blog/js/script.js"></script>
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
 
 
 
 
 
-  </div>
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
 </body>
 </html>
