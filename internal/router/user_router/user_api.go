@@ -104,6 +104,21 @@ func Logout(c *gin.Context) {
 	ok(c, nil)
 }
 
+func GetUserProfile(c *gin.Context) {
+	userId := c.GetUint64("userId")
+	if userId == 0 {
+		fail(c, http.StatusUnauthorized, "用户未登录")
+		return
+	}
+	var userProfile userservice.UserProfile
+	userProfile, err := userservice.UserInfo(c, uint64(userId))
+	if err != nil {
+		fail(c, http.StatusBadRequest, "用户信息获取错误错误: "+err.Error())
+		return
+	}
+	ok(c, userProfile)
+}
+
 // ---------- 路由注册 ----------
 
 func UserRouter(r *gin.Engine) {
@@ -119,5 +134,6 @@ func UserRouter(r *gin.Engine) {
 	priv := r.Group("/api/v1", middleware.Auth())
 	{
 		priv.POST("/logout", Logout)
+		priv.GET("/users/me", GetUserProfile)
 	}
 }
