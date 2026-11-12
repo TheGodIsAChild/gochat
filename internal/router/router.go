@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
+	callapi "gochat/internal/router/call_router"
 	chatapi "gochat/internal/router/chat_router"
 	friendapi "gochat/internal/router/friend_router"
 	groupapi "gochat/internal/router/group_router"
@@ -22,6 +23,7 @@ func NewRouter() *gin.Engine {
 	friendapi.FriendRouter(r)
 	chatapi.ChatRouter(r)
 	groupapi.GroupRouter(r)
+	callapi.CallRouter(r)
 
 	// WebSocket：鉴权在 handler 内部做（浏览器 WS 不能带 Authorization 头，用 query 传 token）
 	r.GET("/ws", ws.ServeWS)

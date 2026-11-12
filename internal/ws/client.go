@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	chatservice "gochat/internal/service/chat_service"
+	callservice "gochat/internal/service/call_service"
 )
 
 const (
@@ -144,11 +145,16 @@ func (c *Client) Close() {
 
 // inMessage 客户端发来的消息格式。
 type inMessage struct {
-	Type           string `json:"type"` // text / read / ping
+	Type           string `json:"type"` // text / read / ping / call_* / webrtc_*
 	ConversationID uint64 `json:"conversation_id"`
 	ClientMsgID    string `json:"client_msg_id"`
 	Content        string `json:"content"`
 	MessageID      uint64 `json:"message_id"`
+
+	// ---- 通话信令字段 ----
+	ToUserID uint64 `json:"to_user_id"` // 信令接收方
+	CallID   uint64 `json:"call_id"`    // 通话 id
+	CallType int8   `json:"call_type"`  // 1音频 2视频
 }
 
 func (c *Client) handleMessage(data []byte) {
@@ -169,6 +175,20 @@ func (c *Client) handleMessage(data []byte) {
 		if err := chatservice.MarkRead(context.Background(), c.UserID, in.ConversationID, in.MessageID); err != nil {
 			c.SendJSON(map[string]any{"type": "error", "message": err.Error()})
 		}
+
+	// ---- 通话信令（M5）----
+	case "call_invite":
+		c.handleCallInvite(in)
+	case "call_accept":
+		c.handleCallAccept(in)
+	case "call_reject":
+		c.handleCallReject(in)
+	case "call_cancel":
+		c.handleCallCancel(in)
+	case "call_end":
+		c.handleCallEnd(in)
+	case "webrtc_offer", "webrtc_answer", "webrtc_ice":
+		c.handleRelay(data, in)
 
 	default:
 		c.SendJSON(map[string]any{"type": "error", "message": "未知消息类型: " + in.Type})
@@ -197,4 +217,118 @@ func (c *Client) handleText(in inMessage) {
 
 	// 2. 推送给会话所有成员（包括自己，方便多端同步；客户端用 client_msg_id 去重）
 	PushMessage(uint64(msg.ConversationID), chatservice.ToItem(msg))
+}
+
+// ============================ 通话信令（M5）============================
+
+// handleCallInvite 主叫发起通话：创建通话记录，推送给被叫。
+func (c *Client) handleCallInvite(in inMessage) {
+	call, err := callservice.Invite(context.Background(), c.UserID, in.ToUserID, in.CallType)
+	if err != nil {
+		c.SendJSON(map[string]any{"type": "error", "message": err.Error()})
+		return
+	}
+
+	// 给主叫 ack
+	c.SendJSON(map[string]any{"type": "call_ack", "call_id": call.ID})
+
+	// 推给被叫：有来电
+	c.hub.SendToUser(in.ToUserID, mustJSON(map[string]any{
+		"type":         "call_incoming",
+		"call_id":      call.ID,
+		"from_user_id": c.UserID,
+		"call_type":    call.Type,
+	}))
+}
+
+// handleCallAccept 被叫接听：通知主叫可以开始交换 SDP 了。
+func (c *Client) handleCallAccept(in inMessage) {
+	call, err := callservice.Accept(context.Background(), in.CallID, c.UserID)
+	if err != nil {
+		c.SendJSON(map[string]any{"type": "error", "call_id": in.CallID, "message": err.Error()})
+		return
+	}
+	c.SendJSON(map[string]any{"type": "call_accepted", "call_id": call.ID})
+	c.hub.SendToUser(uint64(call.CallerID), mustJSON(map[string]any{
+		"type": "call_accepted", "call_id": call.ID,
+	}))
+}
+
+// handleCallReject 被叫拒绝。
+func (c *Client) handleCallReject(in inMessage) {
+	if err := callservice.Reject(context.Background(), in.CallID, c.UserID); err != nil {
+		c.SendJSON(map[string]any{"type": "error", "call_id": in.CallID, "message": err.Error()})
+		return
+	}
+	call, _ := callservice.Get(context.Background(), in.CallID, c.UserID)
+	if call != nil {
+		c.hub.SendToUser(uint64(call.CallerID), mustJSON(map[string]any{
+			"type": "call_rejected", "call_id": call.ID,
+		}))
+	}
+	c.SendJSON(map[string]any{"type": "call_rejected", "call_id": in.CallID})
+}
+
+// handleCallCancel 主叫取消。
+func (c *Client) handleCallCancel(in inMessage) {
+	if err := callservice.Cancel(context.Background(), in.CallID, c.UserID); err != nil {
+		c.SendJSON(map[string]any{"type": "error", "call_id": in.CallID, "message": err.Error()})
+		return
+	}
+	call, _ := callservice.Get(context.Background(), in.CallID, c.UserID)
+	if call != nil {
+		c.hub.SendToUser(uint64(call.CalleeID), mustJSON(map[string]any{
+			"type": "call_canceled", "call_id": call.ID,
+		}))
+	}
+	c.SendJSON(map[string]any{"type": "call_canceled", "call_id": in.CallID})
+}
+
+// handleCallEnd 挂断：通知对方，并返回通话时长。
+func (c *Client) handleCallEnd(in inMessage) {
+	call, err := callservice.End(context.Background(), in.CallID, c.UserID)
+	if err != nil {
+		c.SendJSON(map[string]any{"type": "error", "call_id": in.CallID, "message": err.Error()})
+		return
+	}
+
+	// 找出对方
+	peer := uint64(call.CallerID)
+	if uint64(call.CallerID) == c.UserID {
+		peer = uint64(call.CalleeID)
+	}
+	frame := map[string]any{
+		"type":     "call_ended",
+		"call_id":  call.ID,
+		"duration": call.Duration,
+	}
+	c.hub.SendToUser(peer, mustJSON(frame))
+	c.SendJSON(frame)
+}
+
+// handleRelay 转发 WebRTC 信令（offer/answer/ice）给对方。
+//
+// 服务器不解析 SDP 内容，只加一个 from_user_id 后原样转发。
+// 这就是信令服务器最核心的职责：**帮两端交换连接信息**。
+func (c *Client) handleRelay(raw []byte, in inMessage) {
+	if in.ToUserID == 0 {
+		c.SendJSON(map[string]any{"type": "error", "message": "缺少 to_user_id"})
+		return
+	}
+	var m map[string]any
+	if err := json.Unmarshal(raw, &m); err != nil {
+		c.SendJSON(map[string]any{"type": "error", "message": "信令格式错误"})
+		return
+	}
+	m["from_user_id"] = c.UserID
+	c.hub.SendToUser(in.ToUserID, mustJSON(m))
+}
+
+// mustJSON 把对象序列化成 JSON（出错返回 nil，调用方 SendToUser 会忽略 nil）。
+func mustJSON(v any) []byte {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return nil
+	}
+	return b
 }
