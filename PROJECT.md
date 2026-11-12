@@ -60,7 +60,7 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
 
 ## 五、当前状态
 
-- **项目状态**：✅ M0；✅ **M1**（认证+用户+好友）；✅ **M2**（单聊+WebSocket）；✅ **M3**（群聊）；✅ **M4**（并发加固）；✅ **M5**（WebRTC 语音信令）。
+- **项目状态**：🎉 **M0–M7 全部完成**（认证+用户+好友 / 单聊+WebSocket / 群聊 / 并发加固 / WebRTC 语音信令 / gRPC 微服务 / RabbitMQ）。
   - M1 认证：`internal/auth/`（bcrypt / 双 token HS256+jti+type / Redis jti 白名单+GETDEL）、`middleware/auth.go`、`user_service`（Register/Login/Refresh/Logout）、`user_router`。
   - M1 用户：`GET/PUT /users/me`、`GET /users/search`、`GET/PUT /users/settings`。
   - M1 好友：`friend_service`（6 条规则发申请 / **接受事务+条件更新** / 列表 / 备注 / 删除 / 黑名单）、`friend_router`。
@@ -68,10 +68,12 @@ C:\Users\Mr.Du\Desktop\deepseekHarness\
   - M2 服务：`chat_service`（会话去重 / 会话列表含未读 / **消息幂等发送 + 事务** / 游标分页 / 已读）。
   - M2 WebSocket：`internal/ws/`（Hub RWMutex / 读写双泵 / 心跳 / 慢消费者断开 / token 鉴权 / 统一 PushMessage）。
   - M3 群聊：`group_model` + `group_service`（**建群事务** / 拉人 / 踢人 / 退群 / 改资料 / 解散 / 群主权限 / `gorm.Expr` 原子计数）+ `group_router`；会话列表富化群信息。
-  - **M4 并发加固**：`main.go` 优雅退出（http.Server + 信号 + Shutdown + WS CloseAll + 释放连接）、`middleware/ratelimit.go` 滑动窗口限流（登录/注册/搜索）、`ws/push.go` 信号量限扇出、`ws/hub_test.go` 并发测试、`InitBaseServices` 返回 error、移除日志中的配置（含密码）。
-  - **M5 通话信令**：`call_model`（call_records：caller/callee/type/status/started_at/ended_at/duration）、`call_service`（**状态机条件更新**：invite/accept/reject/cancel/end + 时长计算 + CallItem DTO）、`ws/client.go` 信令处理（call_* + **webrtc_offer/answer/ice 原样转发**）、`call_router`（通话记录）。
-  - **✅ 端到端实测全过**：M2 会话/幂等/未读/WS 推送/ping-pong；M3 建群/群列表/群详情/群消息/踢人/非群主改资料被拒/改群名/会话列表带群信息/解散群；M4 限流（20 次 401 后 429）、hub 并发测试；**M5 双向 WS 呼叫→接听→offer/answer/ice 转发→挂断→记录（状态5、时长）**。
-- **下一步**：**M6 微服务化** —— protobuf + gRPC 拆分（user / chat 服务）+ gateway；若本机无 protoc 则用 buf 或 JSON codec 方案。
+  - M4 并发加固：`main.go` 优雅退出、`middleware/ratelimit.go` 滑动窗口限流、`ws/push.go` 信号量限扇出、`ws/hub_test.go` 并发测试、`InitBaseServices` 返回 error。
+  - M5 通话信令：`call_model` + `call_service`（**状态机条件更新** + 时长计算 + DTO）+ `ws/client.go` 信令处理（call_* + **offer/answer/ice 原样转发**）+ `call_router`。
+  - **M6 微服务**：`internal/grpcx/`（契约 + JSON codec + 服务端 UnknownServiceHandler 分发 + 客户端 Invoke）、user 服务 :9001 / chat 服务 :9002、`rpc_router`（HTTP gateway → gRPC）。
+  - **M7 消息队列**：`core/mq`（RabbitMQ 连接 + 持久化队列）、`mq_model.Outbox`（本地消息表）、`outbox`（事务内写事件）、`internal/mq`（worker 轮询发布 + consumer 消费推送）、MQ 不可用时降级同步推送。
+  - **✅ 端到端实测全过**：M1 认证9项+好友全流程；M2 幂等/未读/WS 推送/ping-pong；M3 建群/踢人/权限/解散；M4 限流 429；M5 呼叫→接听→SDP/ICE 转发→挂断→记录；**M6 gRPC 双服务 + gateway 6 项**；**M7 outbox(status0→1) + RabbitMQ consumer + WS 异步推送**。
+- **下一步**：无（M0–M7 完成）。后续可选：前端页面、protoc 换标准 protobuf、单测覆盖率、压测、链路追踪。
 - **文档**：`gochat-study/learn/00-学习总览.md`、`m1-认证与好友.md`、`m2-单聊与WebSocket.md`、`m3-群聊.md`、`m4-并发加固.md`、`面试集.md`、`场景集.md`。
 - **数据库状态**：10 张表（M1 6 + M2 3 + M3 1）
 - **git**：M1 `95bebcf`/`cb456d4`/`bb8c74d`；M2 `8ba89ae`；M3 `40a67ed`；M4 `b1d12ea`
