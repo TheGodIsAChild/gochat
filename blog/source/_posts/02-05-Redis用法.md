@@ -1,6 +1,6 @@
 ---
 title: Redis 在本项目的 5 种用法
-date: 2026-11-14 23:48:00
+date: 2026-11-14 23:47:00
 categories:
   - 02-设计
 tags:

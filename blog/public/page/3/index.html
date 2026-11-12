@@ -327,15 +327,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/blog/2026/11/14/04-02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" target="_self">
-          认证与好友：双 token 与事务
+        <a href="/blog/2026/11/14/04-01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" target="_self">
+          项目介绍：从零实现一个仿微信 IM 后端
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/04-02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/04-01-%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E4%B8%8E%E6%9E%B6%E6%9E%84/" target="_self">
         <div>
-          一、为什么用双 token单 token 的矛盾：  有效期长 → 体验好，但泄露风险大、无法撤销 有效期短 → 安全，但频繁掉登录  双 token：  access token：2 小时，每个请求携带，泄露窗口小 refresh token：30 天，只用来换新 access，存服务端可撤销  用户只要 30 天内用过，refresh 自动续期 → 无感不掉登录。 二、无感刷新的完整流程123
+          为什么做这个项目我想系统练习三件事：并发编程、微服务拆分、消息队列。普通的 CRUD 项目练不到这些，于是决定做一个「仿微信」的即时通讯后端：  有长连接（WebSocket）→ 练并发 有多个业务域（用户&#x2F;好友&#x2F;聊天&#x2F;群&#x2F;通话）→ 练拆分 有异步推送需求 → 练消息队列  技术栈   层 技术    Web 框架 Gin   ORM GORM + MySQ
         </div>
       </a>
 
@@ -374,13 +374,11 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/GORM/">#GORM</a>
+              <a href="/blog/tags/%E6%9E%B6%E6%9E%84/">#架构</a>
             
-              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+              <a href="/blog/tags/Go/">#Go</a>
             
-              <a href="/blog/tags/Redis/">#Redis</a>
-            
-              <a href="/blog/tags/JWT/">#JWT</a>
+              <a href="/blog/tags/IM/">#IM</a>
             
           </div>
         
@@ -394,15 +392,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/blog/2026/11/14/04-03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" target="_self">
-          实时消息与 WebSocket
+        <a href="/blog/2026/11/14/04-02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" target="_self">
+          认证与好友：双 token 与事务
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/04-03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/04-02-%E8%AE%A4%E8%AF%81%E4%B8%8E%E5%A5%BD%E5%8F%8B/" target="_self">
         <div>
-          一、会话 + 消息两层抽象单聊和群聊共用一套表： 123conversations         会话（type: 1单聊 / 2群聊）conversation_members  成员（谁在会话、读到哪）messages              消息（conversation_id + sender_id + content）  好处：消息表不用区分单聊&#x2F;群聊，统一按 convers
+          一、为什么用双 token单 token 的矛盾：  有效期长 → 体验好，但泄露风险大、无法撤销 有效期短 → 安全，但频繁掉登录  双 token：  access token：2 小时，每个请求携带，泄露窗口小 refresh token：30 天，只用来换新 access，存服务端可撤销  用户只要 30 天内用过，refresh 自动续期 → 无感不掉登录。 二、无感刷新的完整流程123
         </div>
       </a>
 
@@ -441,9 +439,76 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
+              <a href="/blog/tags/GORM/">#GORM</a>
+            
+              <a href="/blog/tags/Redis/">#Redis</a>
+            
+              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+            
+              <a href="/blog/tags/JWT/">#JWT</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/blog/2026/11/14/04-03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" target="_self">
+          实时消息与 WebSocket
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/04-03-%E5%AE%9E%E6%97%B6%E6%B6%88%E6%81%AF%E4%B8%8EWebSocket/" target="_self">
+        <div>
+          一、会话 + 消息两层抽象单聊和群聊共用一套表： 123conversations         会话（type: 1单聊 / 2群聊）conversation_members  成员（谁在会话、读到哪）messages              消息（conversation_id + sender_id + content）  好处：消息表不用区分单聊&#x2F;群聊，统一按 convers
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-11-14 23:37" pubdate>
+              2026-11-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/04-%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">04-里程碑</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
             
               <a href="/blog/tags/WebSocket/">#WebSocket</a>
+            
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
             
               <a href="/blog/tags/%E5%B9%82%E7%AD%89/">#幂等</a>
             
@@ -477,7 +542,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:37" pubdate>
+            <time datetime="2026-11-14 23:36" pubdate>
               2026-11-14
             </time>
           </div>
@@ -542,7 +607,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:36" pubdate>
+            <time datetime="2026-11-14 23:35" pubdate>
               2026-11-14
             </time>
           </div>
@@ -609,7 +674,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:35" pubdate>
+            <time datetime="2026-11-14 23:34" pubdate>
               2026-11-14
             </time>
           </div>
@@ -674,7 +739,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:34" pubdate>
+            <time datetime="2026-11-14 23:33" pubdate>
               2026-11-14
             </time>
           </div>
@@ -741,7 +806,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:33" pubdate>
+            <time datetime="2026-11-14 23:32" pubdate>
               2026-11-14
             </time>
           </div>
@@ -808,7 +873,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:32" pubdate>
+            <time datetime="2026-11-14 23:31" pubdate>
               2026-11-14
             </time>
           </div>
@@ -841,9 +906,9 @@
             
               <a href="/blog/tags/GORM/">#GORM</a>
             
-              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
-            
               <a href="/blog/tags/Redis/">#Redis</a>
+            
+              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
             
               <a href="/blog/tags/JWT/">#JWT</a>
             
@@ -870,73 +935,6 @@
       <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/04-10-M2%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
         <div>
           上图由项目手绘 SVG 说明，配合下文阅读效果更好。   对应提交：M2: conversations/messages models + idempotent send + history pagination + WebSocket hub/client + online status   一、里程碑目标 会话管理：创建&#x2F;获取单聊会话、会话列表（含未读数） 消息：发送、历史拉取（
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-11-14 23:31" pubdate>
-              2026-11-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/blog/categories/04-%E9%87%8C%E7%A8%8B%E7%A2%91/" class="category-chain-item">04-里程碑</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
-            
-              <a href="/blog/tags/WebSocket/">#WebSocket</a>
-            
-              <a href="/blog/tags/%E5%B9%82%E7%AD%89/">#幂等</a>
-            
-              <a href="/blog/tags/%E5%88%86%E9%A1%B5/">#分页</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/blog/2026/11/14/04-11-M3%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
-          M3 详细设计：群聊（建群事务 / 权限 / 人数统计）
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/blog/2026/11/14/04-11-M3%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1/" target="_self">
-        <div>
-          对应提交：M3: groups model + group service + group routes + conversation list group info   一、里程碑目标 群信息模型（groups） 建群（事务：会话 + 群 + 成员） 拉人进群 &#x2F; 踢人 &#x2F; 退群 改群名、群公告（群主权限） 解散群 群消息（复用 M2 的发送与推送）  验收（已实测）：
         </div>
       </a>
 
@@ -975,11 +973,13 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/blog/tags/%E4%BA%8B%E5%8A%A1/">#事务</a>
+              <a href="/blog/tags/WebSocket/">#WebSocket</a>
             
-              <a href="/blog/tags/%E7%BE%A4%E8%81%8A/">#群聊</a>
+              <a href="/blog/tags/%E5%B9%B6%E5%8F%91/">#并发</a>
             
-              <a href="/blog/tags/%E6%9D%83%E9%99%90/">#权限</a>
+              <a href="/blog/tags/%E5%B9%82%E7%AD%89/">#幂等</a>
+            
+              <a href="/blog/tags/%E5%88%86%E9%A1%B5/">#分页</a>
             
           </div>
         
