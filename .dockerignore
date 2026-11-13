@@ -1,0 +1,36 @@
+# Git 与元数据
+.git
+.gitignore
+
+# 编译产物
+*.exe
+*.test
+*.out
+gochat_tmp*
+xiaohugochat
+
+# 运行时文件
+*.log
+server.log
+server.err.log
+
+# 博客：依赖、主题、构建产物都由镜像内构建生成，不需要进构建上下文
+# （注意：不要排除 *.md，博客文章就是 markdown）
+blog/node_modules
+blog/themes
+blog/public
+blog/db.json
+blog/.deploy_git
+
+# 部署与配置示例
+.env
+.env.example
+docker-compose.yml
+docker-compose.dev.yml
+Dockerfile
+.dockerignore
+
+# 编辑器
+.vscode
+.idea
+tmp

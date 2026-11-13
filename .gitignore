@@ -28,3 +28,6 @@ blog/.deploy_git/
 
 # Go 覆盖率报告
 coverage.out
+
+# Go 依赖副本（由 go mod vendor 生成，用于 Docker 离线构建）
+vendor/

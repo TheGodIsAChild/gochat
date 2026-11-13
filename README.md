@@ -1,8 +1,10 @@
-# gochat · 仿微信 IM 后端 + 演示前端 + 学习博客
+# xiaohugochat · 仿微信 IM 后端 + 演示前端 + 学习博客
 
 一个用 Go 从零实现的即时通讯后端（单聊 / 群聊 / WebSocket 实时消息 / WebRTC 语音通话），
 并完整走过了 **单体 → gRPC 微服务 → RabbitMQ 最终一致性** 的演进过程。
 仓库内附带一个**仿微信的三栏演示前端**和一个 **Hexo 学习博客**。
+
+> Docker 镜像与 Compose 服务名：**`xiaohugochat`**，一条命令即可部署演示环境（见 [DEPLOY.md](DEPLOY.md)）。
 
 ![系统架构](blog/source/images/architecture.svg)
 
@@ -10,13 +12,34 @@
 
 ## 一、快速开始
 
-### 1. 启动依赖（Docker）
+### 方式 A：本地开发（改代码/调试用）
+
+> 需要：Go **1.26+**、Docker Desktop。
+> （用方式 B 的 Docker 部署则**不需要**本地装 Go）
+
+#### 1. 启动依赖（Docker）
 
 ```bash
-# 项目根目录（有 docker-compose.yml）
-docker compose up -d
+# 项目根目录
+docker compose -f docker-compose.dev.yml up -d
 # MySQL: 127.0.0.1:3307  Redis: 6379  RabbitMQ: 5672（管理台 15672）
 ```
+
+> 注意：根目录的 `docker-compose.yml` 是**一键部署完整环境**（应用 + 依赖），
+> 开发时用 `docker-compose.dev.yml` 只起依赖，应用用 `go run . -db` 启动。
+
+### 方式 B：一键 Docker 部署（服务器演示用）
+
+```bash
+cp .env.example .env      # 按需修改端口/密码/JWT_SECRET
+docker compose up -d --build
+# 打开 http://<服务器IP>:8080/
+```
+
+镜像名 `xiaohugochat`，包含 Go 后端 + 仿微信前端 + 学习博客。
+完整部署/备份/升级/发布 Docker Hub 说明见 **[DEPLOY.md](DEPLOY.md)**。
+
+---
 
 ### 2. 启动后端（同时托管前端和博客）
 

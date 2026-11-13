@@ -39,6 +39,8 @@ func LoadConfig() (bool, error) {
 	if err := yaml.Unmarshal(bytes, &global.Config); err != nil {
 		return false, fmt.Errorf("yaml 配置解析错误: %w", err)
 	}
+	// 容器化部署：允许用环境变量覆盖配置（优先级：环境变量 > config.yaml）
+	ApplyEnvOverrides()
 	return true, nil
 }
 
