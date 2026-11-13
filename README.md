@@ -75,8 +75,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\seed-demo.ps1
 4. 单聊顶部点 📞 发起 **WebRTC 语音通话**（localhost 是安全上下文，允许麦克风）
 5. 通讯录里加好友、建群、拉人、踢人、拉黑
 
-> 语音通话：同一台机器开两个窗口即可体验 P2P 直连（无需 STUN/TURN）。
-> 跨机器/跨网演示需要在 `web/js/webrtc.js` 里配置 STUN/TURN。
+> **跨设备演示说明（重要）**
+> - **发消息**：任何能访问服务器 8080 端口的设备都可以（局域网或公网），走服务器转发。
+> - **语音通话**：浏览器只在**安全上下文**（`https://` 或 `localhost`）允许采集麦克风，
+>   所以用 `http://<服务器IP>` 打开时点通话会提示需要 HTTPS。
+>   跨设备/跨网络通话还需要 STUN，严格 NAT（4G/企业网）还需要 TURN。
+>   STUN/TURN 已做成配置项（`config.yaml` 的 `rtc` 段或环境变量 `RTC_*`），
+>   完整步骤见 **[DEPLOY.md 第八节](DEPLOY.md#八跨设备语音通话重要)**。
 
 ---
 

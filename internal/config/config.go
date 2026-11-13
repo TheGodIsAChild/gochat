@@ -7,4 +7,5 @@ type Config struct {
 	JWT      JWT
 	Server   Server
 	GRPC     GRPC
+	RTC      RTC
 }

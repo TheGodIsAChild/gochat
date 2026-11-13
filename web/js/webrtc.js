@@ -9,10 +9,13 @@
      4. 交换 ICE candidate
      5. 播放对方音频
 
-   【localhost 演示说明】
-   http://127.0.0.1 属于安全上下文，可以调 getUserMedia；
-   同一台机器两个浏览器窗口之间，主机候选（host candidate）就能直连，
-   因此这里的 ICE 服务器留空也能通。跨机器演示需要加 STUN/TURN。
+   【跨设备演示说明（重要）】
+   1) 浏览器只在「安全上下文」允许采集麦克风：
+      - http://localhost、http://127.0.0.1 可以
+      - 通过 http://<服务器IP> 访问 **不行**，必须上 HTTPS（如 Nginx + 证书）
+   2) 两台设备跨网络时，需要 STUN 才能发现公网地址；
+      严格 NAT（4G / 企业网）还需要 TURN 中继。
+   3) STUN/TURN 由后端 GET /api/v1/rtc/config 下发，换环境不用改前端代码。
    ========================================================= */
 
 const RTC = (() => {
@@ -20,6 +23,29 @@ const RTC = (() => {
   let localStream = null;
   let remoteAudio = null;
   let muted = false;
+
+  // ICE 服务器：默认内置公共 STUN，启动后会被后端配置覆盖
+  let iceServers = [
+    { urls: ['stun:stun.l.google.com:19302', 'stun:stun.miwifi.com:3478'] },
+  ];
+  let iceConfigLoaded = false;
+
+  /** 从后端拉取 ICE 配置（只拉一次）；失败时用内置默认值 */
+  async function loadIceServers() {
+    if (iceConfigLoaded) return iceServers;
+    iceConfigLoaded = true; // 避免并发重复请求
+    try {
+      const res = await fetch('/api/v1/rtc/config');
+      const json = await res.json();
+      const list = (json && json.data && json.data.ice_servers) || [];
+      if (Array.isArray(list) && list.length > 0) {
+        iceServers = list;
+      }
+    } catch (e) {
+      console.warn('[RTC] 获取 ICE 配置失败，使用内置 STUN', e);
+    }
+    return iceServers;
+  }
 
   const callbacks = {
     onState: null,     // (state) => void
@@ -35,6 +61,12 @@ const RTC = (() => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       throw new Error('当前浏览器不支持麦克风采集（需要 localhost 或 HTTPS）');
     }
+    // 跨设备用 http://IP 访问时，浏览器会禁用麦克风，这里给出明确提示
+    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (location.protocol !== 'https:' && !isLocal) {
+      throw new Error('语音通话需要 HTTPS：当前是 http://' + location.hostname +
+        '，浏览器禁止麦克风。请用 HTTPS 域名访问（或在本机用 localhost 演示）');
+    }
     localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     return localStream;
   }
@@ -44,9 +76,9 @@ const RTC = (() => {
     await ensureMedia();
     closePeer();
 
-    // 本机演示不需要 STUN；跨网演示可换成：
-    // iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-    pc = new RTCPeerConnection({ iceServers: [] });
+    // ICE 服务器来自后端配置（含默认公共 STUN），跨网络通话必需
+    const servers = await loadIceServers();
+    pc = new RTCPeerConnection({ iceServers: servers });
 
     localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
 

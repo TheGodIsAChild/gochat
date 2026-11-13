@@ -9,6 +9,7 @@ import (
 	groupapi "gochat/internal/router/group_router"
 	"gochat/internal/router/health"
 	rpcapi "gochat/internal/router/rpc_router"
+	rtcapi "gochat/internal/router/rtc_router"
 	userapi "gochat/internal/router/user_router"
 	"gochat/internal/ws"
 )
@@ -25,6 +26,8 @@ func NewRouter() *gin.Engine {
 	chatapi.ChatRouter(r)
 	groupapi.GroupRouter(r)
 	callapi.CallRouter(r)
+	// WebRTC 通话所需的 STUN/TURN 配置（由后端下发，便于不同环境部署）
+	rtcapi.RTCRouter(r)
 	// M6：HTTP gateway 通过 gRPC 调用内部微服务
 	rpcapi.RPCRouter(r)
 

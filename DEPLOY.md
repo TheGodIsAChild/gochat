@@ -181,7 +181,144 @@ docker push <用户名>/xiaohugochat:1.0.0
 
 ---
 
-## 八、安全清单（公网部署必看）
+## 八、跨设备语音通话（重要）
+
+> 结论：**发消息开箱即用；语音通话需要 HTTPS + STUN（严格 NAT 还要 TURN）**。
+
+### 8.1 为什么用 `http://<IP>` 打不了电话
+
+浏览器规定 `getUserMedia`（采集麦克风）只在**安全上下文**可用：
+
+| 访问方式 | 能否采集麦克风 |
+|---|---|
+| `http://localhost` / `http://127.0.0.1` | ✅ 可以 |
+| `https://任意域名` | ✅ 可以 |
+| `http://<服务器IP>`（手机/另一台电脑） | ❌ **被浏览器禁止** |
+
+所以跨设备演示时，点电话图标会提示「语音通话需要 HTTPS」。
+
+### 8.2 场景对照表
+
+| 场景 | 发消息 | 语音通话 |
+|---|---|---|
+| 本机两个窗口（localhost） | ✅ | ✅ |
+| 同一局域网，`http://IP` | ✅ | ❌ 麦克风被禁 |
+| 同一局域网 + HTTPS | ✅ | ✅（STUN 通常可直连） |
+| 跨网络 + HTTPS + STUN | ✅ | ⚠️ 多数可通，对称 NAT 会失败 |
+| 跨网络 + HTTPS + STUN + TURN | ✅ | ✅ 稳定 |
+
+### 8.3 第一步：配 HTTPS（Nginx + Let's Encrypt）
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name chat.example.com;
+    ssl_certificate     /etc/letsencrypt/live/chat.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/chat.example.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # WebSocket 必须单独配置
+    location /ws {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 3600s;
+    }
+}
+
+server {
+    listen 80;
+    server_name chat.example.com;
+    return 301 https://$host$request_uri;
+}
+```
+
+申请证书：
+
+```bash
+sudo apt install certbot python3-certbot-nginx -y
+sudo certbot --nginx -d chat.example.com
+```
+
+> 没有域名怎么办：用 `mkcert` 自签证书（设备需安装根证书），
+> 或用 Cloudflare Tunnel / ngrok 之类给你一个临时 HTTPS 域名。
+
+### 8.4 第二步：STUN（默认已内置）
+
+配置文件默认值（`config.yaml`）：
+
+```yaml
+rtc:
+  stun_urls:
+    - "stun:stun.l.google.com:19302"
+    - "stun:stun.miwifi.com:3478"
+    - "stun:stun.qq.com:3478"
+```
+
+容器部署可用环境变量覆盖：
+
+```bash
+RTC_STUN_URLS=stun:stun.l.google.com:19302,stun:stun.miwifi.com:3478
+```
+
+前端会通过 `GET /api/v1/rtc/config` 自动获取，**换环境不用改前端代码**。
+
+### 8.5 第三步：TURN（4G / 对称 NAT 必备）
+
+打洞失败时需要有中继服务器。用 coturn 在同一台机器上起一个：
+
+```bash
+docker run -d --name coturn --network host --restart unless-stopped \
+  -e TURN_USERNAME=gochat \
+  -e TURN_PASSWORD=change-me-turn-pass \
+  -e TURN_REALM=chat.example.com \
+  instrumentisto/coturn
+```
+
+> 国内拉不到镜像时加前缀：`docker.m.daocloud.io/instrumentisto/coturn`
+
+注入到应用（`.env`）：
+
+```bash
+RTC_TURN_URL=turn:chat.example.com:3478
+RTC_TURN_USER=gochat
+RTC_TURN_PASS=change-me-turn-pass
+```
+
+然后 `docker compose up -d` 重建应用。
+
+**防火墙必须放行**：
+
+| 端口 | 协议 | 用途 |
+|---|---|---|
+| 3478 | TCP + UDP | TURN 监听 |
+| 49152-65535 | UDP | TURN 中继端口范围 |
+
+> 云服务器要在**安全组**里加，光开系统防火墙不够。
+
+### 8.6 怎么判断通话到底走通了没
+
+1. 两台设备打开 `https://chat.example.com`
+2. 互相加好友 → 点电话图标 → 接听
+3. 若一直「接通中」：
+   - `https://chat.example.com/api/v1/rtc/config` 是否返回了 stun/turn
+   - F12 → Console 是否出现 `ice:failed`
+   - 打开 `chrome://webrtc-internals`，看候选类型：
+     - `host` = 局域网直连
+     - `srflx` = 经过 STUN 打通
+     - `relay` = 走 TURN 中继（说明 TURN 生效）
+   - 页面提示「需要 HTTPS」→ 说明还没配证书
+
+---
+
+## 九、安全清单（公网部署必看）
 
 - [ ] `.env` 里的 `JWT_SECRET`、MySQL/MQ 密码都改成强随机值
 - [ ] **不要**给 MySQL/Redis/RabbitMQ 映射宿主机端口（本 compose 默认不映射）

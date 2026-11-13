@@ -3,6 +3,7 @@ package core
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	"gochat/global"
 )
@@ -47,6 +48,13 @@ func ApplyEnvOverrides() {
 	// ---- gRPC 服务地址（单进程部署时是 127.0.0.1，拆进程部署时可指向其他容器） ----
 	setString(&global.Config.GRPC.UserAddr, "GRPC_USER_ADDR")
 	setString(&global.Config.GRPC.ChatAddr, "GRPC_CHAT_ADDR")
+
+	// ---- WebRTC ICE 服务器（跨设备语音通话必需） ----
+	// RTC_STUN_URLS 用逗号分隔，例如：stun:stun.l.google.com:19302,stun:stun.miwifi.com:3478
+	setStringSlice(&global.Config.RTC.StunURLs, "RTC_STUN_URLS")
+	setString(&global.Config.RTC.TurnURL, "RTC_TURN_URL")
+	setString(&global.Config.RTC.TurnUser, "RTC_TURN_USER")
+	setString(&global.Config.RTC.TurnPass, "RTC_TURN_PASS")
 }
 
 func setString(dst *string, key string) {
@@ -65,4 +73,22 @@ func setInt(dst *int, key string) {
 		return
 	}
 	*dst = n
+}
+
+// setStringSlice 用逗号分隔的环境变量覆盖字符串切片，例如 RTC_STUN_URLS=a,b,c
+func setStringSlice(dst *[]string, key string) {
+	v := os.Getenv(key)
+	if v == "" {
+		return
+	}
+	parts := strings.Split(v, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if s := strings.TrimSpace(p); s != "" {
+			out = append(out, s)
+		}
+	}
+	if len(out) > 0 {
+		*dst = out
+	}
 }

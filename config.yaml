@@ -29,3 +29,15 @@ jwt:
 grpc:
   user_addr: "127.0.0.1:9001"
   chat_addr: "127.0.0.1:9002"
+
+# WebRTC 语音通话的 ICE 服务器
+# 说明：同一台机器（localhost）演示不需要；跨设备/跨网络通话必须配 STUN，
+#      严格 NAT（4G/企业网）还需要 TURN 中继。
+rtc:
+  stun_urls:
+    - "stun:stun.l.google.com:19302"
+    - "stun:stun.miwifi.com:3478"
+    - "stun:stun.qq.com:3478"
+  turn_url: ""        # 例：turn:turn.example.com:3478
+  turn_user: ""       # TURN 用户名
+  turn_pass: ""       # TURN 密码
