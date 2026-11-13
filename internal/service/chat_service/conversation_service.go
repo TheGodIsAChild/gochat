@@ -6,6 +6,7 @@ package chatservice
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -35,42 +36,53 @@ type ConversationItem struct {
 	Unread      int64  `json:"unread"`
 }
 
+// SingleConversationKey 生成单聊会话的唯一键。
+//
+// 【为什么要把 id 排序】
+// A→B 和 B→A 必须得到同一个键，否则会建出两条会话。
+// 统一用「小 id 在前」，保证幂等。
+func SingleConversationKey(userA, userB uint64) string {
+	if userA > userB {
+		userA, userB = userB, userA
+	}
+	return fmt.Sprintf("%d:%d", userA, userB)
+}
+
 // CreateOrGetSingleConversation 创建（或获取已存在的）单聊会话。
 //
-// 【为什么需要「获取已存在」】
-// 两个用户之间只能有一个单聊会话。A 点开和 B 的聊天、B 也点开，必须落到同一个
-// conversation_id 上，否则两边各发各的、消息对不上。
+// 【设计演进：从「先查后插」到「唯一键 + 幂等恢复」】
 //
-// 【怎么判断两人已有会话】
-// conversations 表本身不存两个 user_id（因为单聊/群聊共用表），
-// 所以用 conversation_members 自连接：同一个 conversation_id 下同时存在这两个 user。
+//	旧实现：用 conversation_members 自连接查两人是否已有会话，查不到就插。
+//	问题：查和插之间有空窗期，两个用户同时点开聊天会各建一条会话，
+//	      导致两人落在不同 conversation_id、消息互相收不到。
 //
-// 【并发创建问题】
-// 两个用户同时点开聊天，可能同时判定「不存在」然后各创建一条。
-// M2 先接受这个极小概率问题（会多出一条会话），M4 可以用 Redis 分布式锁或
-// 唯一键（如 single_key='min:max' 唯一索引）彻底解决。
+// 新实现（行业通用范式）：
+//  1. 快速路径：用 single_key 走唯一索引查（O(1)）
+//  2. 创建路径：事务里插会话 + 两条成员
+//  3. 撞唯一索引（说明并发中别人刚建好）→ 捕获 ErrDuplicatedKey → 回查返回
+//
+// 【为什么这样就够了，不需要分布式锁】
+// 唯一索引是数据库层的强约束，不存在"锁过期/多实例漏加锁"的问题；
+// 应用层的查询只是快速路径，正确性由数据库兜底。
 func CreateOrGetSingleConversation(ctx context.Context, userA, userB uint64) (*chatmodel.Conversation, error) {
 	if userA == userB {
 		return nil, errors.New("不能和自己创建会话")
 	}
 
-	// 1. 查是否已存在单聊会话（两个成员 join）
+	key := SingleConversationKey(userA, userB)
+
+	// 1. 快速路径：已经存在就直接返回
 	var conv chatmodel.Conversation
-	err := global.DB.WithContext(ctx).Raw(`
-		SELECT c.* FROM conversations c
-		JOIN conversation_members m1 ON m1.conversation_id = c.id AND m1.user_id = ?
-		JOIN conversation_members m2 ON m2.conversation_id = c.id AND m2.user_id = ?
-		WHERE c.type = 1 AND c.deleted_at IS NULL
-		LIMIT 1`, userA, userB).Scan(&conv).Error
-	if err != nil {
-		return nil, err
-	}
-	if conv.ID != 0 {
+	err := global.DB.WithContext(ctx).Where("single_key = ?", key).First(&conv).Error
+	if err == nil {
 		return &conv, nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("查询单聊会话失败: %w", err)
 	}
 
 	// 2. 不存在 → 事务里创建会话 + 两个成员
-	conv = chatmodel.Conversation{Type: 1}
+	conv = chatmodel.Conversation{Type: 1, SingleKey: &key}
 	err = global.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&conv).Error; err != nil {
 			return err
@@ -81,7 +93,14 @@ func CreateOrGetSingleConversation(ctx context.Context, userA, userB uint64) (*c
 		}).Error
 	})
 	if err != nil {
-		return nil, err
+		// 3. 并发兜底：另一个请求抢先插入 → 唯一索引冲突 → 回查后幂等返回
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			var existing chatmodel.Conversation
+			if e := global.DB.WithContext(ctx).Where("single_key = ?", key).First(&existing).Error; e == nil {
+				return &existing, nil
+			}
+		}
+		return nil, fmt.Errorf("创建单聊会话失败: %w", err)
 	}
 	return &conv, nil
 }

@@ -25,6 +25,20 @@ type Conversation struct {
 	GroupID       uint       `gorm:"not null;default:0" json:"group_id"`                // 群聊关联 groups.id（M3）
 	LastMessageID uint       `gorm:"not null;default:0" json:"last_message_id"`
 	LastMessageAt *time.Time `json:"last_message_at,omitempty"`
+
+	// SingleKey 单聊唯一键：小 id:大 id（如 "1:2"），群聊为 NULL。
+	//
+	// 【为什么加这个字段】
+	// 「两个人之间只能有一个单聊会话」是一条业务不变量。只靠应用层「先查再插」
+	// 在并发下会有窗口：两个请求同时查到「不存在」，就会各建一条会话，
+	// 结果是两人落在不同 conversation_id 上、消息互相收不到。
+	// 把不变量交给数据库表达（唯一索引），并发时第二个插入会失败，
+	// 业务层捕获 Duplicate 后回查即可幂等返回——这才是根本解法。
+	//
+	// 【为什么用 NULL 而不是空串】
+	// MySQL 唯一索引允许**多个 NULL**，但不允许多个 ''。
+	// 群聊不需要这个键，用 NULL 就不会互相冲突。
+	SingleKey *string `gorm:"type:varchar(64);uniqueIndex:uk_conv_single" json:"-"`
 }
 
 func (Conversation) TableName() string { return "conversations" }

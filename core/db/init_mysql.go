@@ -9,6 +9,7 @@ import (
 	group "gochat/internal/model/group_model"
 	mq "gochat/internal/model/mq_model"
 	user "gochat/internal/model/user_model"
+	"log"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -63,6 +64,11 @@ func InitMysqlTables() (bool, error) {
 	)
 	if err != nil {
 		return false, fmt.Errorf("初始化数据库表失败: %w", err)
+	}
+
+	// 数据迁移：给历史单聊会话回填 single_key（幂等，失败不影响启动）
+	if err := BackfillSingleConversationKeys(); err != nil {
+		log.Printf("回填单聊会话 single_key 失败（不影响启动）: %v", err)
 	}
 	return true, nil
 }
