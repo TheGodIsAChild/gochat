@@ -1,6 +1,6 @@
 ---
 title: "源码走读 S21：outbox.go"
-date: 2026-11-14 23:00:00
+date: 2026-11-14 22:59:00
 categories:
   - 05-源码
 tags:

@@ -628,6 +628,7 @@ const App = (() => {
         S.messages = list.concat(S.messages);
       }
       if (list.length < 30) S.noMore = true;
+      sortMessages();
       renderMessages();
       // 标记已读
       const last = list[list.length - 1];
@@ -739,10 +740,40 @@ const App = (() => {
     return '用户' + senderId;
   }
 
+  // 按 message id 升序排列（乐观消息 id<0，永远排在最后）。
+  //
+  // 【为什么需要】
+  // 群消息是"多个发送者并发 + MQ 异步推送"，到达顺序不保证等于入库顺序。
+  // 服务端以数据库自增 id 作为唯一顺序，客户端也必须按 id 排，才能保证所有人看到同一个顺序。
+  function sortMessages() {
+    S.messages.sort((a, b) => {
+      const aPending = a.pending || a.id < 0;
+      const bPending = b.pending || b.id < 0;
+      if (aPending && bPending) return a.id - b.id;
+      if (aPending) return 1;
+      if (bPending) return -1;
+      return a.id - b.id;
+    });
+  }
+
+  // 断线重连后补拉最新一页，避免断线期间的消息永久缺失。
+  async function loadNewestMessages(convId) {
+    try {
+      const d = await API.listMessages(convId, 0, 30);
+      let added = 0;
+      (d.messages || []).forEach(m => {
+        if (!S.messages.some(x => x.id === m.id)) { S.messages.push(m); added++; }
+      });
+      if (added > 0) { sortMessages(); renderMessages(); }
+    } catch (e) { /* 忽略，重连后拉会话列表会兜底 */ }
+  }
+
   function appendMessage(m, scroll) {
     // 去重（同一 message id 或同一 client_msg_id）
     if (S.messages.some(x => x.id === m.id || (x.client_msg_id && x.client_msg_id === m.client_msg_id && x.sender_id === m.sender_id))) return;
     S.messages.push(m);
+    // 【并发排序】按 id 插入，而不是按到达顺序追加
+    sortMessages();
     const box = $('#messages');
     if (!box) return;
     const wasBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
@@ -772,6 +803,7 @@ const App = (() => {
       pending: true,
     };
     S.messages.push(optimistic);
+    sortMessages();
     renderMessages();
 
     // 优先走 WebSocket；未连接则降级 HTTP
@@ -801,6 +833,7 @@ const App = (() => {
     } else if (existsIdx < 0) {
       S.messages.push(real);
     }
+    sortMessages();
     renderMessages();
     loadConversations();
   }
@@ -1018,6 +1051,8 @@ const App = (() => {
     WS.on('open', () => {
       // 重连后重新拉数据
       if (S.me) { loadConversations(); loadRequests(); }
+      // 【补洞】重连期间可能漏掉推送，重新拉当前会话最新一页
+      if (S.currentConv) { loadNewestMessages(S.currentConv.conversation_id); }
     });
 
     // 新消息推送（来自 MQ 消费者）
