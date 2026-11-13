@@ -208,6 +208,70 @@ ws.send(JSON.stringify({ type: 'ping' }));
 - **A 也会收到 `message`**（多端同步用），客户端要用 `client_msg_id` 去重
 - 开启 MQ（M7）时，第 3 步由消费者异步推送，**会有约 0~2 秒延迟**
 
+### 5.1.1 关键：一条消息有「两个 ID」（新手最容易卡在这）
+
+第一次看会疑惑：**我发消息时还没有 message_id，怎么传？**
+
+答案：**消息有两个 ID，分别由客户端和服务端生成。**
+
+| ID | 谁生成 | 什么时候 | 作用 |
+|---|---|---|---|
+| `client_msg_id` | **客户端** | 点发送瞬间（时间戳+随机串） | **幂等**：重发/连点不会产生两条消息 |
+| `message_id`（即 `id`） | **服务端** | INSERT 后的自增主键 | 全局唯一标识：已读、撤回、排序都靠它 |
+
+完整时序（注意消息 id 是在服务端才出现的）：
+
+```
+客户端 A                                服务端
+   │ ① 生成 client_msg_id = "c-abc123"
+   │ ② 立刻本地插入一条"发送中"气泡（tempId = c-abc123）
+   │
+   │ ③ send({ type:"text",
+   │          conversation_id:1,
+   │          client_msg_id:"c-abc123",   ← 只传这个 ID
+   │          content:"你好" })
+   ├────────────────────────────────────>│
+   │                                     │ ④ INSERT messages
+   │                                     │    数据库分配 id=21
+   │<──── ⑤ { type:"ack",
+   │          client_msg_id:"c-abc123",  ← 靠它对上本地气泡
+   │          message_id:21,             ← 服务端分配的正式 id
+   │          conversation_id:1 } ────────┤
+   │ ⑥ 把本地气泡替换成正式消息（去掉"发送中"）
+   │
+   │<──── ⑦ { type:"message", data:{id:21,...} }
+   │        推送（含自己，用于多端同步）
+```
+
+**由这两个 ID 衍生出的三个设计**：
+
+1. **乐观 UI**：点发送立刻显示气泡（"发送中"），不用等服务器 → 体验好
+2. **ack 必须带 client_msg_id**：否则客户端无法知道这个 ack 对应哪条消息
+3. **发送者自己也会收到 `message` 推送**：用于多端同步（手机发的，电脑也要出现）；客户端按 `id` / `client_msg_id` 去重
+
+**ack 和 message 谁先到？**
+
+不保证：
+- MQ 未启用（同步推送）→ ack 先到
+- **MQ 启用（异步推送）→ 推送可能先于 ack 到达**
+
+所以前端 `replaceOptimistic()` 处理了两种情况：如果推送已插入真实消息，就把乐观气泡删掉；否则原地替换。
+
+**WS 断了怎么办？**
+
+降级走 HTTP，**仍然用同一个 `client_msg_id`**：
+
+```
+POST /api/v1/conversations/:id/messages
+{"client_msg_id":"c-abc123","type":1,"content":"你好"}
+```
+
+服务端 `SendMessage` 的幂等逻辑：
+① 先按 `(sender_id, client_msg_id)` 查，存在就直接返回；
+② 不存在就事务插入（消息 + 更新会话最后消息 + 写 outbox）；
+③ 并发撞唯一索引 `uk_sender_client` → 捕获 `ErrDuplicatedKey` → 回查返回。
+
+**所以「wss 发」和「HTTP 发」走同一套落库逻辑，结果完全一致。**
 ### 5.2 标记已读
 
 ```
