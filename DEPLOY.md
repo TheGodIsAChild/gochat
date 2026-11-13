@@ -211,7 +211,8 @@ docker push <用户名>/xiaohugochat:1.0.0
 
 ```nginx
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
+    http2 on;   # Nginx ≥ 1.25.1 写法；旧版本用：listen 443 ssl http2;
     server_name chat.example.com;
     ssl_certificate     /etc/letsencrypt/live/chat.example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/chat.example.com/privkey.pem;
@@ -249,6 +250,13 @@ sudo certbot --nginx -d chat.example.com
 
 > 没有域名怎么办：用 `mkcert` 自签证书（设备需安装根证书），
 > 或用 Cloudflare Tunnel / ngrok 之类给你一个临时 HTTPS 域名。
+
+> **关于 `proxy_http_version 1.1`（面试常问）**
+> 这一行配置的是「**Nginx → 后端**」这一段：Nginx 对上游默认用 HTTP/1.0，
+> 而 WebSocket 的 `Upgrade` 握手依赖 HTTP/1.1（HTTP/2 明确禁止 `Connection`/`Upgrade` 头）。
+> 「**浏览器 → Nginx**」这一段仍可以开 HTTP/2（上面 `http2 on;`），
+> 浏览器会为 WebSocket 单独用 HTTP/1.1 建连，两者互不影响。
+> 详细原理见博客《HTTP 协议演进：为什么 WebSocket 必须用 HTTP/1.1》。
 
 ### 8.4 第二步：STUN（默认已内置）
 

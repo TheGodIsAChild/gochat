@@ -1,6 +1,6 @@
 ---
 title: "源码走读 S02：init_config.go"
-date: 2026-11-14 23:22:00
+date: 2026-11-14 23:21:00
 categories:
   - 05-源码
 tags:
