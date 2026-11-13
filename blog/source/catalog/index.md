@@ -45,6 +45,7 @@ comments: false
 | 05 | [Redis 在本项目的 5 种用法](/blog/2026/11/14/02-05-Redis用法/) |  |
 | 06 | [MySQL 索引与查询优化实战](/blog/2026/11/14/02-06-MySQL索引优化/) |  |
 | 07 | [HTTP 协议演进：为什么 WebSocket 必须用 HTTP/1.1](/blog/2026/11/14/02-07-HTTP协议演进与WebSocket为什么用1.1/) |  |
+| 08 | [wss 怎么用：WebSocket 接口文档 + 设计说明（新手向）](/blog/2026/11/14/02-08-wss怎么用-WebSocket接口文档与设计说明/) |  |
 
 ## ③ 工程篇
 
